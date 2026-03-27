@@ -1,0 +1,3 @@
+# robots.txt — legg denne i repo-roten
+User-agent: *
+Disallow: /
