@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOTALKontroll — Muligheter</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--navy:#1a2744;--orange:#e67e22;--orange-faded:rgba(230,126,34,0.08);--white:#fff;--g50:#f8f9fa;--g100:#f1f3f5;--g200:#e9ecef;--g300:#dee2e6;--g400:#ced4da;--g500:#adb5bd;--g600:#868e96;--g700:#495057;--g800:#343a40;--red:#e74c3c;--green:#27ae60;--green-bg:rgba(39,174,96,0.08);--green-border:rgba(39,174,96,0.25);--blue:#3498db;--blue-bg:rgba(52,152,219,0.08);--sidebar-w:220px;--purple:#8e44ad;--purple-bg:rgba(142,68,173,0.08)}
+  body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--g50);color:var(--g800);min-height:100vh;display:flex}
+
+  /* SIDEBAR */
+  .sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--navy);color:var(--white);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+  .sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px 20px 28px;border-bottom:1px solid rgba(255,255,255,0.06)}
+  .logo-icon{width:34px;height:34px;background:var(--orange);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:var(--white)}
+  .logo-text{font-size:14px;font-weight:600;letter-spacing:.5px}.logo-text span{color:var(--orange)}
+  .sidebar-nav{padding:16px 0;flex:1}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:11px 24px;font-size:14px;font-weight:500;color:rgba(255,255,255,0.5);cursor:pointer;transition:all .15s;border-left:3px solid transparent;text-decoration:none}
+  .nav-item:hover{color:rgba(255,255,255,0.8);background:rgba(255,255,255,0.04)}
+  .nav-item.active{color:var(--white);background:rgba(230,126,34,0.12);border-left-color:var(--orange)}
+  .nav-icon{font-size:18px;width:22px;text-align:center}
+  .nav-sub{padding-left:58px;font-size:12px;padding-top:6px;padding-bottom:6px;opacity:.7}
+  .nav-sub:hover{opacity:1}
+  .nav-sub.active{opacity:1;color:var(--orange);border-left-color:var(--orange);background:rgba(230,126,34,0.06)}
+  .nav-badge{background:var(--orange);color:var(--white);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto}
+
+  /* MAIN */
+  .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:var(--white);border-bottom:1px solid var(--g200);gap:16px}
+  .topbar-user{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--g700);margin-left:auto}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--navy);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+  .back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--g600);text-decoration:none;font-weight:500;transition:color .15s}
+  .back-link:hover{color:var(--navy)}
+  .content{padding:28px 32px;flex:1;max-width:1400px}
+
+  /* STATUS BANNER */
+  .status-banner{display:flex;align-items:center;gap:20px;background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:20px 24px;margin-bottom:24px}
+  .status-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+  .status-icon.ok{background:var(--green-bg);color:var(--green)}
+  .status-icon.running{background:var(--blue-bg);color:var(--blue);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  .status-info{flex:1}
+  .status-title{font-size:15px;font-weight:600;color:var(--navy)}
+  .status-detail{font-size:12px;color:var(--g500);margin-top:3px}
+  .status-stats{display:flex;gap:24px;flex-shrink:0}
+  .stat{text-align:center}
+  .stat-value{font-size:22px;font-weight:700;color:var(--navy)}
+  .stat-label{font-size:10px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.5px}
+  .btn-run{background:var(--navy);color:var(--white);border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;display:inline-flex;align-items:center;gap:6px}
+  .btn-run:hover{background:#2d3f63}
+
+  /* PAGE HEADER */
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+  .page-title{font-size:26px;font-weight:700;color:var(--navy);letter-spacing:-.3px}
+  .page-subtitle{font-size:13px;color:var(--g600);margin-top:4px}
+
+  /* FILTER TABS */
+  .filter-row{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+  .filter-tab{padding:6px 14px;border-radius:18px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid var(--g300);color:var(--g600);background:var(--white);font-family:inherit}
+  .filter-tab:hover{border-color:var(--g400)}
+  .filter-tab.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
+  .filter-tab .ft-count{font-weight:400;opacity:.7;margin-left:3px}
+  .filter-sep{width:1px;height:20px;background:var(--g300)}
+
+  /* CARDS */
+  .opp-list{display:flex;flex-direction:column;gap:12px}
+  .opp-card{background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:20px 24px;transition:all .2s;position:relative;overflow:hidden}
+  .opp-card:hover{border-color:var(--g300);box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+  .opp-card.acted{opacity:.5;pointer-events:none}
+  .opp-card.converted{border-left:4px solid var(--green)}
+  .opp-card.ignored{border-left:4px solid var(--g400)}
+
+  .opp-top{display:flex;align-items:flex-start;gap:16px;margin-bottom:12px}
+  .opp-relevance{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+  .rel-high{background:rgba(39,174,96,0.12);color:var(--green)}
+  .rel-med{background:rgba(230,126,34,0.12);color:var(--orange)}
+  .rel-low{background:rgba(52,152,219,0.1);color:var(--blue)}
+  .opp-main{flex:1;min-width:0}
+  .opp-name{font-size:16px;font-weight:600;color:var(--navy);margin-bottom:4px}
+  .opp-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .opp-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:500;background:var(--g100);color:var(--g700)}
+  .opp-tag.type{background:var(--blue-bg);color:var(--blue)}
+  .opp-tag.geo{background:var(--purple-bg);color:var(--purple)}
+  .opp-tag.size{background:var(--orange-faded);color:var(--orange);font-weight:700}
+  .opp-tag.source{background:var(--g100);color:var(--g500);font-size:10px}
+
+  .opp-body{font-size:13px;color:var(--g700);line-height:1.6;margin-bottom:14px;padding:12px 16px;background:var(--g50);border-radius:8px;border-left:3px solid var(--g300)}
+  .opp-reason{font-weight:600;color:var(--navy);display:block;margin-bottom:4px;font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+
+  .opp-actions{display:flex;gap:8px;align-items:center}
+  .btn-convert{background:var(--green);color:var(--white);border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+  .btn-convert:hover{background:#219a52;transform:translateY(-1px)}
+  .btn-ignore{background:var(--white);color:var(--g600);border:1px solid var(--g300);padding:8px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+  .btn-ignore:hover{background:var(--g50);border-color:var(--g400)}
+  .btn-block{background:var(--white);color:var(--red);border:1px solid rgba(231,76,60,0.2);padding:8px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+  .btn-block:hover{background:rgba(231,76,60,0.04);border-color:rgba(231,76,60,0.4)}
+  .action-spacer{flex:1}
+  .opp-source-link{font-size:11px;color:var(--blue);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+  .opp-source-link:hover{text-decoration:underline}
+
+  .acted-label{position:absolute;top:20px;right:24px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:4px 12px;border-radius:12px}
+  .acted-label.green{background:var(--green-bg);color:var(--green)}
+  .acted-label.gray{background:var(--g100);color:var(--g500)}
+
+  /* EMPTY */
+  .empty-state{text-align:center;padding:60px 20px;color:var(--g500)}
+  .empty-state .icon{font-size:48px;margin-bottom:12px;opacity:.4}
+  .empty-state .msg{font-size:15px;font-weight:500}
+
+  /* IGNORED RULES */
+  .ignored-rules{margin-top:32px}
+  .ignored-rules h3{font-size:14px;font-weight:600;color:var(--g600);margin-bottom:12px;display:flex;align-items:center;gap:8px;cursor:pointer}
+  .ignored-rules h3:hover{color:var(--navy)}
+  .rule-list{display:flex;flex-direction:column;gap:6px}
+  .rule-item{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--white);border:1px solid var(--g200);border-radius:8px;font-size:12px;color:var(--g600)}
+  .rule-item .rule-text{flex:1}
+  .rule-remove{background:none;border:none;color:var(--g400);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px;transition:all .15s}
+  .rule-remove:hover{color:var(--red);background:rgba(231,76,60,0.06)}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:var(--white);padding:12px 24px;border-radius:10px;font-size:13px;font-weight:500;z-index:1000;transition:transform .3s ease;box-shadow:0 4px 20px rgba(0,0,0,0.15);display:flex;align-items:center;gap:8px}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast .toast-icon{font-size:16px}
+  /* HOLD BTN */
+  .btn-hold{background:var(--white);color:var(--orange);border:1px solid rgba(230,126,34,0.3);padding:8px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}.btn-hold:hover{background:var(--orange-faded);border-color:var(--orange)}
+  /* HOLD MODAL */
+  .hold-overlay{position:fixed;inset:0;background:rgba(26,39,68,0.5);z-index:1001;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+  .hold-overlay.open{opacity:1;pointer-events:auto}
+  .hold-modal{background:var(--white);border-radius:16px;width:420px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.2);transform:translateY(20px);transition:transform .25s}.hold-overlay.open .hold-modal{transform:translateY(0)}
+  .hold-header{padding:24px 24px 0;display:flex;align-items:flex-start;justify-content:space-between}
+  .hold-title{font-size:18px;font-weight:700;color:var(--navy)}
+  .hold-sub{font-size:12px;color:var(--g500);margin-top:4px}
+  .hold-close{background:none;border:none;font-size:22px;color:var(--g400);cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1}.hold-close:hover{color:var(--g700);background:var(--g100)}
+  .hold-body{padding:20px 24px}
+  .hold-proj{font-size:14px;font-weight:600;color:var(--navy);padding:10px 14px;background:var(--g50);border-radius:8px;margin-bottom:16px;border-left:3px solid var(--orange)}
+  .hold-label{font-size:12px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+  .hold-slider-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+  .hold-slider{flex:1;-webkit-appearance:none;height:6px;border-radius:3px;background:var(--g200);outline:none}.hold-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--orange);cursor:pointer;border:2px solid var(--white);box-shadow:0 1px 4px rgba(0,0,0,0.2)}
+  .hold-weeks{font-size:16px;font-weight:700;color:var(--navy);min-width:60px;text-align:center}
+  .hold-note{font-size:12px;color:var(--g500);line-height:1.5;margin-top:12px;padding:10px 14px;background:var(--g50);border-radius:8px}
+  .hold-footer{padding:16px 24px 24px;display:flex;gap:10px;justify-content:flex-end}
+  .hold-cancel{background:var(--white);color:var(--g600);border:1px solid var(--g300);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}.hold-cancel:hover{background:var(--g50)}
+  .hold-confirm{background:var(--orange);color:var(--white);border:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}.hold-confirm:hover{background:#d35400}
+  /* HOLD CARD */
+  .opp-card.on-hold{border-left:4px solid var(--orange);opacity:.85}
+  .hold-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:var(--orange-faded);color:var(--orange)}
+  /* ARCHIVE CARD */
+  .opp-card.archived{opacity:.6;background:var(--g50)}
+  .opp-card.archived .opp-actions{display:none}
+  .archive-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:4px 12px;border-radius:12px;display:inline-block;margin-top:8px}
+  .archive-label.green{background:rgba(39,174,96,0.08);color:var(--green)}
+  .archive-label.gray{background:var(--g100);color:var(--g500)}
+  .archive-label.red{background:rgba(231,76,60,0.06);color:var(--red)}
+  /* FILTER SEP */
+  .filter-sep{width:1px;height:20px;background:var(--g300);margin:0 4px}
+  /* EDITABLE RULES */
+  .rule-edit-input{border:1px solid var(--g300);border-radius:5px;padding:4px 8px;font-size:12px;font-family:inherit;width:200px;outline:none;transition:border-color .15s}.rule-edit-input:focus{border-color:var(--orange)}
+  .rule-type-select{border:1px solid var(--g300);border-radius:5px;padding:4px 6px;font-size:11px;font-family:inherit;outline:none;cursor:pointer}
+
+  @media(max-width:1200px){.sidebar{width:60px}.sidebar .logo-text,.sidebar .nav-label,.nav-badge,.nav-sub .nav-label{display:none}.sidebar-logo{padding:16px;justify-content:center}.nav-item{padding:12px;justify-content:center}.main{margin-left:60px}}
+  .login-overlay{position:fixed;inset:0;background:#1a2744;z-index:9999;display:flex;align-items:center;justify-content:center}
+  .login-overlay.hidden{display:none}
+  .login-box{background:#fff;border-radius:16px;padding:40px;width:360px;max-width:90vw;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+  .login-logo{width:50px;height:50px;background:#e67e22;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;color:#fff;margin-bottom:16px}
+  .login-title{font-size:20px;font-weight:700;color:#1a2744;margin-bottom:4px}
+  .login-sub{font-size:13px;color:#adb5bd;margin-bottom:24px}
+  .login-input{width:100%;padding:12px 16px;border:1px solid #dee2e6;border-radius:10px;font-size:14px;font-family:inherit;outline:none;text-align:center;letter-spacing:2px}.login-input:focus{border-color:#e67e22;box-shadow:0 0 0 3px rgba(230,126,34,0.1)}
+  .login-input.err{border-color:#e74c3c;animation:shake .3s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .login-btn{width:100%;padding:12px;background:#e67e22;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:12px}.login-btn:hover{background:#d35400}
+  .login-err{font-size:12px;color:#e74c3c;margin-top:8px;min-height:18px}
+</style>
+</head>
+<body>
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div class="login-logo">TT</div>
+    <div class="login-title">TOTALKontroll</div>
+    <div class="login-sub">Muligheter — PoC</div>
+    <input class="login-input" id="loginPw" type="password" placeholder="Passord" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Logg inn</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="logo-icon">TT</div><div class="logo-text"><span>TOTAL</span>KONTROLL</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-item"><span class="nav-icon">&#8962;</span><span class="nav-label">Min side</span></div>
+    <a class="nav-item" href="TOTALKontroll_Salg_PoC.html"><span class="nav-icon">&#9783;</span><span class="nav-label">Salg</span></a>
+    <a class="nav-item nav-sub active" href="#"><span class="nav-label">Muligheter</span><span class="nav-badge" id="navBadge">0</span></a>
+    <div class="nav-item"><span class="nav-icon">&#9724;</span><span class="nav-label">Prosjekt</span></div>
+    <div class="nav-item"><span class="nav-icon">&#9776;</span><span class="nav-label">Håndbok</span></div>
+    <div class="nav-item"><span class="nav-icon">&#8644;</span><span class="nav-label">Endringsordre</span></div>
+  </nav>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <a class="back-link" href="TOTALKontroll_Salg_PoC.html">&#8592; Tilbake til Salg</a>
+    <div class="topbar-user"><div class="avatar">ØL</div>Øyvind Lode</div>
+  </div>
+  <div class="content">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Muligheter</div>
+        <div class="page-subtitle">Automatisk identifiserte prosjektmuligheter fra offentlige kilder</div>
+      </div>
+    </div>
+
+    <!-- STATUS BANNER -->
+    <div class="status-banner" id="statusBanner">
+      <div class="status-icon ok" id="statusIcon">&#10003;</div>
+      <div class="status-info">
+        <div class="status-title" id="statusTitle">Siste kjøring fullført</div>
+        <div class="status-detail" id="statusDetail">I dag kl. 06:00 — 14 kilder gjennomgått — varighet 2 min 34 sek</div>
+      </div>
+      <div class="status-stats">
+        <div class="stat"><div class="stat-value" id="statNew">0</div><div class="stat-label">Nye treff</div></div>
+        <div class="stat"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Ubehandlet</div></div>
+      </div>
+      <button class="btn-run" onclick="simulateRun()">&#9654; Kjør nå</button>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filter-row" id="filterRow"></div>
+
+    <!-- OPPORTUNITY LIST -->
+    <div class="opp-list" id="oppList"></div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="icon">&#9745;</div>
+      <div class="msg">Ingen ubehandlede muligheter i denne kategorien</div>
+    </div>
+
+    <!-- IGNORED RULES -->
+    <div class="ignored-rules" id="ignoredSection" style="display:none">
+      <h3 onclick="toggleIgnored()">&#9660; Permanent ignorerte søkeord <span id="ignoreCount"></span></h3>
+      <div class="rule-list" id="ruleList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="toast-icon"></span><span class="toast-text"></span></div>
+<!-- HOLD MODAL -->
+<div class="hold-overlay" id="holdOverlay" onclick="if(event.target===this)holdClose()">
+  <div class="hold-modal">
+    <div class="hold-header"><div><div class="hold-title">Sett på hold</div><div class="hold-sub">Velg hvor lenge muligheten skal være på vent</div></div><button class="hold-close" onclick="holdClose()">&times;</button></div>
+    <div class="hold-body">
+      <div class="hold-proj" id="holdProj"></div>
+      <div class="hold-label">Antall uker på hold</div>
+      <div class="hold-slider-row"><input type="range" class="hold-slider" id="holdSlider" min="1" max="12" value="4" oninput="document.getElementById('holdWeeks').textContent=this.value+' uker'"><div class="hold-weeks" id="holdWeeks">4 uker</div></div>
+      <div class="hold-note">Du vil bli varslet 1 uke før holdperioden utløper. Når fristen er ute, flyttes muligheten automatisk tilbake til oversikten.</div>
+    </div>
+    <div class="hold-footer"><button class="hold-cancel" onclick="holdClose()">Avbryt</button><button class="hold-confirm" onclick="holdConfirm()">Sett på hold</button></div>
+  </div>
+</div>
+
+<script>
+// ═══ LOGIN ═══
+function sHash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h*33)^s.charCodeAt(i))>>>0;return h;}
+function doLogin(){const pw=document.getElementById('loginPw').value;if(!pw){document.getElementById('loginPw').classList.add('err');return;}if(sHash(pw)===2562494657){document.getElementById('loginOverlay').classList.add('hidden');sessionStorage.setItem('tk_auth','1');}else{document.getElementById('loginPw').classList.add('err');document.getElementById('loginErr').textContent='Feil passord';setTimeout(()=>document.getElementById('loginPw').classList.remove('err'),300);}}
+if(sessionStorage.getItem('tk_auth')==='1')document.getElementById('loginOverlay').classList.add('hidden');
+
+// ═══ DATA ═══
+let opps=[
+  {id:1,name:'Nye Sandnes Videregående Skole, Totalentreprise',type:'Totalentreprise Næring',region:'Sandnes',estSize:180,source:'Doffin',sourceUrl:'https://doffin.no/Notice/Details/2026-123456',deadline:'2026-06-15',published:'2026-03-25',relevance:'high',reason:'Matcher geografi (Jæren), prosjekttype (totalentreprise næring) og størrelse. TB har referanseprosjekt på tilsvarende offentlige bygg.',status:'new'},
+  {id:2,name:'Reguleringsplan vedtatt, Forus Øst, 240 boenheter',type:'Totalentreprise Bolig',region:'Stavanger',estSize:320,source:'Stavanger kommune',sourceUrl:'#',deadline:'',published:'2026-03-24',relevance:'high',reason:'Stort boligprosjekt i TB sitt kjerneområde. Tidlig fase betyr posisjoneringsmulighet. Peab har historisk brukt lokale UE.',status:'new'},
+  {id:3,name:'Utvidelse Bremnes Seashore, landbasert oppdrettsanlegg',type:'Totalentreprise Fisk',region:'Bømlo',estSize:95,source:'Fiskeribladet',sourceUrl:'#',deadline:'',published:'2026-03-24',relevance:'high',reason:'Direkte match med TB sin spisskompetanse på landbasert oppdrett. Bømlo er innenfor dekningsområdet. Begrenset konkurranse på spesialisert betongarbeid.',status:'new'},
+  {id:4,name:'Jæren Fjernvarme, Teknisk sentral Bryne',type:'Betongentreprise',region:'Bryne',estSize:22,source:'Doffin',sourceUrl:'#',deadline:'2026-05-01',published:'2026-03-23',relevance:'med',reason:'Lokalt prosjekt på Bryne. Ren betongentreprise passer profilen. Moderat størrelse, lav risiko og kort tidshorisont.',status:'new'},
+  {id:5,name:'Haugesund Sykehjem, nybygg 60 plasser',type:'Totalentreprise Næring',region:'Haugesund',estSize:145,source:'Doffin',sourceUrl:'#',deadline:'2026-07-01',published:'2026-03-22',relevance:'med',reason:'Innenfor prosjektstørrelse og kompetanse. Haugesund er geografisk aktuelt. BREEAM-krav kan skille TB fra konkurrenter.',status:'new'},
+  {id:6,name:'Boligblokk Tananger Havn, 48 leiligheter',type:'Totalentreprise Bolig',region:'Sola',estSize:68,source:'Byggfakta',sourceUrl:'#',deadline:'2026-05-20',published:'2026-03-21',relevance:'med',reason:'Nær Stavanger, passende størrelse. Selvaag er en etablert byggherre TB kan bygge relasjon med.',status:'new'},
+  {id:7,name:'Ombygging Fiskå Mølle, lagerbygg betong',type:'Betongentreprise',region:'Stavanger',estSize:14,source:'Mercell',sourceUrl:'#',deadline:'2026-04-15',published:'2026-03-20',relevance:'low',reason:'Liten jobb, men lokal og lav konkurranse. Kan passe som fyllprosjekt.',status:'new'},
+  {id:8,name:'Studentboliger Ullandhaug, 200 hybelenheter',type:'Totalentreprise Bolig',region:'Stavanger',estSize:110,source:'Doffin',sourceUrl:'#',deadline:'2026-08-01',published:'2026-03-19',relevance:'med',reason:'Passende størrelse og type. Stavanger-området. Modulbetong er innenfor kompetansen.',status:'new'},
+];
+// statuses: new, hold, converted, ignored, blocked
+let ignoredRules=[{id:1,text:'Haugesund Svømmehall',type:'project'},{id:2,text:'Asfaltarbeider',type:'keyword'}];
+let viewMode='new'; // new, hold, archive
+let showIgnored=false;
+let holdTargetId=null;
+
+function esc(s){return(s||'').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+function fmtD(d){if(!d)return'—';return new Date(d).toLocaleDateString('nb-NO',{day:'numeric',month:'short',year:'numeric'});}
+function toast(ic,msg){const t=document.getElementById('toast');t.querySelector('.toast-icon').innerHTML=ic;t.querySelector('.toast-text').textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+// ═══ RENDER ═══
+function render(){
+  const allNew=opps.filter(o=>o.status==='new');
+  const allHold=opps.filter(o=>o.status==='hold');
+  const allArchive=opps.filter(o=>['converted','ignored','blocked'].includes(o.status));
+  document.getElementById('navBadge').textContent=allNew.length;
+  document.getElementById('statNew').textContent=opps.filter(o=>o.published==='2026-03-25'||o.published==='2026-03-24').length;
+  document.getElementById('statTotal').textContent=allNew.length;
+
+  // Filter tabs
+  let fh=`<button class="filter-tab ${viewMode==='new'?'active':''}" onclick="setView('new')">Alle nye<span class="ft-count">(${allNew.length})</span></button>`;
+  fh+=`<button class="filter-tab ${viewMode==='hold'?'active':''}" onclick="setView('hold')">&#9202; På hold<span class="ft-count">(${allHold.length})</span></button>`;
+  fh+=`<button class="filter-tab ${viewMode==='archive'?'active':''}" onclick="setView('archive')">Arkiv<span class="ft-count">(${allArchive.length})</span></button>`;
+  document.getElementById('filterRow').innerHTML=fh;
+
+  let items=[];
+  if(viewMode==='new') items=allNew;
+  else if(viewMode==='hold') items=allHold;
+  else items=allArchive;
+
+  if(!items.length){
+    document.getElementById('oppList').innerHTML='';
+    document.getElementById('emptyState').style.display='block';
+    document.getElementById('emptyState').querySelector('.msg').textContent=
+      viewMode==='new'?'Ingen nye muligheter':(viewMode==='hold'?'Ingen muligheter på hold':'Arkivet er tomt');
+  } else {
+    document.getElementById('emptyState').style.display='none';
+    document.getElementById('oppList').innerHTML=items.map(o=>renderCard(o)).join('');
+  }
+
+  // Ignored rules
+  if(ignoredRules.length){
+    document.getElementById('ignoredSection').style.display='block';
+    document.getElementById('ignoreCount').textContent=`(${ignoredRules.length})`;
+    document.getElementById('ruleList').style.display=showIgnored?'flex':'none';
+    if(showIgnored){
+      document.getElementById('ruleList').innerHTML=ignoredRules.map(r=>
+        `<div class="rule-item">
+          <input class="rule-edit-input" value="${esc(r.text)}" onchange="updateRule(${r.id},'text',this.value)">
+          <select class="rule-type-select" onchange="updateRule(${r.id},'type',this.value)">
+            <option value="project" ${r.type==='project'?'selected':''}>Prosjekt</option>
+            <option value="keyword" ${r.type==='keyword'?'selected':''}>Søkeord</option>
+          </select>
+          <button class="rule-remove" onclick="removeRule(${r.id})" title="Fjern">&times;</button>
+        </div>`
+      ).join('');
+    }
+  } else {
+    document.getElementById('ignoredSection').style.display='none';
+  }
+}
+
+function renderCard(o){
+  const rc=o.relevance==='high'?'rel-high':o.relevance==='med'?'rel-med':'rel-low';
+  const rl=o.relevance==='high'?'&#9733;':o.relevance==='med'?'&#9734;':'&#8226;';
+  const dl=o.deadline?`<span class="opp-tag">Frist: ${fmtD(o.deadline)}</span>`:'<span class="opp-tag">Tidlig fase</span>';
+  const src=o.sourceUrl&&o.sourceUrl!=='#'?`<a class="opp-source-link" href="${esc(o.sourceUrl)}" target="_blank">&#8599; Åpne kilde</a>`:'';
+
+  // Hold card
+  if(o.status==='hold'){
+    return`<div class="opp-card on-hold"><div class="opp-top"><div class="opp-relevance ${rc}">${rl}</div><div class="opp-main"><div class="opp-name">${esc(o.name)}</div><div class="opp-meta"><span class="opp-tag type">${o.type}</span><span class="opp-tag geo">&#9673; ${o.region}</span><span class="opp-tag size">~${o.estSize} MNOK</span><span class="hold-badge">&#9202; På hold til uke ${o.holdUntilWeek} (${o.holdWeeks} uker)</span></div></div></div>
+    <div class="opp-body"><span class="opp-reason">Hvorfor dette er relevant for Totalbetong:</span>${esc(o.reason)}</div>
+    <div class="opp-actions"><button class="btn-convert" onclick="doConvert(${o.id})">&#10003; Konverter til lead</button><button class="btn-ignore" onclick="doIgnore(${o.id})">Ignorer denne</button><span class="action-spacer"></span>${src}</div></div>`;
+  }
+
+  // Archive card
+  if(['converted','ignored','blocked'].includes(o.status)){
+    const lbl=o.status==='converted'?'<span class="archive-label green">&#10003; Konvertert til lead</span>':o.status==='ignored'?'<span class="archive-label gray">Ignorert</span>':'<span class="archive-label red">Permanent ignorert</span>';
+    return`<div class="opp-card archived"><div class="opp-top"><div class="opp-relevance ${rc}">${rl}</div><div class="opp-main"><div class="opp-name">${esc(o.name)}</div><div class="opp-meta"><span class="opp-tag type">${o.type}</span><span class="opp-tag geo">&#9673; ${o.region}</span><span class="opp-tag size">~${o.estSize} MNOK</span></div>${lbl}</div></div></div>`;
+  }
+
+  // New card (default)
+  return`<div class="opp-card" id="card-${o.id}"><div class="opp-top"><div class="opp-relevance ${rc}">${rl}</div><div class="opp-main"><div class="opp-name">${esc(o.name)}</div><div class="opp-meta"><span class="opp-tag type">${o.type}</span><span class="opp-tag geo">&#9673; ${o.region}</span><span class="opp-tag size">~${o.estSize} MNOK</span>${dl}<span class="opp-tag source">${o.source} — ${fmtD(o.published)}</span></div></div></div>
+  <div class="opp-body"><span class="opp-reason">Hvorfor dette er relevant for Totalbetong:</span>${esc(o.reason)}</div>
+  <div class="opp-actions"><button class="btn-convert" onclick="doConvert(${o.id})">&#10003; Konverter til lead</button><button class="btn-hold" onclick="openHold(${o.id})">&#9202; Sett på hold</button><button class="btn-ignore" onclick="doIgnore(${o.id})">Ignorer denne</button><button class="btn-block" onclick="doBlock(${o.id})">Ignorer fremtidige</button><span class="action-spacer"></span>${src}</div></div>`;
+}
+
+// ═══ ACTIONS ═══
+function doConvert(id){const o=opps.find(x=>x.id===id);if(!o)return;o.status='converted';toast('&#10003;','"'+o.name+'" lagt til i salgspipeline');render();}
+function doIgnore(id){const o=opps.find(x=>x.id===id);if(!o)return;o.status='ignored';toast('&#128473;','Mulighet ignorert');render();}
+function doBlock(id){const o=opps.find(x=>x.id===id);if(!o)return;
+  const kw=o.name.split(',')[0].trim();
+  if(confirm('Permanent ignorere fremtidige treff som ligner "'+kw+'"?\n\nDu kan redigere regelen senere.')){
+    o.status='blocked';ignoredRules.push({id:Date.now(),text:kw,type:'project'});
+    toast('&#128275;','Fremtidige treff for "'+kw+'" filtreres bort');render();
+  }
+}
+
+// ═══ HOLD ═══
+function openHold(id){
+  const o=opps.find(x=>x.id===id);if(!o)return;
+  holdTargetId=id;
+  document.getElementById('holdProj').textContent=o.name;
+  document.getElementById('holdSlider').value=4;
+  document.getElementById('holdWeeks').textContent='4 uker';
+  document.getElementById('holdOverlay').classList.add('open');
+}
+function holdClose(){document.getElementById('holdOverlay').classList.remove('open');holdTargetId=null;}
+function holdConfirm(){
+  const o=opps.find(x=>x.id===holdTargetId);if(!o)return;
+  const weeks=parseInt(document.getElementById('holdSlider').value);
+  const now=new Date();
+  const untilDate=new Date(now.getTime()+weeks*7*24*60*60*1000);
+  const untilWeek=getISOWeek(untilDate);
+  o.status='hold';o.holdWeeks=weeks;o.holdUntilWeek=untilWeek;
+  holdClose();toast('&#9202;','"'+o.name+'" satt på hold i '+weeks+' uker');render();
+}
+function getISOWeek(d){const t=new Date(d);t.setHours(0,0,0,0);t.setDate(t.getDate()+3-(t.getDay()+6)%7);const w1=new Date(t.getFullYear(),0,4);return 1+Math.round(((t-w1)/864e5-3+(w1.getDay()+6)%7)/7);}
+
+// ═══ VIEWS & RULES ═══
+function setView(v){viewMode=v;render();}
+function toggleIgnored(){showIgnored=!showIgnored;render();}
+function removeRule(id){ignoredRules=ignoredRules.filter(r=>r.id!==id);toast('&#128275;','Regel fjernet');render();}
+function updateRule(id,field,val){const r=ignoredRules.find(x=>x.id===id);if(r)r[field]=val;}
+
+function simulateRun(){
+  const ic=document.getElementById('statusIcon'),ti=document.getElementById('statusTitle'),de=document.getElementById('statusDetail');
+  ic.className='status-icon running';ic.innerHTML='&#8987;';ti.textContent='Søker etter muligheter...';de.textContent='Gjennomgår Doffin, Mercell, Byggfakta, kommunale reguleringsplaner, Fiskeribladet...';
+  setTimeout(()=>{
+    opps.unshift({id:Date.now(),name:'Nytt kontorbygg Forus, K8 Eiendom',type:'Totalentreprise Næring',region:'Stavanger',estSize:90,source:'Byggfakta',sourceUrl:'#',deadline:'2026-08-15',published:new Date().toISOString().split('T')[0],relevance:'med',reason:'Forus-området, passende størrelse. Kontorbygg er kjerneprodukt for totalentreprise næring.',status:'new'});
+    ic.className='status-icon ok';ic.innerHTML='&#10003;';ti.textContent='Kjøring fullført';de.textContent='Nettopp — 14 kilder gjennomgått — 1 nytt treff funnet';
+    viewMode='new';toast('&#10003;','1 ny mulighet identifisert');render();
+  },3500);
+}
+
+render();
+</script>
+</body>
+</html>
