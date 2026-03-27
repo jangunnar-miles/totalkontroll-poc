@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOTALKontroll — Salg</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{--navy:#1a2744;--orange:#e67e22;--orange-faded:rgba(230,126,34,0.08);--white:#fff;--g50:#f8f9fa;--g100:#f1f3f5;--g200:#e9ecef;--g300:#dee2e6;--g400:#ced4da;--g500:#adb5bd;--g600:#868e96;--g700:#495057;--g800:#343a40;--red:#e74c3c;--red-bg:rgba(231,76,60,0.06);--red-border:rgba(231,76,60,0.25);--green:#27ae60;--green-bg:rgba(39,174,96,0.1);--sidebar-w:220px}
+  body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--g50);color:var(--g800);min-height:100vh;display:flex}
+  .sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--navy);color:var(--white);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+  .sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px 20px 28px;border-bottom:1px solid rgba(255,255,255,0.06)}
+  .logo-icon{width:34px;height:34px;background:var(--orange);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:var(--white)}
+  .logo-text{font-size:14px;font-weight:600;letter-spacing:.5px}.logo-text span{color:var(--orange)}
+  .sidebar-nav{padding:16px 0;flex:1}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:11px 24px;font-size:14px;font-weight:500;color:rgba(255,255,255,0.5);cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+  .nav-item:hover{color:rgba(255,255,255,0.8);background:rgba(255,255,255,0.04)}
+  .nav-item.active{color:var(--white);background:rgba(230,126,34,0.12);border-left-color:var(--orange)}
+  .nav-icon{font-size:18px;width:22px;text-align:center}
+  .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:var(--white);border-bottom:1px solid var(--g200);gap:16px}
+  .topbar-user{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--g700)}
+  .role-selector{display:flex;align-items:center}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--navy);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+  .content{padding:28px 32px;flex:1}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px}
+  .page-title{font-size:26px;font-weight:700;color:var(--navy);letter-spacing:-.3px}
+  .page-subtitle{font-size:13px;color:var(--g600);margin-top:4px}
+  .btn-primary{display:inline-flex;align-items:center;gap:6px;background:var(--orange);color:var(--white);border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;font-family:inherit}
+  .btn-primary:hover{background:#d35400}
+  .chart-section{background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:24px;margin-bottom:24px}
+  .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+  .chart-title{font-size:15px;font-weight:600;color:var(--navy)}.chart-subtitle{font-size:12px;color:var(--g500);margin-top:2px}
+  .chart-kpis{display:flex;gap:24px}.kpi{text-align:right}
+  .kpi-value{font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.3px}
+  .kpi-label{font-size:11px;color:var(--g500);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+  .chart-container{position:relative;height:300px;cursor:pointer}
+  .chart-filter-badge{display:inline-flex;align-items:center;gap:6px;background:var(--orange-faded);border:1px solid var(--orange);color:var(--orange);padding:4px 12px;border-radius:16px;font-size:11px;font-weight:600;margin-top:8px;cursor:pointer}
+  .chart-filter-badge:hover{background:rgba(230,126,34,0.15)}
+  .chart-lock-tab{padding:4px 12px;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid var(--g300);color:var(--g600);background:var(--white);font-family:inherit}.chart-lock-tab:hover{border-color:var(--g400)}.chart-lock-tab.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
+  .year-target-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .year-card{flex:1;min-width:180px;background:var(--white);border:1px solid var(--g200);border-radius:10px;padding:12px 16px;transition:border-color .15s}
+  .year-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .year-card-year{font-size:14px;font-weight:700;color:var(--navy)}
+  .year-card-pct{font-size:12px;font-weight:700;padding:2px 8px;border-radius:10px}
+  .year-card-pct.green{background:rgba(39,174,96,0.1);color:var(--green)}
+  .year-card-pct.orange{background:rgba(230,126,34,0.1);color:var(--orange)}
+  .year-card-pct.red{background:rgba(231,76,60,0.1);color:var(--red)}
+  .year-card-pct.gray{background:var(--g100);color:var(--g500)}
+  .year-card-bar{height:6px;background:var(--g100);border-radius:3px;overflow:hidden;margin-bottom:8px}
+  .year-card-fill{height:100%;border-radius:3px;transition:width .3s}
+  .year-card-fill.green{background:var(--green)}.year-card-fill.orange{background:var(--orange)}.year-card-fill.red{background:var(--red)}
+  .year-card-nums{display:flex;align-items:baseline;gap:4px}
+  .year-card-actual{font-size:16px;font-weight:700;color:var(--navy)}
+  .year-card-sep{font-size:12px;color:var(--g400)}
+  .year-card-target-wrap{display:flex;align-items:baseline;gap:4px}
+  .year-card-input{width:60px;padding:3px 6px;border:1px solid var(--g300);border-radius:5px;font-size:13px;font-family:inherit;text-align:right;outline:none;color:var(--g700);transition:border-color .15s}.year-card-input:focus{border-color:var(--orange)}
+  .year-card-unit{font-size:11px;color:var(--g500)}
+  .tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+  .tab{padding:7px 16px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:1px solid var(--g300);color:var(--g700);background:var(--white);font-family:inherit}
+  .tab:hover{border-color:var(--g400)}.tab.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
+  .tab .count{display:inline-block;background:rgba(0,0,0,0.08);padding:1px 7px;border-radius:10px;font-size:11px;margin-left:4px}
+  .tab.active .count{background:rgba(255,255,255,0.2)}
+  .table-wrap{background:var(--white);border:1px solid var(--g200);border-radius:12px;overflow:hidden}
+  .table-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:1750px}
+  thead th{background:var(--g50);padding:10px 12px;font-size:11px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.5px;text-align:left;border-bottom:1px solid var(--g200);white-space:nowrap;position:sticky;top:0;z-index:10;user-select:none;transition:background .1s}
+  thead th.sortable{cursor:pointer}thead th.sortable:hover{background:var(--g100)}
+  thead th.required-col::after{content:' *';color:var(--red)}
+  thead th .sort-arrow{font-size:10px;margin-left:3px;opacity:.3}
+  thead th .sort-arrow.active{opacity:1;color:var(--orange)}
+  thead th.dragging{opacity:.5;background:var(--orange-faded)}
+  thead th.drag-over{box-shadow:inset -3px 0 0 var(--orange)}
+  tbody tr{transition:background .1s}tbody tr:hover{background:var(--orange-faded)}
+  tbody tr.row-warning{background:var(--red-bg)!important}tbody tr.row-warning:hover{background:rgba(231,76,60,0.1)!important}
+  tbody tr.row-warning td{border-bottom-color:var(--red-border)}
+  tbody tr.row-highlight{background:rgba(230,126,34,0.12)!important}
+  tbody td{padding:6px 8px;font-size:13px;color:var(--g800);border-bottom:1px solid var(--g100);vertical-align:middle}
+  .cell-edit{width:100%;border:1px solid transparent;background:transparent;padding:6px 8px;font-size:13px;font-family:inherit;color:var(--g800);border-radius:4px;transition:all .15s;outline:none}
+  .cell-edit:hover{border-color:var(--g300);background:var(--white)}
+  .cell-edit:focus{border-color:var(--orange);background:var(--white);box-shadow:0 0 0 2px rgba(230,126,34,0.15)}
+  .cell-edit.invalid{border-color:var(--red);background:rgba(231,76,60,0.03)}
+  select.cell-edit{cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:24px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%23868e96' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+  input[type="number"].cell-edit{-moz-appearance:textfield;text-align:right}
+  input[type="number"].cell-edit::-webkit-inner-spin-button{-webkit-appearance:none}
+  .meeting-check{display:flex;align-items:center;justify-content:center}
+  .meeting-check input[type="checkbox"]{width:18px;height:18px;cursor:pointer;accent-color:var(--green)}
+  .warning-indicator{display:inline-flex;align-items:center;color:var(--red)}
+  .warning-indicator svg{width:14px;height:14px;fill:var(--red)}
+  .p-weight{font-size:11px;font-weight:600;color:var(--g500);text-align:center;display:block}
+  .weighted-value{font-size:13px;font-weight:600;color:var(--navy);text-align:right;display:block}
+  .btn-delete{background:none;border:none;cursor:pointer;color:var(--g400);font-size:18px;padding:4px;border-radius:4px;transition:all .15s;line-height:1}
+  .btn-delete:hover{color:var(--red);background:rgba(231,76,60,0.08)}
+  .dalux-link{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;transition:all .1s;text-decoration:none}
+  .dalux-link:hover{background:var(--green-bg)}
+  .dalux-link svg{width:18px;height:18px}
+  .dalux-empty{color:var(--g300);font-size:13px;text-align:center;display:block}
+  .table-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--g200);font-size:11px;color:var(--g500);flex-wrap:wrap;gap:12px}
+  tfoot td{padding:10px 12px;font-size:13px;font-weight:700;color:var(--navy);border-top:2px solid var(--g200);background:var(--g50);white-space:nowrap}
+  .legend{display:flex;gap:16px;align-items:center}.legend-item{display:flex;align-items:center;gap:4px}
+  .legend-swatch{width:10px;height:10px;border-radius:2px}
+  /* LOCK */
+  .lock-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:4px 6px;border-radius:4px;transition:all .15s;line-height:1;color:var(--g400)}.lock-btn:hover{color:var(--navy);background:var(--g100)}
+  .lock-icon{display:inline-flex;align-items:center;justify-content:center;color:var(--navy);font-size:15px;cursor:pointer;padding:4px 6px;border-radius:4px;transition:all .15s}.lock-icon:hover{background:rgba(230,126,34,0.1)}
+  tbody tr.row-locked{background:var(--g50)!important}
+  tbody tr.row-locked td{color:var(--g400)!important}
+  tbody tr.row-locked .cell-edit,tbody tr.row-locked select.cell-edit,tbody tr.row-locked input.cell-edit{pointer-events:none;color:var(--g400);border-color:transparent!important;background:transparent!important}
+  tbody tr.row-locked .btn-delete{pointer-events:none;opacity:.2}
+  tbody tr.row-locked .meeting-check input{pointer-events:none}
+  tbody tr.row-locked .lm-info{color:var(--g400)}
+  tbody tr.row-locked .dalux-link{pointer-events:none;opacity:.3}
+  tbody tr.row-locked .weighted-value{color:var(--g400)}
+  tbody tr.row-locked .p-weight{color:var(--g400)}
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(26,39,68,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+  .modal-overlay.open{opacity:1;pointer-events:auto}
+  .modal{background:var(--white);border-radius:16px;width:480px;max-width:92vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);transform:translateY(20px);transition:transform .25s}.modal-overlay.open .modal{transform:translateY(0)}
+  .modal-header{padding:24px 24px 0;display:flex;align-items:flex-start;justify-content:space-between}
+  .modal-title{font-size:18px;font-weight:700;color:var(--navy)}.modal-subtitle{font-size:12px;color:var(--g500);margin-top:4px;font-weight:400}
+  .modal-close{background:none;border:none;font-size:22px;color:var(--g400);cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1}.modal-close:hover{color:var(--g700);background:var(--g100)}
+  .modal-body{padding:20px 24px}
+  .modal-field{margin-bottom:20px}
+  .modal-label{display:block;font-size:12px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+  .modal-input{width:100%;padding:10px 14px;border:1px solid var(--g300);border-radius:8px;font-size:14px;font-family:inherit;color:var(--g800);transition:border-color .15s;outline:none}
+  .modal-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(230,126,34,0.1)}
+  .modal-input.err{border-color:var(--red)}
+  .modal-err-msg{font-size:11px;color:var(--red);margin-top:4px;display:none}.modal-err-msg.show{display:block}
+  .modal-divider{height:1px;background:var(--g200);margin:4px 0 20px}
+  .role-grid{display:flex;flex-direction:column;gap:6px}
+  .role-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;transition:background .1s;cursor:pointer}
+  .role-item:hover{background:var(--g50)}
+  .role-item.locked{cursor:default}
+  .role-item.locked .role-check{accent-color:var(--navy)}
+  .role-check{width:16px;height:16px;accent-color:var(--green);cursor:pointer;flex-shrink:0}
+  .role-check:disabled{cursor:default;opacity:.7}
+  .role-name{font-size:13px;color:var(--g800);flex:1}
+  .role-locked-badge{font-size:9px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;background:var(--g100);padding:2px 8px;border-radius:4px}
+  .modal-footer{padding:16px 24px 24px;display:flex;gap:10px;justify-content:flex-end}
+  .btn-modal-save{background:var(--green);color:var(--white);border:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;display:inline-flex;align-items:center;gap:6px}.btn-modal-save:hover{background:#219a52}
+  .btn-modal-cancel{background:var(--white);color:var(--g600);border:1px solid var(--g300);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}.btn-modal-cancel:hover{background:var(--g50)}
+  .modal-proj-name{font-size:14px;font-weight:600;color:var(--navy);padding:10px 14px;background:var(--g50);border-radius:8px;margin-bottom:20px;border-left:3px solid var(--orange)}
+  .lm-info{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--green);font-weight:600}
+  .info-btn{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;cursor:pointer;margin-left:6px;vertical-align:middle;opacity:.4;transition:opacity .15s}.info-btn:hover{opacity:.7}
+  .info-btn svg{width:15px;height:15px}
+  .modal-label{position:relative}
+  .info-tip{display:none;position:absolute;left:0;top:calc(100% + 6px);background:var(--navy);color:var(--white);font-size:12px;font-weight:400;padding:10px 14px;border-radius:8px;line-height:1.5;width:320px;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,0.15);text-transform:none;letter-spacing:0}
+  .info-tip.show{display:block}
+  /* QUARTERLY PANEL */
+  .qd-btn{background:none;border:none;cursor:pointer;padding:2px;border-radius:3px;vertical-align:middle;margin-left:4px;opacity:.4;transition:opacity .15s;line-height:1}.qd-btn:hover{opacity:.8}.qd-btn.active{opacity:1;color:var(--orange)}.qd-btn.disabled{opacity:.15;cursor:default;pointer-events:none}
+  .qd-btn svg{width:14px;height:14px;vertical-align:middle}
+  tr.qd-row td{padding:0!important;border-bottom:2px solid var(--orange)}
+  .qd-panel{background:var(--g50);padding:16px 20px;border-top:1px solid var(--g200)}
+  .qd-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .qd-title{font-size:13px;font-weight:600;color:var(--navy)}
+  .qd-actions{display:flex;gap:8px;align-items:center}
+  .qd-even{font-size:11px;color:var(--blue);cursor:pointer;font-weight:600;background:none;border:none;font-family:inherit;padding:4px 10px;border-radius:6px;transition:all .15s}.qd-even:hover{background:rgba(52,152,219,0.08)}
+  .qd-close{font-size:18px;color:var(--g400);cursor:pointer;background:none;border:none;padding:2px 6px;border-radius:4px;line-height:1}.qd-close:hover{color:var(--g700);background:var(--g100)}
+  .qd-grid{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+  .qd-item{flex:1;min-width:80px}
+  .qd-qlabel{font-size:10px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px;text-align:center}
+  .qd-input{width:100%;padding:7px 8px;border:1px solid var(--g300);border-radius:6px;font-size:13px;font-family:inherit;text-align:right;outline:none;transition:border-color .15s}.qd-input:focus{border-color:var(--orange);box-shadow:0 0 0 2px rgba(230,126,34,0.1)}
+  .qd-sum{min-width:100px;text-align:right}
+  .qd-sum-label{font-size:10px;font-weight:600;color:var(--g500);text-transform:uppercase;margin-bottom:3px}
+  .qd-sum-value{font-size:14px;font-weight:700;padding:7px 8px}.qd-sum-ok{color:var(--green)}.qd-sum-err{color:var(--red)}
+  .qd-hint{font-size:11px;color:var(--g500);margin-top:8px}
+  @media(max-width:1200px){.sidebar{width:60px}.sidebar .logo-text,.sidebar .nav-label{display:none}.sidebar-logo{padding:16px;justify-content:center}.nav-item{padding:12px;justify-content:center}.main{margin-left:60px}}
+  /* LOGIN */
+  .login-overlay{position:fixed;inset:0;background:var(--navy);z-index:9999;display:flex;align-items:center;justify-content:center}
+  .login-overlay.hidden{display:none}
+  .login-box{background:var(--white);border-radius:16px;padding:40px;width:360px;max-width:90vw;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+  .login-logo{width:50px;height:50px;background:var(--orange);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;color:var(--white);margin-bottom:16px}
+  .login-title{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:4px}
+  .login-sub{font-size:13px;color:var(--g500);margin-bottom:24px}
+  .login-input{width:100%;padding:12px 16px;border:1px solid var(--g300);border-radius:10px;font-size:14px;font-family:inherit;outline:none;text-align:center;transition:border-color .15s;letter-spacing:2px}.login-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(230,126,34,0.1)}
+  .login-input.err{border-color:var(--red);animation:shake .3s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .login-btn{width:100%;padding:12px;background:var(--orange);color:var(--white);border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:12px;transition:background .15s}.login-btn:hover{background:#d35400}
+  .login-err{font-size:12px;color:var(--red);margin-top:8px;min-height:18px}
+</style>
+</head>
+<body>
+<!-- LOGIN -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div class="login-logo">TT</div>
+    <div class="login-title">TOTALKontroll</div>
+    <div class="login-sub">Salgsmodul — PoC</div>
+    <input class="login-input" id="loginPw" type="password" placeholder="Passord" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Logg inn</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="logo-icon">TT</div><div class="logo-text"><span>TOTAL</span>KONTROLL</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-item"><span class="nav-icon">&#8962;</span><span class="nav-label">Min side</span></div>
+    <div class="nav-item active"><span class="nav-icon">&#9783;</span><span class="nav-label">Salg</span></div>
+    <a class="nav-item" href="TOTALKontroll_Muligheter.html" style="padding-left:58px;font-size:12px;text-decoration:none;opacity:.7;border-left-color:transparent" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7"><span class="nav-label">&#9672; Muligheter</span><span style="background:var(--orange);color:var(--white);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto">8</span></a>
+    <div class="nav-item"><span class="nav-icon">&#9724;</span><span class="nav-label">Prosjekt</span></div>
+    <div class="nav-item"><span class="nav-icon">&#9776;</span><span class="nav-label">Håndbok</span></div>
+    <div class="nav-item"><span class="nav-icon">&#8644;</span><span class="nav-label">Endringsordre</span></div>
+  </nav>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div></div>
+    <div class="topbar-user"><div class="avatar">OB</div>Olav Bang</div>
+  </div>
+  <div class="content">
+    <div class="page-header"><div><div class="page-title">Salg</div><div class="page-subtitle">Salgsprosess, leads og ordreserve</div></div><button class="btn-primary" onclick="addNewRow()">+ Ny lead</button></div>
+    <div class="chart-section">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Ordreserve — vektet prognose per prosjekttype (4 år)</div>
+          <div class="chart-subtitle">Kontraktsverdi fordelt per kvartal &times; P-vekting. Vunnet = 100%. Tapt ekskludert.</div>
+          <div style="display:flex;gap:4px;margin-top:8px;align-items:center;flex-wrap:wrap">
+            <span style="font-size:11px;color:var(--g500);margin-right:4px">Vis:</span>
+            <button class="chart-lock-tab active" data-lf="all" onclick="setLockFilter('all')">Alle</button>
+            <button class="chart-lock-tab" data-lf="locked" onclick="setLockFilter('locked')">&#128274; Låst</button>
+            <button class="chart-lock-tab" data-lf="open" onclick="setLockFilter('open')">&#128275; Åpne</button>
+          </div>
+          <div id="chartFilterBadge"></div>
+        </div>
+        <div class="chart-kpis">
+          <div class="kpi"><div class="kpi-value" id="kpi-pipeline">—</div><div class="kpi-label">Total pipeline</div></div>
+          <div class="kpi"><div class="kpi-value" id="kpi-weighted">—</div><div class="kpi-label">Vektet verdi</div></div>
+        </div>
+      </div>
+      <!-- YEAR TARGETS & KPIs -->
+      <div id="yearTargetRow" class="year-target-row"></div>
+      <div class="chart-container"><canvas id="prognosisChart"></canvas></div>
+    </div>
+    <div class="tabs" id="statusTabs">
+      <button class="tab active" data-status="all">Alle aktive <span class="count" id="count-all">0</span></button>
+      <button class="tab" data-status="Lead">Lead <span class="count" id="count-Lead">0</span></button>
+      <button class="tab" data-status="Gi pris">Gi pris <span class="count" id="count-Gi pris">0</span></button>
+      <button class="tab" data-status="Tilbud sendt">Tilbud sendt <span class="count" id="count-Tilbud sendt">0</span></button>
+      <button class="tab" data-status="Ikke sendt tilbud">Ikke sendt tilbud <span class="count" id="count-Ikke sendt tilbud">0</span></button>
+      <button class="tab" data-status="Vunnet">Vunnet <span class="count" id="count-Vunnet">0</span></button>
+      <button class="tab" data-status="Tapt">Tapt <span class="count" id="count-Tapt">0</span></button>
+    </div>
+    <div class="table-wrap"><div class="table-scroll"><table><thead><tr id="headerRow"></tr></thead><tbody id="salesBody"></tbody><tfoot><tr id="salesFoot"></tr></tfoot></table></div>
+      <div class="table-footer"><div class="legend"><div class="legend-item"><div class="legend-swatch" style="background:var(--red-bg);border:1px solid var(--red-border)"></div>Lukkemøte ikke avholdt &amp; &lt;2 uker til innlevering</div><div class="legend-item"><span style="color:var(--red);font-weight:600">*</span> Obligatorisk felt</div></div><div id="rowCount"></div></div>
+    </div>
+  </div>
+</div>
+<!-- LUKKEMØTE MODAL -->
+<div class="modal-overlay" id="lmOverlay" onclick="if(event.target===this)lmClose()">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title">Bekreft lukkemøte</div><div class="modal-subtitle">Registrer dato og velg hvem som skal varsles</div></div>
+      <button class="modal-close" onclick="lmClose()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-proj-name" id="lmProjName"></div>
+      <div class="modal-field">
+        <label class="modal-label">Dato for lukkemøte *</label>
+        <input type="date" class="modal-input" id="lmDato">
+        <div class="modal-err-msg" id="lmDatoErr">Dato er obligatorisk</div>
+      </div>
+      <div class="modal-divider"></div>
+      <div class="modal-field">
+        <label class="modal-label">Varsle følgende roller <span class="info-btn" onclick="this.nextElementSibling.classList.toggle('show')"><svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="9" fill="#1a2744" stroke="#1a2744" stroke-width="1.5"/><path d="M10 9v5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="6.5" r="0.75" fill="#fff"/></svg></span><span class="info-tip">Valgte roller mottar en varsling om at lukkemøte er registrert. Du må selv opprette møteinnkalling i kalenderen til deltakerne.</span></label>
+        <div class="role-grid" id="lmRoles"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" onclick="lmClose()">Avbryt</button>
+      <button class="btn-modal-save" onclick="lmSave()">&#10003; Bekreft lukkemøte</button>
+    </div>
+  </div>
+</div>
+<!-- UNLOCK MODAL -->
+<div class="modal-overlay" id="ulkOverlay" onclick="if(event.target===this)ulkClose()">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <div><div class="modal-title">Lås opp rad</div><div class="modal-subtitle">Bekreft opplåsning</div></div>
+      <button class="modal-close" onclick="ulkClose()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-proj-name" id="ulkProjName"></div>
+      <div class="modal-field">
+        <label class="modal-label">Historikk</label>
+        <div id="ulkHistory"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" onclick="ulkClose()">Avbryt</button>
+      <button class="btn-modal-save" onclick="ulkConfirm()" style="background:var(--orange)">&#128275; Bekreft opplåsning</button>
+    </div>
+  </div>
+</div>
+<script>
+// ═══ LOGIN ═══
+function sHash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h*33)^s.charCodeAt(i))>>>0;return h;}
+function doLogin(){const pw=document.getElementById('loginPw').value;if(!pw){document.getElementById('loginPw').classList.add('err');return;}if(sHash(pw)===2562494657){document.getElementById('loginOverlay').classList.add('hidden');sessionStorage.setItem('tk_auth','1');}else{document.getElementById('loginPw').classList.add('err');document.getElementById('loginErr').textContent='Feil passord';setTimeout(()=>{document.getElementById('loginPw').classList.remove('err');},300);}}
+if(sessionStorage.getItem('tk_auth')==='1')document.getElementById('loginOverlay').classList.add('hidden');
+const STATUS_OPTIONS=['Lead','Gi pris','Tilbud sendt','Ikke sendt tilbud','Vunnet','Tapt'];
+const AVDELINGER=['Bryne','Stavanger','Bodø','Oslo'];
+const PROSJEKTTYPER=['Totalentreprise Næring','Totalentreprise Bolig','Totalentreprise Fisk','Betongentreprise'];
+const ANSVARLIGE=['','Atle','Berit','Jan Arvid','Jette','Kristian','Lidvar','Olav','Stig Andre','Øyvind'];
+const P_OPTIONS=[{value:'P1',label:'P1 (10%)',weight:.10},{value:'P2',label:'P2 (25%)',weight:.25},{value:'P3',label:'P3 (50%)',weight:.50},{value:'P4',label:'P4 (75%)',weight:.75},{value:'P5',label:'P5 (90%)',weight:.90},{value:'P6',label:'P6 (100%)',weight:1}];
+function getPW(v){return P_OPTIONS.find(p=>p.value===v)||null}
+function isClosed(s){return s==='Vunnet'||s==='Tapt'}
+const REQ={'Lead':['prosjektnavn','storrelse','innleveringsdato'],'Gi pris':['prosjektnavn','storrelse','innleveringsdato','kunde','byggherre'],'Tilbud sendt':['prosjektnavn','storrelse','innleveringsdato','kunde','byggherre','prosjekttype'],'Ikke sendt tilbud':['prosjektnavn','storrelse','innleveringsdato'],'Vunnet':['prosjektnavn','storrelse','innleveringsdato','kunde','byggherre','prosjekttype','prosjektansvarlig'],'Tapt':['prosjektnavn','storrelse','innleveringsdato']};
+const TC={'Totalentreprise Næring':{bg:'rgba(26,39,68,0.65)',border:'#1a2744',dim:'rgba(26,39,68,0.15)'},'Totalentreprise Bolig':{bg:'rgba(230,126,34,0.6)',border:'#e67e22',dim:'rgba(230,126,34,0.12)'},'Totalentreprise Fisk':{bg:'rgba(52,152,219,0.55)',border:'#2980b9',dim:'rgba(52,152,219,0.12)'},'Betongentreprise':{bg:'rgba(39,174,96,0.55)',border:'#27ae60',dim:'rgba(39,174,96,0.12)'}};
+const DALUX_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+const QD_SVG='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="8" width="3" height="6" rx=".5"/><rect x="5.5" y="4" width="3" height="10" rx=".5"/><rect x="10" y="6" width="3" height="8" rx=".5"/></svg>';
+let qdOpenId=null;
+const COLS=[
+  {id:'warning',label:'⚠',w:'40px',sort:false,req:false},
+  {id:'status',label:'Status',sort:true,req:true,f:'status'},
+  {id:'prosjektnavn',label:'Prosjektnavn',sort:true,req:true,f:'prosjektnavn'},
+  {id:'avdeling',label:'Avdeling',sort:true,f:'avdeling'},
+  {id:'kunde',label:'Kunde',sort:true,f:'kunde'},
+  {id:'byggherre',label:'Byggherre',sort:true,f:'byggherre'},
+  {id:'storrelse',label:'Størrelse MNOK',sort:true,req:true,f:'storrelse',al:'right'},
+  {id:'prosjekttype',label:'Prosjekttype',sort:true,f:'prosjekttype'},
+  {id:'prosjektansvarlig',label:'Salgsansvarlig',sort:true,f:'prosjektansvarlig'},
+  {id:'innleveringsdato',label:'Innleveringsdato',sort:true,req:true,f:'innleveringsdato'},
+  {id:'oppstart',label:'Est. oppstart',sort:true,f:'oppstart'},
+  {id:'lengde',label:'Lengde (mnd)',sort:true,f:'lengde',al:'right'},
+  {id:'lukkemote',label:'Lukkemøte',sort:true,f:'lukkemote',al:'center'},
+  {id:'dalux',label:'Dalux Box',w:'65px',sort:true,f:'daluxLink',al:'center'},
+  {id:'pvekt',label:'P-vekt',w:'110px',sort:true,f:'pvekt',al:'center'},
+  {id:'weighted',label:'Vektet MNOK',sort:true,al:'right'},
+  {id:'lock',label:'Låst',w:'50px',sort:true,f:'locked',al:'center'},
+  {id:'delete',label:'',w:'40px',sort:false}
+];
+let colOrder=['warning','status','prosjektnavn','avdeling','kunde','byggherre','prosjekttype','prosjektansvarlig','innleveringsdato','oppstart','lengde','lukkemote','dalux','storrelse','pvekt','weighted','lock','delete'];
+function gc(id){return COLS.find(c=>c.id===id)}
+
+let data=[
+  {id:1,status:'Gi pris',prosjektnavn:'Stavanger Universitetssykehus Tilbygg',avdeling:'Bryne',kunde:'Helse Vest RHF',byggherre:'Statsbygg',storrelse:520,prosjekttype:'Totalentreprise Næring',prosjektansvarlig:'Øyvind',innleveringsdato:'2026-04-08',lukkemote:false,pvekt:'P3',oppstart:'2026-08-01',lengde:24,daluxLink:''},
+  {id:2,status:'Tilbud sendt',prosjektnavn:'Havneparken Blokk B+C',locked:true,lockLog:[{action:'locked',by:'Olav',date:'2026-03-25',storrelse:480,pvekt:'P4'}],avdeling:'Bryne',kunde:'Havneparken Utvikling AS',byggherre:'Havneparken Utvikling AS',storrelse:480,prosjekttype:'Totalentreprise Bolig',prosjektansvarlig:'Lidvar',innleveringsdato:'2026-03-15',lukkemote:true,lukkemoteDato:'2026-03-10',lukkemoteVarslet:['Daglig leder','Salgsleder','Styreleder','Økonomisjef'],pvekt:'P4',oppstart:'2026-06-01',lengde:20,daluxLink:'https://build.dalux.com/client/project/hbc'},
+  {id:3,status:'Vunnet',prosjektnavn:'Kvernaland Settefiskanlegg',locked:true,lockLog:[{action:'locked',by:'Øyvind',date:'2026-03-15',storrelse:750,pvekt:null}],avdeling:'Bryne',kunde:'Grieg Seafood ASA',byggherre:'Grieg Seafood ASA',storrelse:750,prosjekttype:'Totalentreprise Fisk',prosjektansvarlig:'Jan Arvid',innleveringsdato:'2026-02-01',lukkemote:true,lukkemoteDato:'2026-01-28',lukkemoteVarslet:['Daglig leder','Salgsleder','Styreleder','Leder akvakultur','Økonomisjef'],pvekt:null,oppstart:'2026-04-01',lengde:30,daluxLink:'https://build.dalux.com/client/project/kvernaland'},
+  {id:4,status:'Gi pris',prosjektnavn:'Sola Flyplass Utvidelse P-hus',avdeling:'Stavanger',kunde:'Avinor AS',byggherre:'Avinor AS',storrelse:373,prosjekttype:'Betongentreprise',prosjektansvarlig:'Atle',innleveringsdato:'2026-04-05',lukkemote:false,pvekt:'P4',oppstart:'2026-07-01',lengde:14,daluxLink:'https://build.dalux.com/client/project/sola'},
+];
+let activeFilter='all',chartFilter=null,sortCol=null,sortDir='asc',nextId=100,dragSrc=null;
+let currentRole={id:'olav',name:'Olav',avatar:'OB'};
+let chartLockFilter='all';
+const ROLES={olav:{id:'olav',name:'Olav',avatar:'OB'},oyvind:{id:'oyvind',name:'Øyvind',avatar:'ØL'}};
+function switchRole(v){currentRole=ROLES[v];document.getElementById('userAvatar').textContent=currentRole.avatar;document.getElementById('userName').textContent=currentRole.name==='Olav'?'Olav Bang':'Øyvind Lode';}
+
+function esc(s){return(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+function warn(r){if(r.lukkemote||isClosed(r.status)||!r.innleveringsdato)return false;return(new Date(r.innleveringsdato)-new Date())<14*864e5}
+function mkey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+function inRange(r,mk){if(!r.oppstart||!r.lengde)return false;const s=new Date(r.oppstart),e=new Date(s.getFullYear(),s.getMonth()+r.lengde-1,1);return mk>=mkey(s)&&mk<=mkey(e)}
+
+function getFiltered(){
+  let d=[...data];
+  if(activeFilter==='all')d=d.filter(r=>r.status!=='Tapt');
+  else d=d.filter(r=>r.status===activeFilter);
+  if(chartFilter)d=d.filter(r=>{
+    if(r.prosjekttype!==chartFilter.type)return false;
+    if(!r.oppstart||!r.lengde)return false;
+    const ms=qKeyToMonths(chartFilter.mk);
+    return ms.some(mk=>inRange(r,mk));
+  });
+  if(sortCol){d.sort((a,b)=>{let va,vb;const c=gc(sortCol);
+    if(sortCol==='weighted'){const pa=isClosed(a.status)?0:(getPW(a.pvekt)||{weight:0}).weight,pb=isClosed(b.status)?0:(getPW(b.pvekt)||{weight:0}).weight;va=a.storrelse*pa;vb=b.storrelse*pb;}
+    else if(sortCol==='warning'){va=warn(a)?1:0;vb=warn(b)?1:0;}
+    else if(sortCol==='dalux'){va=a.daluxLink?1:0;vb=b.daluxLink?1:0;}
+    else if(c&&c.f){va=a[c.f];vb=b[c.f];}else{va=0;vb=0;}
+    if(va==null)va='';if(vb==null)vb='';
+    if(typeof va==='number'&&typeof vb==='number')return sortDir==='asc'?va-vb:vb-va;
+    if(typeof va==='boolean')return sortDir==='asc'?(va===vb?0:va?1:-1):(va===vb?0:va?-1:1);
+    return sortDir==='asc'?String(va).localeCompare(String(vb)):String(vb).localeCompare(String(va));
+  });}return d;
+}
+
+function renderHeader(){
+  document.getElementById('headerRow').innerHTML=colOrder.map(id=>{const c=gc(id);if(!c)return'';
+    const arr=c.sort?(sortCol===id?`<span class="sort-arrow active">${sortDir==='asc'?'▲':'▼'}</span>`:'<span class="sort-arrow">▲</span>'):'';
+    return`<th class="${c.req?'required-col':''} ${c.sort?'sortable':''}" style="${c.w?'width:'+c.w+';':''}${c.al?'text-align:'+c.al+';':''}" data-col="${id}" draggable="true" ondragstart="ds(event)" ondragover="dov(event)" ondrop="dd(event)" ondragend="de(event)" onclick="hc('${id}')">${c.label}${arr}</th>`;
+  }).join('');
+}
+
+function renderTable(){
+  const rows=getFiltered(),tb=document.getElementById('salesBody');
+  tb.innerHTML=rows.map(r=>{
+    const cl=isClosed(r.status),pw=cl?null:getPW(r.pvekt),wv=r.status==='Vunnet'?(r.storrelse||0).toFixed(1):(pw?(r.storrelse*pw.weight).toFixed(1):'—'),w=warn(r),rq=REQ[r.status]||[];
+    let hl=false;if(chartFilter&&r.prosjekttype===chartFilter.type)hl=inRange(r,chartFilter.mk);
+    const cls=w?'row-warning':hl?'row-highlight':'';
+    const lk=r.locked?true:false;
+    const rowCls=lk?'row-locked'+(w?' row-warning':''):(cls);
+    const C={};
+    C.warning=`<td>${w?'<span class="warning-indicator"><svg viewBox="0 0 16 16"><path d="M8 1L1 14h14L8 1zm0 4v4m0 2v1"/></svg></span>':''}</td>`;
+    C.status=`<td><select class="cell-edit" onchange="uf(${r.id},'status',this.value)">${STATUS_OPTIONS.map(s=>`<option value="${s}"${s===r.status?' selected':''}>${s}</option>`).join('')}</select></td>`;
+    C.prosjektnavn=`<td><input class="cell-edit${rq.includes('prosjektnavn')&&!r.prosjektnavn?' invalid':''}" type="text" value="${esc(r.prosjektnavn)}" onchange="uf(${r.id},'prosjektnavn',this.value)" placeholder="Prosjektnavn *"></td>`;
+    C.avdeling=`<td><select class="cell-edit" onchange="uf(${r.id},'avdeling',this.value)"><option value="">—</option>${AVDELINGER.map(a=>`<option value="${a}"${a===r.avdeling?' selected':''}>${a}</option>`).join('')}</select></td>`;
+    C.kunde=`<td><input class="cell-edit${rq.includes('kunde')&&!r.kunde?' invalid':''}" type="text" value="${esc(r.kunde)}" onchange="uf(${r.id},'kunde',this.value)" placeholder="${rq.includes('kunde')?'Kunde *':'Kunde'}"></td>`;
+    C.byggherre=`<td><input class="cell-edit${rq.includes('byggherre')&&!r.byggherre?' invalid':''}" type="text" value="${esc(r.byggherre)}" onchange="uf(${r.id},'byggherre',this.value)" placeholder="${rq.includes('byggherre')?'Byggherre *':'Byggherre'}"></td>`;
+    C.storrelse=`<td><input class="cell-edit${rq.includes('storrelse')&&!r.storrelse?' invalid':''}" type="number" step="0.1" min="0" value="${r.storrelse||''}" onchange="uf(${r.id},'storrelse',parseFloat(this.value)||0)" style="width:80px"><button class="qd-btn${r.oppstart&&r.lengde?' '+(qdOpenId===r.id?'active':''):' disabled'}" onclick="toggleQd(${r.id})" title="${r.oppstart&&r.lengde?'Fordel per kvartal':'Sett oppstart og lengde først'}">${QD_SVG}</button></td>`;
+    C.prosjekttype=`<td><select class="cell-edit${rq.includes('prosjekttype')&&!r.prosjekttype?' invalid':''}" onchange="uf(${r.id},'prosjekttype',this.value)"><option value="">—</option>${PROSJEKTTYPER.map(p=>`<option value="${p}"${p===r.prosjekttype?' selected':''}>${p}</option>`).join('')}</select></td>`;
+    C.prosjektansvarlig=`<td><select class="cell-edit${rq.includes('prosjektansvarlig')&&!r.prosjektansvarlig?' invalid':''}" onchange="uf(${r.id},'prosjektansvarlig',this.value)">${ANSVARLIGE.map(a=>`<option value="${a}"${a===r.prosjektansvarlig?' selected':''}>${a||'—'}</option>`).join('')}</select></td>`;
+    C.innleveringsdato=`<td><input class="cell-edit${rq.includes('innleveringsdato')&&!r.innleveringsdato?' invalid':''}" type="date" value="${r.innleveringsdato||''}" onchange="uf(${r.id},'innleveringsdato',this.value)"></td>`;
+    C.oppstart=`<td><input class="cell-edit" type="date" value="${r.oppstart||''}" onchange="uf(${r.id},'oppstart',this.value)"></td>`;
+    C.lengde=`<td><input class="cell-edit" type="number" min="1" max="60" value="${r.lengde||''}" onchange="uf(${r.id},'lengde',parseInt(this.value)||0)" style="width:70px;text-align:right" placeholder="mnd"></td>`;
+    C.lukkemote=r.lukkemote?`<td class="meeting-check"><span class="lm-info" title="${r.lukkemoteDato||''}">&#10003; ${r.lukkemoteDato?mfd(r.lukkemoteDato):'Bekreftet'}</span></td>`:`<td class="meeting-check"><input type="checkbox" onchange="openLm(${r.id},this)"></td>`;
+    C.dalux=`<td style="text-align:center">${r.daluxLink?`<a class="dalux-link" href="${esc(r.daluxLink)}" target="_blank" rel="noopener" title="Åpne i Dalux Box">${DALUX_SVG}</a>`:'<span class="dalux-empty">—</span>'}</td>`;
+    const pvc=cl?'<span class="p-weight" style="color:var(--g400)">N/A</span>':`<select class="cell-edit" style="width:100px;text-align:center;font-size:11px;font-weight:600" onchange="uf(${r.id},'pvekt',this.value)"><option value="">—</option>${P_OPTIONS.map(p=>`<option value="${p.value}"${p.value===r.pvekt?' selected':''}>${p.label}</option>`).join('')}</select>`;
+    C.pvekt=`<td>${pvc}</td>`;C.weighted=`<td><span class="weighted-value">${wv}</span></td>`;
+    C.lock=lk?`<td style="text-align:center"><span class="lock-icon" onclick="openUnlock(${r.id})" title="Låst — klikk for å låse opp">&#128274;</span></td>`:`<td style="text-align:center"><button class="lock-btn" onclick="lockRow(${r.id})" title="Lås rad">&#128275;</button></td>`;
+    C.delete=`<td><button class="btn-delete" onclick="dr(${r.id})" title="Slett">&times;</button></td>`;
+    let rowHtml=`<tr class="${rowCls}">${colOrder.map(c=>C[c]||'<td></td>').join('')}</tr>`;
+    if(qdOpenId===r.id&&r.oppstart&&r.lengde){
+      const qs=getQuarters(r);
+      const qvals=r.qdist||{};
+      const total=qs.reduce((s,q)=>s+(parseFloat(qvals[q.key])||0),0);
+      const diff=Math.abs(total-(r.storrelse||0));
+      const ok=diff<0.05;
+      rowHtml+=`<tr class="qd-row"><td colspan="${colOrder.length}"><div class="qd-panel">
+        <div class="qd-head"><div class="qd-title">Inntektsfordeling per kvartal — ${esc(r.prosjektnavn)}</div><div class="qd-actions"><button class="qd-even" onclick="qdEven(${r.id})">Fordel jevnt</button><button class="qd-close" onclick="toggleQd(${r.id})">&times;</button></div></div>
+        <div class="qd-grid">${qs.map(q=>`<div class="qd-item"><div class="qd-qlabel">${q.label}</div><input class="qd-input" type="number" step="0.1" min="0" value="${qvals[q.key]||''}" placeholder="0" onchange="qdSet(${r.id},'${q.key}',this.value)"></div>`).join('')}
+        <div class="qd-sum"><div class="qd-sum-label">Sum</div><div class="qd-sum-value ${ok?'qd-sum-ok':'qd-sum-err'}">${total.toFixed(1)} / ${(r.storrelse||0).toFixed(1)}</div></div></div>
+        ${ok?'<div class="qd-hint">&#10003; Fordeling stemmer med totalverdi</div>':`<div class="qd-hint" style="color:var(--red)">Differanse: ${(total-(r.storrelse||0)).toFixed(1)} MNOK</div>`}
+      </div></td></tr>`;
+    }
+    return rowHtml;
+  }).join('');
+  updateCounts();updateKPIs();updateChart();
+  // Footer sums
+  const sumStr=rows.reduce((s,r)=>s+(r.storrelse||0),0);
+  const sumWt=rows.reduce((s,r)=>{if(r.status==='Tapt')return s;if(r.status==='Vunnet')return s+(r.storrelse||0);const p=getPW(r.pvekt);return s+(r.storrelse||0)*(p?p.weight:0);},0);
+  document.getElementById('salesFoot').innerHTML=colOrder.map(c=>{
+    if(c==='storrelse')return`<td style="text-align:right">${sumStr.toFixed(1)}</td>`;
+    if(c==='weighted')return`<td style="text-align:right">${sumWt.toFixed(1)}</td>`;
+    if(c==='prosjektnavn')return`<td>Sum (${rows.length} saker)</td>`;
+    return'<td></td>';
+  }).join('');
+}
+
+function uf(id,f,v){const r=data.find(x=>x.id===id);if(!r)return;
+  if(r.locked){renderTable();return;}
+  if(f==='status'&&(v==='Tilbud sendt'||v==='Vunnet')&&!r.lukkemote){alert('Lukkemøte må være avholdt før status kan settes til "'+v+'".');renderTable();return;}
+  r[f]=v;if(f==='status'&&isClosed(v))r.pvekt=null;if(f==='status'&&!isClosed(v)&&r.pvekt===null)r.pvekt='P1';renderTable();}
+
+function lockRow(id){const r=data.find(x=>x.id===id);if(!r)return;
+  const now=new Date().toISOString().split('T')[0];
+  r.locked=true;
+  r.lockLog=r.lockLog||[];
+  r.lockLog.push({action:'locked',by:currentRole.name,date:now,storrelse:r.storrelse,pvekt:r.pvekt});
+  renderTable();}
+
+function openUnlock(id){
+  const r=data.find(x=>x.id===id);if(!r)return;
+  unlockRowId=id;
+  const last=r.lockLog&&r.lockLog.length?r.lockLog[r.lockLog.length-1]:null;
+  let hist='';
+  if(r.lockLog&&r.lockLog.length){
+    hist=r.lockLog.slice().reverse().map(l=>{
+      const pw=l.pvekt?l.pvekt:'N/A';
+      return`<div style="padding:8px 12px;background:var(--g50);border-radius:6px;margin-bottom:4px;font-size:12px;line-height:1.5"><strong>${l.action==='locked'?'&#128274; Låst':'&#128275; Opplåst'}</strong> av ${esc(l.by)} — ${l.date}<br><span style="color:var(--g500)">Størrelse: ${l.storrelse} MNOK | P-vekt: ${pw}</span></div>`;
+    }).join('');
+  }
+  document.getElementById('ulkProjName').textContent=r.prosjektnavn||'(uten navn)';
+  document.getElementById('ulkHistory').innerHTML=hist||'<div style="font-size:12px;color:var(--g400)">Ingen historikk</div>';
+  document.getElementById('ulkOverlay').classList.add('open');
+}
+function ulkClose(){document.getElementById('ulkOverlay').classList.remove('open');unlockRowId=null;}
+function ulkConfirm(){
+  const r=data.find(x=>x.id===unlockRowId);if(!r)return;
+  const now=new Date().toISOString().split('T')[0];
+  r.locked=false;
+  r.lockLog=r.lockLog||[];
+  r.lockLog.push({action:'unlocked',by:currentRole.name,date:now,storrelse:r.storrelse,pvekt:r.pvekt});
+  ulkClose();
+  alert('Opplåsning loggført');
+  renderTable();}
+let unlockRowId=null;
+function dr(id){const r=data.find(x=>x.id===id);if(r&&confirm(`Slett "${r.prosjektnavn||'(uten navn)'}"?`)){data=data.filter(x=>x.id!==id);renderTable();}}
+function addNewRow(){data.unshift({id:nextId++,status:'Lead',prosjektnavn:'',avdeling:'',kunde:'',byggherre:'',storrelse:0,prosjekttype:'',prosjektansvarlig:'',innleveringsdato:'',lukkemote:false,pvekt:'P1',oppstart:'',lengde:0,daluxLink:''});activeFilter='all';chartFilter=null;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.status==='all'));renderHeader();renderTable();setTimeout(()=>{const f=document.querySelector('tbody tr:first-child input[type="text"]');if(f)f.focus();},50);}
+function hc(id){const c=gc(id);if(!c||!c.sort)return;if(sortCol===id)sortDir=sortDir==='asc'?'desc':'asc';else{sortCol=id;sortDir='asc';}renderHeader();renderTable();}
+function ds(e){dragSrc=e.target.closest('th').dataset.col;e.target.closest('th').classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+function dov(e){e.preventDefault();e.dataTransfer.dropEffect='move';const th=e.target.closest('th');document.querySelectorAll('th').forEach(t=>t.classList.remove('drag-over'));if(th&&th.dataset.col!==dragSrc)th.classList.add('drag-over');}
+function dd(e){e.preventDefault();const th=e.target.closest('th');if(!th||!dragSrc)return;const t=th.dataset.col;if(t===dragSrc)return;const f=colOrder.indexOf(dragSrc),to=colOrder.indexOf(t);if(f<0||to<0)return;colOrder.splice(f,1);colOrder.splice(to,0,dragSrc);renderHeader();renderTable();}
+function de(){dragSrc=null;document.querySelectorAll('th').forEach(t=>{t.classList.remove('dragging','drag-over');});}
+
+document.getElementById('statusTabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(!t)return;activeFilter=t.dataset.status;chartFilter=null;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));renderTable();});
+
+function updateCounts(){const c={};STATUS_OPTIONS.forEach(s=>c[s]=0);data.forEach(r=>{if(c[r.status]!==undefined)c[r.status]++;});document.getElementById('count-all').textContent=data.filter(r=>r.status!=='Tapt').length;STATUS_OPTIONS.forEach(s=>{const el=document.getElementById('count-'+s);if(el)el.textContent=c[s];});document.getElementById('rowCount').textContent=`Viser ${getFiltered().length} av ${data.length} saker`;}
+function updateKPIs(){let p=data.filter(r=>r.status!=='Tapt');if(activeFilter!=='all')p=p.filter(r=>r.status===activeFilter);if(chartLockFilter==='locked')p=p.filter(r=>r.locked);else if(chartLockFilter==='open')p=p.filter(r=>!r.locked);const tp=p.reduce((s,r)=>s+(r.storrelse||0),0),tw=p.reduce((s,r)=>{if(r.status==='Vunnet')return s+(r.storrelse||0);const w=getPW(r.pvekt);return s+(r.storrelse||0)*(w?w.weight:0);},0);document.getElementById('kpi-pipeline').textContent=tp.toFixed(0)+' MNOK';document.getElementById('kpi-weighted').textContent=tw.toFixed(1)+' MNOK';}
+
+let chart=null;
+const curYear=new Date().getFullYear();
+const chartYears=[curYear,curYear+1,curYear+2,curYear+3];
+let yearTargets={};
+chartYears.forEach(y=>{yearTargets[y]=0;});
+yearTargets[curYear]=1800;yearTargets[curYear+1]=2000;yearTargets[curYear+2]=2200;yearTargets[curYear+3]=2400;
+
+function getYearActual(year,eligible){
+  let total=0;
+  const qs=buildQuarterBuckets().filter(q=>q.key.startsWith(year+''));
+  qs.forEach(qb=>{
+    eligible.forEach(r=>{
+      qb.months.forEach(mk=>{
+        if(inRange(r,mk))total+=getMonthlyValue(r,mk);
+      });
+    });
+  });
+  return Math.round(total*10)/10;
+}
+
+function getChartEligible(){
+  let el=data.filter(r=>r.status!=='Tapt'&&r.oppstart&&r.lengde>0);
+  if(activeFilter==='all')el=el.filter(r=>r.status!=='Tapt');
+  else el=el.filter(r=>r.status===activeFilter);
+  if(chartLockFilter==='locked')el=el.filter(r=>r.locked);
+  else if(chartLockFilter==='open')el=el.filter(r=>!r.locked);
+  return el;
+}
+
+function renderYearCards(){
+  const el=getChartEligible();
+  document.getElementById('yearTargetRow').innerHTML=chartYears.map(y=>{
+    const actual=getYearActual(y,el);
+    const target=yearTargets[y]||0;
+    let pct=target>0?Math.round(actual/target*100):0;
+    let colorCls=target===0?'gray':pct>=90?'green':pct>=70?'orange':'red';
+    let pctText=target>0?pct+'%':'—';
+    let fillW=target>0?Math.min(pct,100):0;
+    return`<div class="year-card">
+      <div class="year-card-head"><span class="year-card-year">${y}</span><span class="year-card-pct ${colorCls}">${pctText}</span></div>
+      <div class="year-card-bar"><div class="year-card-fill ${colorCls}" style="width:${fillW}%"></div></div>
+      <div class="year-card-nums">
+        <span class="year-card-actual">${actual.toFixed(0)}</span>
+        <span class="year-card-sep">/</span>
+        <div class="year-card-target-wrap"><input class="year-card-input" type="number" min="0" step="10" value="${target||''}" placeholder="—" oninput="setYearTarget(${y},this.value)"><span class="year-card-unit">MNOK</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function setYearTarget(y,v){yearTargets[y]=parseFloat(v)||0;renderYearCards();updateChart();}
+
+// ═══ QUARTERLY HELPERS ═══
+function getQKey(y,q){return y+'Q'+q;}
+function getQuarters(r){
+  if(!r.oppstart||!r.lengde)return[];
+  const s=new Date(r.oppstart),qs=[];
+  const sm=s.getMonth(),sy=s.getFullYear();
+  const em=sm+r.lengde-1;
+  let cm=sm,cy=sy;
+  while(cy*12+cm<=sy*12+em){
+    const q=Math.floor(cm/3)+1;
+    const key=getQKey(cy,q);
+    if(!qs.find(x=>x.key===key))qs.push({key,label:'Q'+q+' '+cy,year:cy,q});
+    cm++;if(cm>11){cm=0;cy++;}
+  }
+  return qs;
+}
+function qKeyToMonths(key){
+  const m=key.match(/(\d+)Q(\d)/);if(!m)return[];
+  const y=parseInt(m[1]),q=parseInt(m[2]);
+  const sm=(q-1)*3;
+  return[0,1,2].map(i=>{const d=new Date(y,sm+i,1);return mkey(d);});
+}
+function toggleQd(id){qdOpenId=qdOpenId===id?null:id;renderTable();}
+function qdSet(id,qkey,val){const r=data.find(x=>x.id===id);if(!r)return;r.qdist=r.qdist||{};r.qdist[qkey]=parseFloat(val)||0;renderTable();}
+function qdEven(id){const r=data.find(x=>x.id===id);if(!r||!r.storrelse)return;const qs=getQuarters(r);if(!qs.length)return;const per=Math.round(r.storrelse/qs.length*10)/10;r.qdist={};qs.forEach((q,i)=>{r.qdist[q.key]=i<qs.length-1?per:Math.round((r.storrelse-per*(qs.length-1))*10)/10;});renderTable();}
+function getMonthlyValue(r,monthKey){
+  const w=r.status==='Vunnet'?1:(getPW(r.pvekt)||{weight:0}).weight;
+  if(!w)return 0;
+  if(r.qdist&&Object.keys(r.qdist).length){
+    // Use quarterly distribution
+    const qs=getQuarters(r);
+    for(const q of qs){
+      const ms=qKeyToMonths(q.key);
+      if(ms.includes(monthKey)){
+        const qval=r.qdist[q.key]||0;
+        const mCount=ms.filter(mk=>inRange(r,mk)).length;
+        return mCount>0?(qval*w)/(mCount):0;
+      }
+    }
+    return 0;
+  }
+  // Default: even distribution
+  return(r.storrelse*w)/r.lengde;
+}
+function buildQuarterBuckets(){
+  const n=new Date(),qs=[];
+  const sy=n.getFullYear(),sq=Math.floor(n.getMonth()/3)+1;
+  for(let i=0;i<16;i++){
+    let q=sq+i,y=sy;while(q>4){q-=4;y++;}
+    const key=getQKey(y,q);
+    const ms=qKeyToMonths(key);
+    qs.push({key,label:'Q'+q+' '+y,months:ms});
+  }
+  return qs;
+}
+
+function updateChart(){
+  const el=getChartEligible();
+  const quarters=buildQuarterBuckets();
+  const to=['Totalentreprise Næring','Totalentreprise Bolig','Totalentreprise Fisk','Betongentreprise'];
+  const at=[...new Set(el.map(r=>r.prosjekttype).filter(Boolean))];
+  const st=to.filter(t=>at.includes(t));
+  const ds=st.map(type=>{
+    const d=quarters.map(qb=>{
+      let tot=0;
+      el.forEach(r=>{
+        if(r.prosjekttype!==type)return;
+        qb.months.forEach(mk=>{if(inRange(r,mk))tot+=getMonthlyValue(r,mk);});
+      });
+      return Math.round(tot*10)/10;
+    });
+    const c=TC[type]||{bg:'rgba(149,165,166,0.5)',border:'#95a5a6',dim:'rgba(149,165,166,0.12)'};
+    const bg=chartFilter?d.map((_,i)=>(chartFilter.type===type&&chartFilter.mk===quarters[i].key)?c.bg:c.dim):c.bg;
+    return{label:type,data:d,backgroundColor:bg,borderColor:chartFilter?'transparent':c.border,borderWidth:chartFilter?0:1};
+  });
+  // Segmented target line per year
+  const hasAnyTarget=chartYears.some(y=>yearTargets[y]>0);
+  if(hasAnyTarget){
+    const targetData=quarters.map(qb=>{
+      const yr=parseInt(qb.key);
+      const t=yearTargets[yr]||0;
+      return t>0?t/4:null;
+    });
+    ds.push({label:'Salgsmål',data:targetData,type:'line',borderColor:'#e74c3c',borderWidth:2,borderDash:[8,4],pointRadius:0,pointHoverRadius:4,pointBackgroundColor:'#e74c3c',fill:false,order:0,stack:'target',spanGaps:false,segment:{borderColor:ctx=>{const i=ctx.p0DataIndex;const j=ctx.p1DataIndex;return(targetData[i]!=null&&targetData[j]!=null)?'#e74c3c':'transparent';}}});
+  }
+  const badge=document.getElementById('chartFilterBadge');
+  if(chartFilter){const ql=quarters.find(q=>q.key===chartFilter.mk);badge.innerHTML=`<span class="chart-filter-badge" onclick="ccf()">Filter: ${chartFilter.type} — ${ql?ql.label:chartFilter.mk} &times;</span>`;}else badge.innerHTML='';
+  const cfg={type:'bar',data:{labels:quarters.map(q=>q.label),datasets:ds},options:{
+    responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    onClick:(evt)=>{if(!chart)return;const els=chart.getElementsAtEventForMode(evt,'nearest',{intersect:true},false);if(!els.length){ccf();return;}const e=els[0];if(chart.data.datasets[e.datasetIndex].type==='line')return;const ty=chart.data.datasets[e.datasetIndex].label,mk=quarters[e.index].key;if(chartFilter&&chartFilter.type===ty&&chartFilter.mk===mk)ccf();else{chartFilter={type:ty,mk};renderTable();}},
+    plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'rectRounded',padding:16,font:{family:'DM Sans',size:11,weight:'500'},filter:item=>item.text!=='Salgsmål'}},tooltip:{backgroundColor:'rgba(26,39,68,0.95)',titleFont:{family:'DM Sans',size:12},bodyFont:{family:'DM Sans',size:12},padding:10,cornerRadius:6,callbacks:{label:c=>{if(c.dataset.type==='line')return'Salgsmål: '+c.parsed.y.toFixed(1)+' MNOK/kv';return c.dataset.label+': '+c.parsed.y.toFixed(1)+' MNOK';},afterBody:items=>{const t=items.filter(i=>i.dataset.type!=='line').reduce((s,i)=>s+i.parsed.y,0);return'\nTotalt: '+t.toFixed(1)+' MNOK';}}}},
+    scales:{x:{stacked:true,grid:{display:false},ticks:{font:{family:'DM Sans',size:11}}},y:{stacked:true,beginAtZero:true,title:{display:true,text:'Vektet ordreserve (MNOK/kvartal)',font:{family:'DM Sans',size:11,weight:'500'},color:'#868e96'},grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'DM Sans',size:11},callback:v=>v.toFixed(0)}}}
+  }};
+  if(chart){chart.data=cfg.data;chart.options.onClick=cfg.options.onClick;chart.update();}else chart=new Chart(document.getElementById('prognosisChart'),cfg);
+  renderYearCards();
+}
+function ccf(){chartFilter=null;renderTable();}
+function setLockFilter(v){chartLockFilter=v;document.querySelectorAll('.chart-lock-tab').forEach(b=>b.classList.toggle('active',b.dataset.lf===v));updateKPIs();updateChart();}
+
+// ═══ LUKKEMØTE MODAL ═══
+const LM_LOCKED=['Daglig leder','Salgsleder','Styreleder'];
+const LM_OPT=['Bærekraftsleder','Driftssjef','Leder Betong','Leder Prosjektering','Leder akvakultur','Leder bolig','Leder prosess og forbedring','Økonomisjef'];
+let lmRowId=null;
+function mfd(d){if(!d)return'';return new Date(d).toLocaleDateString('nb-NO',{day:'numeric',month:'short'});}
+function openLm(id,cb){
+  cb.checked=false;
+  const r=data.find(x=>x.id===id);if(!r)return;
+  lmRowId=id;
+  document.getElementById('lmProjName').textContent=r.prosjektnavn||'(uten navn)';
+  document.getElementById('lmDato').value=new Date().toISOString().split('T')[0];
+  document.getElementById('lmDato').classList.remove('err');
+  document.getElementById('lmDatoErr').classList.remove('show');
+  const all=[...LM_LOCKED.map(n=>({name:n,locked:true})),...LM_OPT.map(n=>({name:n,locked:false}))];
+  document.getElementById('lmRoles').innerHTML=all.map(ro=>{
+    const chk=ro.locked?'checked disabled':'';
+    const cls=ro.locked?'role-item locked':'role-item';
+    const badge=ro.locked?'<span class="role-locked-badge">Obligatorisk</span>':'';
+    return`<label class="${cls}"><input type="checkbox" class="role-check" ${chk} data-role="${esc(ro.name)}"><span class="role-name">${esc(ro.name)}</span>${badge}</label>`;
+  }).join('');
+  document.getElementById('lmOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('lmDato').focus(),100);
+}
+function lmClose(){document.getElementById('lmOverlay').classList.remove('open');lmRowId=null;}
+function lmSave(){
+  const dato=document.getElementById('lmDato').value;
+  if(!dato){document.getElementById('lmDato').classList.add('err');document.getElementById('lmDatoErr').classList.add('show');return;}
+  const r=data.find(x=>x.id===lmRowId);if(!r)return;
+  const roles=[];document.querySelectorAll('#lmRoles .role-check:checked').forEach(c=>roles.push(c.dataset.role));
+  r.lukkemote=true;r.lukkemoteDato=dato;r.lukkemoteVarslet=roles;
+  lmClose();renderTable();
+}
+
+renderHeader();renderTable();
+</script>
+</body>
+</html>
