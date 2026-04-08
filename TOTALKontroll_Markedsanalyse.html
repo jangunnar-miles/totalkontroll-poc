@@ -171,26 +171,28 @@
 <!-- LOGIN -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
-    <div class="login-logo">TT</div>
-    <div class="login-title">TOTALKontroll</div>
-    <div class="login-sub">Markedsanalyse — PoC</div>
+    <div style="margin-bottom:16px"><svg viewBox="0 0 100 90" style="width:50px;height:50px"><rect x="8" y="4" width="84" height="18" rx="2" fill="#E87722"/><rect x="8" y="30" width="36" height="56" rx="2" fill="#E87722"/><rect x="56" y="30" width="36" height="56" rx="2" fill="#E87722"/></svg></div>
+    <div class="login-title"><span style="color:#E87722">TOTAL</span>Kontroll</div>
+    <div class="login-sub">Ledelsessystem — DEMO</div>
     <input class="login-input" id="loginPw" type="password" placeholder="Passord" onkeydown="if(event.key==='Enter')doLogin()">
     <button class="login-btn" onclick="doLogin()">Logg inn</button>
     <div class="login-err" id="loginErr"></div>
   </div>
 </div>
+</div>
 
+<svg style="display:none"><symbol id="tb-logo" viewBox="0 0 100 90"><rect x="8" y="4" width="84" height="18" rx="2" fill="#E87722"/><rect x="8" y="30" width="36" height="56" rx="2" fill="#E87722"/><rect x="56" y="30" width="36" height="56" rx="2" fill="#E87722"/></symbol></svg>
 <aside class="sidebar">
-  <div class="sidebar-logo"><div class="logo-icon">TT</div><div class="logo-text"><span>TOTAL</span>KONTROLL</div></div>
+  <div class="sidebar-logo"><svg style="width:30px;height:30px" viewBox="0 0 100 90"><use href="#tb-logo"/></svg><div class="logo-text"><span>TOTAL</span>KONTROLL</div></div>
   <nav class="sidebar-nav">
-    <div class="nav-item"><span class="nav-icon">&#8962;</span><span class="nav-label">Min side</span></div>
-    <a class="nav-item" href="TOTALKontroll_Salg_PoC.html"><span class="nav-icon">&#9783;</span><span class="nav-label">Salg</span></a>
-    <a class="nav-item nav-sub" href="TOTALKontroll_Muligheter.html"><span class="nav-label">Muligheter</span></a>
-    <a class="nav-item nav-sub active" href="#"><span class="nav-label">Markedsanalyse</span></a>
-    <div class="nav-item"><span class="nav-icon">&#9724;</span><span class="nav-label">Prosjekt</span></div>
-    <div class="nav-item"><span class="nav-icon">&#9776;</span><span class="nav-label">Håndbok</span></div>
-    <div class="nav-item"><span class="nav-icon">&#8644;</span><span class="nav-label">Endringsordre</span></div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="nav-label">Min side</span></div>
+    <a class="nav-item" href="TOTALKontroll_Salg_PoC.html" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span class="nav-label">Salg</span></a>
+    <a class="nav-item" href="TOTALKontroll_Muligheter.html" style="text-decoration:none;padding-left:32px;font-size:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span class="nav-label">Muligheter</span></a>
+    <a class="nav-item active" href="TOTALKontroll_Markedsanalyse.html" style="text-decoration:none;padding-left:32px;font-size:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><span class="nav-label">Markedsanalyse</span></a>
+    <a class="nav-item" href="prosjekt_poc_light.html" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span class="nav-label">Prosjekt</span></a>
+    <a class="nav-item" href="#" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="nav-label">Håndbok</span></a>
   </nav>
+  <div style="padding:14px 18px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:rgba(255,255,255,0.4);font-weight:500">Konseptvisning, kun demo data</div>
 </aside>
 
 <div class="main">
@@ -278,8 +280,7 @@
 
 <script>
 // ═══ LOGIN ═══
-function sHash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h*33)^s.charCodeAt(i))>>>0;return h;}
-function doLogin(){const pw=document.getElementById('loginPw').value;if(!pw){document.getElementById('loginPw').classList.add('err');return;}if(sHash(pw)===2562494657){document.getElementById('loginOverlay').classList.add('hidden');sessionStorage.setItem('tk_auth','1');}else{document.getElementById('loginPw').classList.add('err');document.getElementById('loginErr').textContent='Feil passord';setTimeout(()=>document.getElementById('loginPw').classList.remove('err'),300);}}
+function doLogin(){const pw=document.getElementById('loginPw').value;if(pw==='DF2026'){document.getElementById('loginOverlay').classList.add('hidden');sessionStorage.setItem('tk_auth','1');}else{document.getElementById('loginPw').classList.add('err');document.getElementById('loginErr').textContent='Feil passord';setTimeout(()=>{document.getElementById('loginPw').classList.remove('err');},300);}}
 if(sessionStorage.getItem('tk_auth')==='1')document.getElementById('loginOverlay').classList.add('hidden');
 
 // ═══ STATE ═══
