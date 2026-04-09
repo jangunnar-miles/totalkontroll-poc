@@ -157,8 +157,36 @@
   /* EDITABLE RULES */
   .rule-edit-input{border:1px solid var(--g300);border-radius:5px;padding:4px 8px;font-size:12px;font-family:inherit;width:200px;outline:none;transition:border-color .15s}.rule-edit-input:focus{border-color:var(--orange)}
   .rule-type-select{border:1px solid var(--g300);border-radius:5px;padding:4px 6px;font-size:11px;font-family:inherit;outline:none;cursor:pointer}
+  /* MANUAL CARDS */
+  .opp-card.manual{border-left:4px solid var(--navy)}
+  .manual-icon{width:44px;height:44px;border-radius:10px;background:rgba(26,39,68,0.08);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .opp-tag.manual-tag{background:rgba(26,39,68,0.08);color:var(--navy);font-weight:600}
+  .btn-delete-opp{background:var(--white);color:var(--red);border:1px solid rgba(231,76,60,0.2);padding:8px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s}
+  .btn-delete-opp:hover{background:rgba(231,76,60,0.04);border-color:rgba(231,76,60,0.4)}
+  .btn-add-manual{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:var(--white);border:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s}
+  .btn-add-manual:hover{background:#2d3f63}
+  /* CREATE MODAL */
+  .create-overlay{position:fixed;inset:0;background:rgba(26,39,68,0.5);z-index:1001;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+  .create-overlay.open{opacity:1;pointer-events:auto}
+  .create-modal{background:var(--white);border-radius:16px;width:500px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,0.2);transform:translateY(20px);transition:transform .25s}.create-overlay.open .create-modal{transform:translateY(0)}
+  .create-header{padding:24px 24px 0;display:flex;align-items:flex-start;justify-content:space-between}
+  .create-title{font-size:18px;font-weight:700;color:var(--navy)}
+  .create-sub{font-size:12px;color:var(--g500);margin-top:4px}
+  .create-close{background:none;border:none;font-size:22px;color:var(--g400);cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1}.create-close:hover{color:var(--g700);background:var(--g100)}
+  .create-body{padding:20px 24px}
+  .create-field{margin-bottom:14px}
+  .create-label{font-size:12px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:block}
+  .create-input{width:100%;padding:10px 14px;border:1px solid var(--g300);border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s}.create-input:focus{border-color:var(--orange);box-shadow:0 0 0 2px rgba(230,126,34,0.1)}
+  .create-select{width:100%;padding:10px 14px;border:1px solid var(--g300);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:var(--white);cursor:pointer}.create-select:focus{border-color:var(--orange)}
+  .create-textarea{width:100%;padding:10px 14px;border:1px solid var(--g300);border-radius:8px;font-size:13px;font-family:inherit;outline:none;resize:vertical;min-height:70px;transition:border-color .15s}.create-textarea:focus{border-color:var(--orange)}
+  .create-row{display:flex;gap:12px}
+  .create-row .create-field{flex:1}
+  .create-footer{padding:16px 24px 24px;display:flex;gap:10px;justify-content:flex-end}
+  .create-cancel{background:var(--white);color:var(--g600);border:1px solid var(--g300);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}.create-cancel:hover{background:var(--g50)}
+  .create-confirm{background:var(--orange);color:var(--white);border:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}.create-confirm:hover{background:#d35400}
+  .archive-origin{font-size:10px;color:var(--g500);font-style:italic;margin-left:8px}
 
-  @media(max-width:1200px){.sidebar{width:60px}.sidebar .logo-text,.sidebar .nav-label,.nav-badge,.nav-sub .nav-label{display:none}.sidebar-logo{padding:16px;justify-content:center}.nav-item{padding:12px;justify-content:center}.main{margin-left:60px}}
+  @media(max-width:1200px){.sidebar{width:60px}.sidebar .logo-text,.sidebar .nav-label,.nav-badge,.nav-sub{display:none}.sidebar-logo{padding:16px;justify-content:center}.nav-item{padding:12px;justify-content:center}.main{margin-left:60px}}
   .login-overlay{position:fixed;inset:0;background:#1a2744;z-index:9999;display:flex;align-items:center;justify-content:center}
   .login-overlay.hidden{display:none}
   .login-box{background:#fff;border-radius:16px;padding:40px;width:360px;max-width:90vw;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
@@ -184,17 +212,19 @@
   </div>
 </div>
 
+<svg style="display:none"><symbol id="tb-logo" viewBox="0 0 100 90"><rect x="8" y="4" width="84" height="18" rx="2" fill="#E87722"/><rect x="8" y="30" width="36" height="56" rx="2" fill="#E87722"/><rect x="56" y="30" width="36" height="56" rx="2" fill="#E87722"/></symbol></svg>
 <aside class="sidebar">
-  <div class="sidebar-logo"><div class="logo-icon">TT</div><div class="logo-text"><span>TOTAL</span>KONTROLL</div></div>
+  <div class="sidebar-logo"><svg style="width:30px;height:30px" viewBox="0 0 100 90"><use href="#tb-logo"/></svg><div class="logo-text"><span>TOTAL</span>KONTROLL</div></div>
   <nav class="sidebar-nav">
-    <div class="nav-item"><span class="nav-icon">&#8962;</span><span class="nav-label">Min side</span></div>
-    <a class="nav-item" href="TOTALKontroll_Salg_PoC.html"><span class="nav-icon">&#9783;</span><span class="nav-label">Salg</span></a>
-    <a class="nav-item nav-sub active" href="#"><span class="nav-label">Muligheter</span><span class="nav-badge" id="navBadge">0</span></a>
-    <a class="nav-item nav-sub" href="TOTALKontroll_Markedsanalyse.html"><span class="nav-label">Markedsanalyse</span></a>
-    <div class="nav-item"><span class="nav-icon">&#9724;</span><span class="nav-label">Prosjekt</span></div>
-    <div class="nav-item"><span class="nav-icon">&#9776;</span><span class="nav-label">Håndbok</span></div>
-    <div class="nav-item"><span class="nav-icon">&#8644;</span><span class="nav-label">Endringsordre</span></div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="nav-label">Min side</span></div>
+    <a class="nav-item" href="TOTALKontroll_Salg_PoC.html" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span class="nav-label">Salg</span></a>
+    <a class="nav-item active" href="#" style="text-decoration:none;padding-left:32px;font-size:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span class="nav-label">Muligheter</span><span class="nav-badge" id="navBadge">0</span></a>
+    <a class="nav-item" href="TOTALKontroll_Markedsanalyse.html" style="text-decoration:none;padding-left:32px;font-size:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><span class="nav-label">Markedsanalyse</span></a>
+    <a class="nav-item" href="prosjekt_poc_light.html" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span class="nav-label">Prosjekt</span></a>
+    <div class="nav-sub"><a class="nav-item" href="TOTALKontroll_Fremdriftsplan.html" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Fremdriftsplan</a></div>
+    <a class="nav-item" href="#" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="nav-label">Håndbok</span></a>
   </nav>
+  <div style="padding:14px 18px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:rgba(255,255,255,0.4);font-weight:500">Konseptvisning, kun demo data</div>
 </aside>
 
 <div class="main">
@@ -208,6 +238,7 @@
         <div class="page-title">Muligheter</div>
         <div class="page-subtitle">Automatisk identifiserte prosjektmuligheter fra offentlige kilder</div>
       </div>
+      <button class="btn-add-manual" onclick="openCreate()">+ Registrer mulighet</button>
     </div>
 
     <!-- DEMO BANNER -->
@@ -252,6 +283,23 @@
 
 <div class="toast" id="toast"><span class="toast-icon"></span><span class="toast-text"></span></div>
 <!-- HOLD MODAL -->
+<!-- CREATE MANUAL MODAL -->
+<div class="create-overlay" id="createOverlay" onclick="if(event.target===this)closeCreate()">
+  <div class="create-modal">
+    <div class="create-header"><div><div class="create-title">Registrer mulighet</div><div class="create-sub">Legg til en mulighet manuelt</div></div><button class="create-close" onclick="closeCreate()">&times;</button></div>
+    <div class="create-body">
+      <div class="create-field"><label class="create-label">Prosjektnavn *</label><input class="create-input" id="cName" placeholder="F.eks. Utvidelse settefiskanlegg Finnøy"></div>
+      <div class="create-row">
+        <div class="create-field"><label class="create-label">Prosjekttype</label><select class="create-select" id="cType"><option value="Totalentreprise Fisk">Totalentreprise Fisk</option><option value="Totalentreprise Næring">Totalentreprise Næring</option><option value="Totalentreprise Bolig">Totalentreprise Bolig</option><option value="Betongentreprise">Betongentreprise</option></select></div>
+        <div class="create-field"><label class="create-label">Region</label><input class="create-input" id="cRegion" placeholder="F.eks. Stavanger"></div>
+      </div>
+      <div class="create-field"><label class="create-label">Estimert størrelse (MNOK)</label><input class="create-input" id="cSize" type="number" min="0" placeholder="0"></div>
+      <div class="create-field"><label class="create-label">Notat</label><textarea class="create-textarea" id="cNote" placeholder="Kontekst, kilde, bakgrunn..."></textarea></div>
+    </div>
+    <div class="create-footer"><button class="create-cancel" onclick="closeCreate()">Avbryt</button><button class="create-confirm" onclick="saveManual()">Registrer</button></div>
+  </div>
+</div>
+
 <div class="hold-overlay" id="holdOverlay" onclick="if(event.target===this)holdClose()">
   <div class="hold-modal">
     <div class="hold-header"><div><div class="hold-title">Sett på hold</div><div class="hold-sub">Velg hvor lenge muligheten skal være på vent</div></div><button class="hold-close" onclick="holdClose()">&times;</button></div>
@@ -284,9 +332,15 @@ let opps=[
 ];
 // statuses: new, hold, converted, ignored, blocked
 let ignoredRules=[{id:1,text:'Haugesund Svømmehall',type:'project'},{id:2,text:'Asfaltarbeider',type:'keyword'}];
-let viewMode='new'; // new, hold, archive
+let viewMode='new'; // new, hold, manual, archive
 let showIgnored=false;
 let holdTargetId=null;
+
+// ═══ MANUAL OPPORTUNITIES ═══
+let manualOpps=[
+  {id:9001,name:'Salmon Evolution Fase 2, Indre Harøy',type:'Totalentreprise Fisk',region:'Husøy/Harøy',estSize:500,note:'Tidlige rykter om fase 2 utvidelse. Jan Arvid har kontakt med prosjektdirektør. Byggestart tidligst 2027.',status:'active',created:'2026-03-20'},
+  {id:9002,name:'Grieg Seafood utvidelse Årdal Aqua',type:'Totalentreprise Fisk',region:'Hjelmeland',estSize:350,note:'Grieg har medeiskap i Årdal Aqua. Følge med på reguleringsplan. Øyvind sjekker via nettverket.',status:'active',created:'2026-03-18'},
+];
 
 function esc(s){return(s||'').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
 function fmtD(d){if(!d)return'—';return new Date(d).toLocaleDateString('nb-NO',{day:'numeric',month:'short',year:'numeric'});}
@@ -296,7 +350,10 @@ function toast(ic,msg){const t=document.getElementById('toast');t.querySelector(
 function render(){
   const allNew=opps.filter(o=>o.status==='new');
   const allHold=opps.filter(o=>o.status==='hold');
-  const allArchive=opps.filter(o=>['converted','ignored','blocked'].includes(o.status));
+  const allManual=manualOpps.filter(o=>o.status==='active');
+  const allArchiveAI=opps.filter(o=>['converted','ignored','blocked'].includes(o.status));
+  const allArchiveManual=manualOpps.filter(o=>o.status==='converted');
+  const allArchive=[...allArchiveAI,...allArchiveManual];
   document.getElementById('navBadge').textContent=allNew.length;
   document.getElementById('statNew').textContent=opps.filter(o=>o.published==='2026-03-25'||o.published==='2026-03-24').length;
   document.getElementById('statTotal').textContent=allNew.length;
@@ -304,22 +361,33 @@ function render(){
   // Filter tabs
   let fh=`<button class="filter-tab ${viewMode==='new'?'active':''}" onclick="setView('new')">Alle nye<span class="ft-count">(${allNew.length})</span></button>`;
   fh+=`<button class="filter-tab ${viewMode==='hold'?'active':''}" onclick="setView('hold')">&#9202; På hold<span class="ft-count">(${allHold.length})</span></button>`;
+  fh+=`<button class="filter-tab ${viewMode==='manual'?'active':''}" onclick="setView('manual')">&#9998; Manuelt registrerte<span class="ft-count">(${allManual.length})</span></button>`;
   fh+=`<button class="filter-tab ${viewMode==='archive'?'active':''}" onclick="setView('archive')">Arkiv<span class="ft-count">(${allArchive.length})</span></button>`;
   document.getElementById('filterRow').innerHTML=fh;
 
   let items=[];
   if(viewMode==='new') items=allNew;
   else if(viewMode==='hold') items=allHold;
+  else if(viewMode==='manual') items=allManual;
   else items=allArchive;
 
+  const emptyMsgs={new:'Ingen nye muligheter',hold:'Ingen muligheter på hold',manual:'Ingen manuelt registrerte muligheter',archive:'Arkivet er tomt'};
   if(!items.length){
     document.getElementById('oppList').innerHTML='';
     document.getElementById('emptyState').style.display='block';
-    document.getElementById('emptyState').querySelector('.msg').textContent=
-      viewMode==='new'?'Ingen nye muligheter':(viewMode==='hold'?'Ingen muligheter på hold':'Arkivet er tomt');
+    document.getElementById('emptyState').querySelector('.msg').textContent=emptyMsgs[viewMode]||'Ingen elementer';
   } else {
     document.getElementById('emptyState').style.display='none';
-    document.getElementById('oppList').innerHTML=items.map(o=>renderCard(o)).join('');
+    if(viewMode==='manual'){
+      document.getElementById('oppList').innerHTML=items.map(o=>renderManualCard(o)).join('');
+    } else if(viewMode==='archive'){
+      document.getElementById('oppList').innerHTML=items.map(o=>{
+        if(o.source===undefined && o.created!==undefined) return renderManualArchiveCard(o);
+        return renderCard(o);
+      }).join('');
+    } else {
+      document.getElementById('oppList').innerHTML=items.map(o=>renderCard(o)).join('');
+    }
   }
 
   // Ignored rules
@@ -360,7 +428,8 @@ function renderCard(o){
   // Archive card
   if(['converted','ignored','blocked'].includes(o.status)){
     const lbl=o.status==='converted'?'<span class="archive-label green">&#10003; Konvertert til lead</span>':o.status==='ignored'?'<span class="archive-label gray">Ignorert</span>':'<span class="archive-label red">Permanent ignorert</span>';
-    return`<div class="opp-card archived"><div class="opp-top"><div class="opp-relevance ${rc}">${rl}</div><div class="opp-main"><div class="opp-name">${esc(o.name)}</div><div class="opp-meta"><span class="opp-tag type">${o.type}</span><span class="opp-tag geo">&#9673; ${o.region}</span><span class="opp-tag size">~${o.estSize} MNOK</span></div>${lbl}</div></div></div>`;
+    const origin=o.status==='converted'?'<span class="archive-origin">fra AI-treff</span>':'';
+    return`<div class="opp-card archived"><div class="opp-top"><div class="opp-relevance ${rc}">${rl}</div><div class="opp-main"><div class="opp-name">${esc(o.name)}</div><div class="opp-meta"><span class="opp-tag type">${o.type}</span><span class="opp-tag geo">&#9673; ${o.region}</span><span class="opp-tag size">~${o.estSize} MNOK</span></div>${lbl}${origin}</div></div></div>`;
   }
 
   // New card (default)
@@ -369,8 +438,8 @@ function renderCard(o){
   <div class="opp-actions"><button class="btn-convert" onclick="doConvert(${o.id})">&#10003; Konverter til lead</button><button class="btn-hold" onclick="openHold(${o.id})">&#9202; Sett på hold</button><button class="btn-ignore" onclick="doIgnore(${o.id})">Ignorer denne</button><button class="btn-block" onclick="doBlock(${o.id})">Ignorer fremtidige</button><span class="action-spacer"></span>${src}</div></div>`;
 }
 
-// ═══ ACTIONS ═══
-function doConvert(id){const o=opps.find(x=>x.id===id);if(!o)return;o.status='converted';toast('&#10003;','"'+o.name+'" lagt til i salgspipeline');render();}
+// ═══ ACTIONS (AI) ═══
+function doConvert(id){const o=opps.find(x=>x.id===id);if(!o)return;o.status='converted';o._origin='ai';toast('&#10003;','"'+o.name+'" lagt til i salgspipeline');render();}
 function doIgnore(id){const o=opps.find(x=>x.id===id);if(!o)return;o.status='ignored';toast('&#128473;','Mulighet ignorert');render();}
 function doBlock(id){const o=opps.find(x=>x.id===id);if(!o)return;
   const kw=o.name.split(',')[0].trim();
@@ -378,6 +447,30 @@ function doBlock(id){const o=opps.find(x=>x.id===id);if(!o)return;
     o.status='blocked';ignoredRules.push({id:Date.now(),text:kw,type:'project'});
     toast('&#128275;','Fremtidige treff for "'+kw+'" filtreres bort');render();
   }
+}
+
+// ═══ MANUAL CARD RENDER ═══
+function renderManualCard(o){
+  return`<div class="opp-card manual"><div class="opp-top"><div class="manual-icon">&#9998;</div><div class="opp-main"><div class="opp-name">${esc(o.name)}</div><div class="opp-meta"><span class="opp-tag type">${o.type}</span>${o.region?`<span class="opp-tag geo">&#9673; ${o.region}</span>`:''}${o.estSize?`<span class="opp-tag size">~${o.estSize} MNOK</span>`:''}<span class="opp-tag manual-tag">Manuelt registrert</span><span class="opp-tag source">Opprettet ${fmtD(o.created)}</span></div></div></div>
+  ${o.note?`<div class="opp-body"><span class="opp-reason">Notat:</span>${esc(o.note)}</div>`:''}
+  <div class="opp-actions"><button class="btn-convert" onclick="convertManual(${o.id})">&#10003; Konverter til lead</button><span class="action-spacer"></span><button class="btn-delete-opp" onclick="deleteManual(${o.id})">&#128465; Slett</button></div></div>`;
+}
+function renderManualArchiveCard(o){
+  return`<div class="opp-card archived"><div class="opp-top"><div class="manual-icon" style="opacity:.5">&#9998;</div><div class="opp-main"><div class="opp-name">${esc(o.name)}</div><div class="opp-meta"><span class="opp-tag type">${o.type}</span>${o.region?`<span class="opp-tag geo">&#9673; ${o.region}</span>`:''}${o.estSize?`<span class="opp-tag size">~${o.estSize} MNOK</span>`:''}</div><span class="archive-label green">&#10003; Konvertert til lead</span><span class="archive-origin">fra manuell registrering</span></div></div></div>`;
+}
+
+// ═══ MANUAL ACTIONS ═══
+function convertManual(id){const o=manualOpps.find(x=>x.id===id);if(!o)return;o.status='converted';toast('&#10003;','"'+o.name+'" lagt til i salgspipeline');render();}
+function deleteManual(id){if(!confirm('Er du sikker på at du vil slette denne muligheten?'))return;manualOpps=manualOpps.filter(x=>x.id!==id);toast('&#128465;','Mulighet slettet');render();}
+
+// ═══ CREATE MANUAL ═══
+function openCreate(){document.getElementById('createOverlay').classList.add('open');document.getElementById('cName').value='';document.getElementById('cType').value='Totalentreprise Fisk';document.getElementById('cRegion').value='';document.getElementById('cSize').value='';document.getElementById('cNote').value='';setTimeout(()=>document.getElementById('cName').focus(),200);}
+function closeCreate(){document.getElementById('createOverlay').classList.remove('open');}
+function saveManual(){
+  const name=document.getElementById('cName').value.trim();
+  if(!name){document.getElementById('cName').style.borderColor='var(--red)';setTimeout(()=>document.getElementById('cName').style.borderColor='',1500);return;}
+  manualOpps.unshift({id:Date.now(),name,type:document.getElementById('cType').value,region:document.getElementById('cRegion').value.trim(),estSize:parseFloat(document.getElementById('cSize').value)||0,note:document.getElementById('cNote').value.trim(),status:'active',created:new Date().toISOString().split('T')[0]});
+  closeCreate();viewMode='manual';toast('&#10003;','"'+name+'" registrert');render();
 }
 
 // ═══ HOLD ═══

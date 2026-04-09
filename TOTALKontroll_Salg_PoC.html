@@ -24,19 +24,35 @@
   .topbar-user{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--g700)}
   .role-selector{display:flex;align-items:center}
   .avatar{width:32px;height:32px;border-radius:50%;background:var(--navy);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
-  .content{padding:28px 32px;flex:1}
-  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px}
-  .page-title{font-size:26px;font-weight:700;color:var(--navy);letter-spacing:-.3px}
+  .content{padding:clamp(14px,2vw,28px) clamp(14px,2.2vw,32px);flex:1}
+  .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:clamp(16px,1.5vw,24px)}
+  .page-title{font-size:clamp(20px,1.8vw,26px);font-weight:700;color:var(--navy);letter-spacing:-.3px}
   .page-subtitle{font-size:13px;color:var(--g600);margin-top:4px}
   .btn-primary{display:inline-flex;align-items:center;gap:6px;background:var(--orange);color:var(--white);border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;font-family:inherit}
   .btn-primary:hover{background:#d35400}
-  .chart-section{background:var(--white);border:1px solid var(--g200);border-radius:12px;padding:24px;margin-bottom:24px}
-  .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+  .btn-secondary{display:inline-flex;align-items:center;gap:6px;background:var(--white);color:var(--g700);border:1px solid var(--g300);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:inherit}
+  .btn-secondary:hover{background:var(--g50);border-color:var(--g400)}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;padding-top:16px;border-top:1px solid var(--g100);margin-top:16px}
+  .chart-section{background:var(--white);border:1px solid var(--g200);border-radius:12px;margin-bottom:24px;overflow:hidden}
+  .chart-bar{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;cursor:pointer;transition:background .15s;gap:16px}
+  .chart-bar:hover{background:var(--g50)}
+  .chart-bar-left{display:flex;align-items:center;gap:24px}
+  .chart-bar-title{font-size:15px;font-weight:700;color:var(--navy)}
+  .chart-expand-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid var(--g300);border-radius:8px;background:var(--white);font-size:12px;font-weight:600;color:var(--g600);cursor:pointer;font-family:inherit;transition:all .15s;flex-shrink:0}
+  .chart-expand-btn:hover{border-color:var(--orange);color:var(--orange)}
+  .chart-expand-btn .chevron{font-size:10px;transition:transform .3s}
+  .chart-section.expanded .chart-expand-btn .chevron{transform:rotate(180deg)}
+  .chart-expandable{max-height:0;overflow:hidden;transition:max-height .4s ease}
+  .chart-section.expanded .chart-expandable{max-height:800px}
+  .chart-expand-inner{padding:0 24px 24px}
+  .chart-tease{height:40px;background:linear-gradient(to bottom,rgba(255,255,255,0),var(--white));pointer-events:none;margin-top:-40px;position:relative;z-index:1;transition:opacity .3s}
+  .chart-section.expanded .chart-tease{opacity:0;height:0;margin:0}
+  .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;padding-top:4px;border-top:1px solid var(--g100)}
   .chart-title{font-size:15px;font-weight:600;color:var(--navy)}.chart-subtitle{font-size:12px;color:var(--g500);margin-top:2px}
   .chart-kpis{display:flex;gap:24px}.kpi{text-align:right}
-  .kpi-value{font-size:20px;font-weight:700;color:var(--navy);letter-spacing:-.3px}
-  .kpi-label{font-size:11px;color:var(--g500);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
-  .chart-container{position:relative;height:300px;cursor:pointer}
+  .kpi-value{font-size:clamp(16px,1.3vw,20px);font-weight:700;color:var(--navy);letter-spacing:-.3px}
+  .kpi-label{font-size:clamp(9px,0.7vw,11px);color:var(--g500);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+  .chart-container{position:relative;height:clamp(200px,20vw,300px);cursor:pointer}
   .chart-filter-badge{display:inline-flex;align-items:center;gap:6px;background:var(--orange-faded);border:1px solid var(--orange);color:var(--orange);padding:4px 12px;border-radius:16px;font-size:11px;font-weight:600;margin-top:8px;cursor:pointer}
   .chart-filter-badge:hover{background:rgba(230,126,34,0.15)}
   .chart-lock-tab{padding:4px 12px;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid var(--g300);color:var(--g600);background:var(--white);font-family:inherit}.chart-lock-tab:hover{border-color:var(--g400)}.chart-lock-tab.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
@@ -65,7 +81,7 @@
   .tab.active .count{background:rgba(255,255,255,0.2)}
   .table-wrap{background:var(--white);border:1px solid var(--g200);border-radius:12px;overflow:hidden}
   .table-scroll{overflow-x:auto}
-  table{width:100%;border-collapse:collapse;min-width:1750px}
+  table{width:100%;border-collapse:collapse;min-width:1100px}
   thead th{background:var(--g50);padding:10px 12px;font-size:11px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.5px;text-align:left;border-bottom:1px solid var(--g200);white-space:nowrap;position:sticky;top:0;z-index:10;user-select:none;transition:background .1s}
   thead th.sortable{cursor:pointer}thead th.sortable:hover{background:var(--g100)}
   thead th.required-col::after{content:' *';color:var(--red)}
@@ -77,8 +93,8 @@
   tbody tr.row-warning{background:var(--red-bg)!important}tbody tr.row-warning:hover{background:rgba(231,76,60,0.1)!important}
   tbody tr.row-warning td{border-bottom-color:var(--red-border)}
   tbody tr.row-highlight{background:rgba(230,126,34,0.12)!important}
-  tbody td{padding:6px 8px;font-size:13px;color:var(--g800);border-bottom:1px solid var(--g100);vertical-align:middle}
-  .cell-edit{width:100%;border:1px solid transparent;background:transparent;padding:6px 8px;font-size:13px;font-family:inherit;color:var(--g800);border-radius:4px;transition:all .15s;outline:none}
+  tbody td{padding:6px 8px;font-size:clamp(11px,0.85vw,13px);color:var(--g800);border-bottom:1px solid var(--g100);vertical-align:middle}
+  .cell-edit{width:100%;border:1px solid transparent;background:transparent;padding:6px 8px;font-size:clamp(11px,0.85vw,13px);font-family:inherit;color:var(--g800);border-radius:4px;transition:all .15s;outline:none}
   .cell-edit:hover{border-color:var(--g300);background:var(--white)}
   .cell-edit:focus{border-color:var(--orange);background:var(--white);box-shadow:0 0 0 2px rgba(230,126,34,0.15)}
   .cell-edit.invalid{border-color:var(--red);background:rgba(231,76,60,0.03)}
@@ -97,6 +113,16 @@
   .dalux-link:hover{background:var(--green-bg)}
   .dalux-link svg{width:18px;height:18px}
   .dalux-empty{color:var(--g300);font-size:13px;text-align:center;display:block}
+  .dalux-create{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;border:1px dashed var(--g300);background:none;cursor:pointer;transition:all .15s;color:var(--g400)}.dalux-create:hover{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+  .dalux-create svg{width:16px;height:16px}
+  .dlx-overlay{position:fixed;inset:0;background:rgba(26,39,68,0.5);z-index:1001;display:none;align-items:center;justify-content:center}
+  .dlx-overlay.open{display:flex}
+  .col-toggle-btn{padding:5px 12px;border:1px solid var(--g300);border-radius:8px;background:var(--white);font-size:12px;font-weight:500;color:var(--g600);cursor:pointer;font-family:inherit;transition:all .15s}.col-toggle-btn:hover{border-color:var(--g400);color:var(--navy)}
+  .col-menu{display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--white);border:1px solid var(--g200);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.1);padding:8px 0;min-width:220px;z-index:50;max-height:400px;overflow-y:auto}
+  .col-menu.open{display:block}
+  .col-menu label{display:flex;align-items:center;gap:8px;padding:7px 14px;font-size:12px;color:var(--g700);cursor:pointer;transition:background .1s}.col-menu label:hover{background:var(--g50)}
+  .col-menu input[type=checkbox]{accent-color:var(--orange);width:15px;height:15px;cursor:pointer}
+  .col-menu .cm-divider{border-top:1px solid var(--g200);margin:4px 0}
   .table-footer{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--g200);font-size:11px;color:var(--g500);flex-wrap:wrap;gap:12px}
   tfoot td{padding:10px 12px;font-size:13px;font-weight:700;color:var(--navy);border-top:2px solid var(--g200);background:var(--g50);white-space:nowrap}
   .legend{display:flex;gap:16px;align-items:center}.legend-item{display:flex;align-items:center;gap:4px}
@@ -110,7 +136,6 @@
   tbody tr.row-locked .btn-delete{pointer-events:none;opacity:.2}
   tbody tr.row-locked .meeting-check input{pointer-events:none}
   tbody tr.row-locked .lm-info{color:var(--g400)}
-  tbody tr.row-locked .dalux-link{pointer-events:none;opacity:.3}
   tbody tr.row-locked .weighted-value{color:var(--g400)}
   tbody tr.row-locked .p-weight{color:var(--g400)}
   /* MODAL */
@@ -165,7 +190,65 @@
   .qd-sum-label{font-size:10px;font-weight:600;color:var(--g500);text-transform:uppercase;margin-bottom:3px}
   .qd-sum-value{font-size:14px;font-weight:700;padding:7px 8px}.qd-sum-ok{color:var(--green)}.qd-sum-err{color:var(--red)}
   .qd-hint{font-size:11px;color:var(--g500);margin-top:8px}
-  @media(max-width:1200px){.sidebar{width:60px}.sidebar .logo-text,.sidebar .nav-label{display:none}.sidebar-logo{padding:16px;justify-content:center}.nav-item{padding:12px;justify-content:center}.main{margin-left:60px}}
+  @media(max-width:1200px){
+    .sidebar{width:60px}.sidebar .logo-text,.sidebar .nav-label,.nav-sub{display:none}.sidebar-logo{padding:16px;justify-content:center}.nav-item{padding:12px;justify-content:center}.main{margin-left:60px}
+  }
+  @media(max-width:1400px){
+    .content{padding:20px 20px}
+    .topbar{padding:10px 20px}
+    .page-title{font-size:22px}
+    .page-subtitle{font-size:12px}
+    .page-header{margin-bottom:16px}
+    table{min-width:900px}
+    thead th{padding:7px 8px;font-size:10px;letter-spacing:.3px}
+    tbody td{padding:5px 6px;font-size:12px}
+    .cell-edit{padding:4px 6px;font-size:12px}
+    select.cell-edit{font-size:11px}
+    .tab{padding:5px 12px;font-size:12px}
+    .tab .count{font-size:10px;padding:1px 5px}
+    .chart-bar{padding:14px 18px}
+    .chart-bar-title{font-size:14px}
+    .chart-bar-left{gap:16px}
+    .chart-kpis{gap:16px}
+    .kpi-value{font-size:18px!important}
+    .kpi-label{font-size:9px!important}
+    .chart-expand-btn{padding:6px 12px;font-size:11px}
+    .chart-expand-inner{padding:0 18px 18px}
+    .chart-container{height:240px}
+    .chart-title{font-size:14px!important}
+    .chart-subtitle{font-size:11px!important}
+    .year-card{min-width:140px;padding:10px 12px}
+    .year-card-year{font-size:12px}
+    .year-card-actual{font-size:14px}
+    .year-card-input{width:50px;font-size:11px}
+    .year-card-pct{font-size:10px}
+    .year-target-row{gap:8px}
+    .chart-lock-tab{padding:3px 10px;font-size:10px}
+    .btn-primary{padding:8px 16px;font-size:12px}
+    .table-footer{font-size:11px;padding:8px 12px}
+    .legend{font-size:10px}
+    .col-toggle-btn{font-size:11px;padding:4px 10px}
+    .modal{width:440px}
+    .qd-panel{padding:12px 14px}
+  }
+  @media(max-width:1100px){
+    .content{padding:14px 14px}
+    .page-title{font-size:20px}
+    table{min-width:700px}
+    thead th{padding:6px 6px;font-size:9px}
+    tbody td{padding:4px 5px;font-size:11px}
+    .cell-edit{padding:3px 5px;font-size:11px}
+    .tab{padding:4px 10px;font-size:11px}
+    .chart-container{height:200px}
+    .year-card{min-width:120px;padding:8px 10px}
+    .year-card-actual{font-size:12px}
+    .year-card-year{font-size:11px}
+    .chart-bar{padding:12px 14px}
+    .chart-bar-title{font-size:13px}
+    .kpi-value{font-size:16px!important}
+    .chart-expand-inner{padding:0 14px 14px}
+    .chart-header{margin-bottom:10px}
+  }
   /* LOGIN */
   .login-overlay{position:fixed;inset:0;background:var(--navy);z-index:9999;display:flex;align-items:center;justify-content:center}
   .login-overlay.hidden{display:none}
@@ -215,26 +298,39 @@
   <div class="content">
     <div class="page-header"><div><div class="page-title">Salg</div><div class="page-subtitle">Salgsprosess, leads og ordreserve</div></div><button class="btn-primary" onclick="addNewRow()">+ Ny lead</button></div>
     <div class="chart-section">
-      <div class="chart-header">
-        <div>
-          <div class="chart-title">Ordreserve — vektet prognose per prosjekttype (4 år)</div>
-          <div class="chart-subtitle">Kontraktsverdi fordelt per kvartal &times; P-vekting. Vunnet = 100%. Tapt ekskludert.</div>
-          <div style="display:flex;gap:4px;margin-top:8px;align-items:center;flex-wrap:wrap">
-            <span style="font-size:11px;color:var(--g500);margin-right:4px">Vis:</span>
-            <button class="chart-lock-tab active" data-lf="all" onclick="setLockFilter('all')">Alle</button>
-            <button class="chart-lock-tab" data-lf="locked" onclick="setLockFilter('locked')">&#128274; Låst</button>
-            <button class="chart-lock-tab" data-lf="open" onclick="setLockFilter('open')">&#128275; Åpne</button>
+      <!-- COLLAPSED BAR (always visible) -->
+      <div class="chart-bar" onclick="toggleChart()">
+        <div class="chart-bar-left">
+          <div class="chart-bar-title">Ordreserve</div>
+          <div class="chart-kpis">
+            <div class="kpi"><div class="kpi-value" id="kpi-pipeline">—</div><div class="kpi-label">Total pipeline</div></div>
+            <div class="kpi"><div class="kpi-value" id="kpi-weighted">—</div><div class="kpi-label">Vektet verdi</div></div>
           </div>
-          <div id="chartFilterBadge"></div>
-        </div>
-        <div class="chart-kpis">
-          <div class="kpi"><div class="kpi-value" id="kpi-pipeline">—</div><div class="kpi-label">Total pipeline</div></div>
-          <div class="kpi"><div class="kpi-value" id="kpi-weighted">—</div><div class="kpi-label">Vektet verdi</div></div>
+          <button class="chart-expand-btn" id="chartExpandBtn">Vis graf <span class="chevron" id="chartChevron">&#9660;</span></button>
         </div>
       </div>
-      <!-- YEAR TARGETS & KPIs -->
-      <div id="yearTargetRow" class="year-target-row"></div>
-      <div class="chart-container"><canvas id="prognosisChart"></canvas></div>
+      <!-- EXPANDABLE CONTENT -->
+      <div class="chart-expandable" id="chartExpandable" onclick="event.stopPropagation()">
+        <div class="chart-expand-inner">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Vektet prognose per prosjekttype (4 år)</div>
+              <div class="chart-subtitle">Kontraktsverdi fordelt per kvartal &times; P-vekting. Vunnet = 100%. Tapt ekskludert.</div>
+              <div style="display:flex;gap:4px;margin-top:8px;align-items:center;flex-wrap:wrap">
+                <span style="font-size:11px;color:var(--g500);margin-right:4px">Vis:</span>
+                <button class="chart-lock-tab active" data-lf="all" onclick="setLockFilter('all')">Alle</button>
+                <button class="chart-lock-tab" data-lf="locked" onclick="setLockFilter('locked')">&#128274; Låst</button>
+                <button class="chart-lock-tab" data-lf="open" onclick="setLockFilter('open')">&#128275; Åpne</button>
+              </div>
+              <div id="chartFilterBadge"></div>
+            </div>
+          </div>
+          <!-- YEAR TARGETS & KPIs -->
+          <div id="yearTargetRow" class="year-target-row"></div>
+          <div class="chart-container"><canvas id="prognosisChart"></canvas></div>
+        </div>
+        <div class="chart-tease" id="chartTease"></div>
+      </div>
     </div>
     <div class="tabs" id="statusTabs">
       <button class="tab active" data-status="all">Alle aktive <span class="count" id="count-all">0</span></button>
@@ -245,8 +341,32 @@
       <button class="tab" data-status="Vunnet">Vunnet <span class="count" id="count-Vunnet">0</span></button>
       <button class="tab" data-status="Tapt">Tapt <span class="count" id="count-Tapt">0</span></button>
     </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div></div>
+      <div style="position:relative"><button class="col-toggle-btn" onclick="toggleColMenu()" title="Velg kolonner">&#9881; Kolonner</button>
+        <div class="col-menu" id="colMenu"></div>
+      </div>
+    </div>
     <div class="table-wrap"><div class="table-scroll"><table><thead><tr id="headerRow"></tr></thead><tbody id="salesBody"></tbody><tfoot><tr id="salesFoot"></tr></tfoot></table></div>
       <div class="table-footer"><div class="legend"><div class="legend-item"><div class="legend-swatch" style="background:var(--red-bg);border:1px solid var(--red-border)"></div>Lukkemøte ikke avholdt &amp; &lt;2 uker til innlevering</div><div class="legend-item"><span style="color:var(--red);font-weight:600">*</span> Obligatorisk felt</div></div><div id="rowCount"></div></div>
+    </div>
+  </div>
+</div>
+<!-- DALUX CREATE MODAL -->
+<div class="dlx-overlay" id="dlxOverlay" onclick="if(event.target===this)dlxClose()">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header"><div class="modal-title">Opprett Dalux Box prosjekt</div><button class="modal-close" onclick="dlxClose()">&times;</button></div>
+    <div style="padding:20px 24px">
+      <div id="dlxBody">
+        <div style="font-size:14px;color:var(--g700);margin-bottom:6px">Prosjekt:</div>
+        <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:16px" id="dlxProjName"></div>
+        <div style="font-size:13px;color:var(--g600);line-height:1.6;margin-bottom:20px;padding:12px;background:var(--g50);border-radius:8px">Dette vil opprette et nytt prosjekt i Dalux Box via API og koble det til denne salgsmuligheten.</div>
+      </div>
+      <div id="dlxResult" style="display:none"></div>
+      <div class="modal-actions" id="dlxActions">
+        <button class="btn-secondary" onclick="dlxClose()">Avbryt</button>
+        <button class="btn-primary" id="dlxCreateBtn" onclick="dlxCreate()">Opprett Dalux Box prosjekt</button>
+      </div>
     </div>
   </div>
 </div>
@@ -332,7 +452,8 @@ const COLS=[
   {id:'lock',label:'Låst',w:'50px',sort:true,f:'locked',al:'center'},
   {id:'delete',label:'',w:'40px',sort:false}
 ];
-let colOrder=['warning','status','prosjektnavn','avdeling','kunde','byggherre','prosjekttype','prosjektansvarlig','innleveringsdato','oppstart','lengde','lukkemote','dalux','storrelse','pvekt','weighted','lock','delete'];
+let colOrder=['warning','dalux','status','prosjektansvarlig','prosjektnavn','avdeling','kunde','byggherre','prosjekttype','innleveringsdato','oppstart','lengde','lukkemote','storrelse','pvekt','weighted','lock','delete'];
+let visibleCols=new Set(['dalux','status','prosjektansvarlig','prosjektnavn','oppstart','storrelse','pvekt','weighted','lock']);
 function gc(id){return COLS.find(c=>c.id===id)}
 
 let data=[
@@ -374,8 +495,10 @@ function getFiltered(){
   });}return d;
 }
 
+function getVisCols(){return colOrder.filter(id=>{const c=gc(id);if(!c)return false;if(id==='warning'||id==='delete')return true;return visibleCols.has(id);});}
 function renderHeader(){
-  document.getElementById('headerRow').innerHTML=colOrder.map(id=>{const c=gc(id);if(!c)return'';
+  const cols=getVisCols();
+  document.getElementById('headerRow').innerHTML=cols.map(id=>{const c=gc(id);if(!c)return'';
     const arr=c.sort?(sortCol===id?`<span class="sort-arrow active">${sortDir==='asc'?'▲':'▼'}</span>`:'<span class="sort-arrow">▲</span>'):'';
     return`<th class="${c.req?'required-col':''} ${c.sort?'sortable':''}" style="${c.w?'width:'+c.w+';':''}${c.al?'text-align:'+c.al+';':''}" data-col="${id}" draggable="true" ondragstart="ds(event)" ondragover="dov(event)" ondrop="dd(event)" ondragend="de(event)" onclick="hc('${id}')">${c.label}${arr}</th>`;
   }).join('');
@@ -403,19 +526,19 @@ function renderTable(){
     C.oppstart=`<td><input class="cell-edit" type="date" value="${r.oppstart||''}" onchange="uf(${r.id},'oppstart',this.value)"></td>`;
     C.lengde=`<td><input class="cell-edit" type="number" min="1" max="60" value="${r.lengde||''}" onchange="uf(${r.id},'lengde',parseInt(this.value)||0)" style="width:70px;text-align:right" placeholder="mnd"></td>`;
     C.lukkemote=r.lukkemote?`<td class="meeting-check"><span class="lm-info" title="${r.lukkemoteDato||''}">&#10003; ${r.lukkemoteDato?mfd(r.lukkemoteDato):'Bekreftet'}</span></td>`:`<td class="meeting-check"><input type="checkbox" onchange="openLm(${r.id},this)"></td>`;
-    C.dalux=`<td style="text-align:center">${r.daluxLink?`<a class="dalux-link" href="${esc(r.daluxLink)}" target="_blank" rel="noopener" title="Åpne i Dalux Box">${DALUX_SVG}</a>`:'<span class="dalux-empty">—</span>'}</td>`;
+    C.dalux=`<td style="text-align:center">${r.daluxLink?`<a class="dalux-link" href="${esc(r.daluxLink)}" target="_blank" rel="noopener" title="Åpne i Dalux Box">${DALUX_SVG}</a>`:`<button class="dalux-create" onclick="event.stopPropagation();openDlxCreate(${r.id})" title="Opprett Dalux Box prosjekt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></button>`}</td>`;
     const pvc=cl?'<span class="p-weight" style="color:var(--g400)">N/A</span>':`<select class="cell-edit" style="width:100px;text-align:center;font-size:11px;font-weight:600" onchange="uf(${r.id},'pvekt',this.value)"><option value="">—</option>${P_OPTIONS.map(p=>`<option value="${p.value}"${p.value===r.pvekt?' selected':''}>${p.label}</option>`).join('')}</select>`;
     C.pvekt=`<td>${pvc}</td>`;C.weighted=`<td><span class="weighted-value">${wv}</span></td>`;
     C.lock=lk?`<td style="text-align:center"><span class="lock-icon" onclick="openUnlock(${r.id})" title="Låst — klikk for å låse opp">&#128274;</span></td>`:`<td style="text-align:center"><button class="lock-btn" onclick="lockRow(${r.id})" title="Lås rad">&#128275;</button></td>`;
     C.delete=`<td><button class="btn-delete" onclick="dr(${r.id})" title="Slett">&times;</button></td>`;
-    let rowHtml=`<tr class="${rowCls}">${colOrder.map(c=>C[c]||'<td></td>').join('')}</tr>`;
+    let rowHtml=`<tr class="${rowCls}">${getVisCols().map(c=>C[c]||'<td></td>').join('')}</tr>`;
     if(qdOpenId===r.id&&r.oppstart&&r.lengde){
       const qs=getQuarters(r);
       const qvals=r.qdist||{};
       const total=qs.reduce((s,q)=>s+(parseFloat(qvals[q.key])||0),0);
       const diff=Math.abs(total-(r.storrelse||0));
       const ok=diff<0.05;
-      rowHtml+=`<tr class="qd-row"><td colspan="${colOrder.length}"><div class="qd-panel">
+      rowHtml+=`<tr class="qd-row"><td colspan="${getVisCols().length}"><div class="qd-panel">
         <div class="qd-head"><div class="qd-title">Inntektsfordeling per kvartal — ${esc(r.prosjektnavn)}</div><div class="qd-actions"><button class="qd-even" onclick="qdEven(${r.id})">Fordel jevnt</button><button class="qd-close" onclick="toggleQd(${r.id})">&times;</button></div></div>
         <div class="qd-grid">${qs.map(q=>`<div class="qd-item"><div class="qd-qlabel">${q.label}</div><input class="qd-input" type="number" step="0.1" min="0" value="${qvals[q.key]||''}" placeholder="0" onchange="qdSet(${r.id},'${q.key}',this.value)"></div>`).join('')}
         <div class="qd-sum"><div class="qd-sum-label">Sum</div><div class="qd-sum-value ${ok?'qd-sum-ok':'qd-sum-err'}">${total.toFixed(1)} / ${(r.storrelse||0).toFixed(1)}</div></div></div>
@@ -428,7 +551,7 @@ function renderTable(){
   // Footer sums
   const sumStr=rows.reduce((s,r)=>s+(r.storrelse||0),0);
   const sumWt=rows.reduce((s,r)=>{if(r.status==='Tapt')return s;if(r.status==='Vunnet')return s+(r.storrelse||0);const p=getPW(r.pvekt);return s+(r.storrelse||0)*(p?p.weight:0);},0);
-  document.getElementById('salesFoot').innerHTML=colOrder.map(c=>{
+  document.getElementById('salesFoot').innerHTML=getVisCols().map(c=>{
     if(c==='storrelse')return`<td style="text-align:right">${sumStr.toFixed(1)}</td>`;
     if(c==='weighted')return`<td style="text-align:right">${sumWt.toFixed(1)}</td>`;
     if(c==='prosjektnavn')return`<td>Sum (${rows.length} saker)</td>`;
@@ -476,6 +599,49 @@ function ulkConfirm(){
 let unlockRowId=null;
 function dr(id){const r=data.find(x=>x.id===id);if(r&&confirm(`Slett "${r.prosjektnavn||'(uten navn)'}"?`)){data=data.filter(x=>x.id!==id);renderTable();}}
 function addNewRow(){data.unshift({id:nextId++,status:'Lead',prosjektnavn:'',avdeling:'',kunde:'',byggherre:'',storrelse:0,prosjekttype:'',prosjektansvarlig:'',innleveringsdato:'',lukkemote:false,pvekt:'P1',oppstart:'',lengde:0,daluxLink:''});activeFilter='all';chartFilter=null;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.status==='all'));renderHeader();renderTable();setTimeout(()=>{const f=document.querySelector('tbody tr:first-child input[type="text"]');if(f)f.focus();},50);}
+
+// ═══ COLUMN VISIBILITY ═══
+function toggleColMenu(){document.getElementById('colMenu').classList.toggle('open');}
+document.addEventListener('click',e=>{const m=document.getElementById('colMenu');if(m&&m.classList.contains('open')&&!e.target.closest('.col-menu')&&!e.target.closest('.col-toggle-btn'))m.classList.remove('open');});
+function renderColMenu(){
+  const toggleable=COLS.filter(c=>c.id!=='warning'&&c.id!=='delete');
+  document.getElementById('colMenu').innerHTML=toggleable.map(c=>{
+    const checked=visibleCols.has(c.id)?'checked':'';
+    return`<label><input type="checkbox" ${checked} onchange="toggleCol('${c.id}',this.checked)"> ${c.label||c.id}</label>`;
+  }).join('');
+}
+function toggleCol(id,show){if(show)visibleCols.add(id);else visibleCols.delete(id);renderHeader();renderTable();renderColMenu();}
+renderColMenu();
+
+// ═══ DALUX CREATE ═══
+let dlxTargetId=null;
+function openDlxCreate(id){
+  const r=data.find(x=>x.id===id);if(!r)return;
+  dlxTargetId=id;
+  document.getElementById('dlxProjName').textContent=r.prosjektnavn||'Uten navn';
+  document.getElementById('dlxBody').style.display='block';
+  document.getElementById('dlxResult').style.display='none';
+  document.getElementById('dlxResult').innerHTML='';
+  document.getElementById('dlxCreateBtn').style.display='';
+  document.getElementById('dlxOverlay').classList.add('open');
+}
+function dlxClose(){document.getElementById('dlxOverlay').classList.remove('open');dlxTargetId=null;}
+function dlxCreate(){
+  const btn=document.getElementById('dlxCreateBtn');
+  btn.disabled=true;btn.textContent='Oppretter...';
+  document.getElementById('dlxBody').style.display='none';
+  document.getElementById('dlxResult').style.display='block';
+  document.getElementById('dlxResult').innerHTML='<div style="text-align:center;padding:20px"><div style="display:inline-block;width:24px;height:24px;border:3px solid var(--g200);border-top-color:var(--navy);border-radius:50%;animation:spin .8s linear infinite"></div><div style="margin-top:10px;font-size:13px;color:var(--g500)">Kontakter Dalux API...</div></div>';
+  setTimeout(()=>{
+    const r=data.find(x=>x.id===dlxTargetId);if(!r){dlxClose();return;}
+    const fakeId='DLX-'+String(Math.floor(100000+Math.random()*900000));
+    r.daluxLink='https://build.dalux.com/client/project/'+fakeId.toLowerCase();
+    document.getElementById('dlxResult').innerHTML=`<div style="text-align:center;padding:20px"><div style="width:48px;height:48px;border-radius:50%;background:var(--green-bg);display:inline-flex;align-items:center;justify-content:center;font-size:24px;color:var(--green);margin-bottom:12px">&#10003;</div><div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px">Prosjekt opprettet</div><div style="font-size:13px;color:var(--g600);margin-bottom:12px">Dalux Box prosjekt er opprettet og koblet til salgsmuligheten.</div><div style="padding:10px 14px;background:var(--g50);border-radius:8px;font-size:13px"><span style="color:var(--g500)">Prosjekt-ID:</span> <strong style="color:var(--navy)">${fakeId}</strong></div></div>`;
+    btn.style.display='none';
+    document.querySelector('#dlxActions .btn-secondary').textContent='Lukk';
+    renderTable();
+  },2000);
+}
 function hc(id){const c=gc(id);if(!c||!c.sort)return;if(sortCol===id)sortDir=sortDir==='asc'?'desc':'asc';else{sortCol=id;sortDir='asc';}renderHeader();renderTable();}
 function ds(e){dragSrc=e.target.closest('th').dataset.col;e.target.closest('th').classList.add('dragging');e.dataTransfer.effectAllowed='move';}
 function dov(e){e.preventDefault();e.dataTransfer.dropEffect='move';const th=e.target.closest('th');document.querySelectorAll('th').forEach(t=>t.classList.remove('drag-over'));if(th&&th.dataset.col!==dragSrc)th.classList.add('drag-over');}
@@ -636,6 +802,14 @@ function updateChart(){
 }
 function ccf(){chartFilter=null;renderTable();}
 function setLockFilter(v){chartLockFilter=v;document.querySelectorAll('.chart-lock-tab').forEach(b=>b.classList.toggle('active',b.dataset.lf===v));updateKPIs();updateChart();}
+let chartExpanded=false;
+function toggleChart(){
+  chartExpanded=!chartExpanded;
+  document.querySelector('.chart-section').classList.toggle('expanded',chartExpanded);
+  const btn=document.getElementById('chartExpandBtn');
+  btn.childNodes[0].textContent=chartExpanded?'Skjul graf ':'Vis graf ';
+  if(chartExpanded&&chart)chart.resize();
+}
 
 // ═══ LUKKEMØTE MODAL ═══
 const LM_LOCKED=['Daglig leder','Salgsleder','Styreleder'];
