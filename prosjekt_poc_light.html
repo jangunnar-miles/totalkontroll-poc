@@ -382,6 +382,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
       <div class="nav-item" onclick="window.open('TOTALKontroll_Markedsanalyse.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Markedsanalyse</div>
     </div>
     <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Prosjekt</div>
+    <div class="nav-sub"><a class="nav-item" href="TOTALKontroll_Fremdriftsplan.html" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Fremdriftsplan</a></div>
     <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Håndbok</div>
   </div>
   <div class="sidebar-footer" style="color:var(--text-inverse-muted);font-size:11px;font-weight:500;">Konseptvisning, kun demo data</div>
@@ -482,7 +483,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 </div>
 
 <script>
-document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter'){if(e.target.value==='DF2026'){document.getElementById('gate').classList.add('hidden');document.getElementById('app').style.display='';}else{document.getElementById('pwError').style.display='block';e.target.value='';}}});
+if(sessionStorage.getItem('tk_auth')==='1'){document.getElementById('gate').classList.add('hidden');document.getElementById('app').style.display='';}
+document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter'){if(e.target.value==='DF2026'){sessionStorage.setItem('tk_auth','1');document.getElementById('gate').classList.add('hidden');document.getElementById('app').style.display='';}else{document.getElementById('pwError').style.display='block';e.target.value='';}}});
 
 const projects=[
   {id:'p1',name:'Forus Kontorpark Bygg D',pnr:'P-2024-018',type:'TE Næring',cat:'te-naering',leader:'Lars Vestbø',phase:'Produksjon',customer:'Vestpark Utvikling AS',contractValue:'145 MNOK',plannedEnd:'Nov 2026',
