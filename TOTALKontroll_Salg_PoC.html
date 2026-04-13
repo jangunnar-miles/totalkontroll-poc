@@ -91,7 +91,7 @@
   thead th.drag-over{box-shadow:inset -3px 0 0 var(--orange)}
   tbody tr{transition:background .1s}tbody tr:hover{background:var(--orange-faded)}
   tbody tr.row-warning{background:var(--red-bg)!important}tbody tr.row-warning:hover{background:rgba(231,76,60,0.1)!important}
-  tbody tr.row-warning td{border-bottom-color:var(--red-border)}
+  tbody tr.row-warning td{border-bottom:1px solid var(--red-border)!important}
   tbody tr.row-highlight{background:rgba(230,126,34,0.12)!important}
   tbody td{padding:6px 8px;font-size:clamp(11px,0.85vw,13px);color:var(--g800);border-bottom:1px solid var(--g100);vertical-align:middle}
   .cell-edit{width:100%;border:1px solid transparent;background:transparent;padding:6px 8px;font-size:clamp(11px,0.85vw,13px);font-family:inherit;color:var(--g800);border-radius:4px;transition:all .15s;outline:none}
@@ -190,6 +190,19 @@
   .qd-sum-label{font-size:10px;font-weight:600;color:var(--g500);text-transform:uppercase;margin-bottom:3px}
   .qd-sum-value{font-size:14px;font-weight:700;padding:7px 8px}.qd-sum-ok{color:var(--green)}.qd-sum-err{color:var(--red)}
   .qd-hint{font-size:11px;color:var(--g500);margin-top:8px}
+  /* NOTE */
+  .note-btn{background:none;border:none;cursor:pointer;padding:3px;border-radius:5px;transition:all .15s;line-height:1;font-size:15px;opacity:.3}
+  .note-btn:hover{opacity:.7;background:var(--g100)}
+  .note-btn.has-note{opacity:.85;color:var(--orange)}
+  .note-btn.has-note:hover{opacity:1}
+  tr.note-row td{padding:0!important;border-bottom:2px solid var(--blue)}
+  .note-panel{background:var(--g50);padding:14px 20px;border-top:1px solid var(--g200)}
+  .note-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .note-title{font-size:13px;font-weight:600;color:var(--navy)}
+  .note-actions{display:flex;gap:8px}
+  .note-save{padding:6px 14px;background:var(--navy);color:var(--white);border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}.note-save:hover{background:#2d3f63}
+  .note-cancel{padding:6px 14px;background:var(--white);color:var(--g600);border:1px solid var(--g300);border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}.note-cancel:hover{background:var(--g50)}
+  .note-textarea{width:100%;min-height:80px;padding:10px 12px;border:1px solid var(--g300);border-radius:8px;font-size:13px;font-family:inherit;color:var(--g800);resize:vertical;outline:none;line-height:1.5;transition:border-color .15s}.note-textarea:focus{border-color:var(--orange);box-shadow:0 0 0 2px rgba(230,126,34,0.1)}
   @media(max-width:1200px){
     .sidebar{width:60px}.sidebar .logo-text,.sidebar .nav-label,.nav-sub{display:none}.sidebar-logo{padding:16px;justify-content:center}.nav-item{padding:12px;justify-content:center}.main{margin-left:60px}
   }
@@ -427,7 +440,7 @@ const ANSVARLIGE=['','Atle','Berit','Jan Arvid','Jette','Kristian','Lidvar','Ola
 const P_OPTIONS=[{value:'P1',label:'P1 (10%)',weight:.10},{value:'P2',label:'P2 (25%)',weight:.25},{value:'P3',label:'P3 (50%)',weight:.50},{value:'P4',label:'P4 (75%)',weight:.75},{value:'P5',label:'P5 (90%)',weight:.90},{value:'P6',label:'P6 (100%)',weight:1}];
 function getPW(v){return P_OPTIONS.find(p=>p.value===v)||null}
 function isClosed(s){return s==='Vunnet'||s==='Tapt'}
-const REQ={'Lead':['prosjektnavn','storrelse','innleveringsdato'],'Gi pris':['prosjektnavn','storrelse','innleveringsdato','kunde','byggherre'],'Tilbud sendt':['prosjektnavn','storrelse','innleveringsdato','kunde','byggherre','prosjekttype'],'Ikke sendt tilbud':['prosjektnavn','storrelse','innleveringsdato'],'Vunnet':['prosjektnavn','storrelse','innleveringsdato','kunde','byggherre','prosjekttype','prosjektansvarlig'],'Tapt':['prosjektnavn','storrelse','innleveringsdato']};
+const REQ={'Lead':['prosjektnavn','storrelse'],'Gi pris':['prosjektnavn','storrelse','kunde','byggherre'],'Tilbud sendt':['prosjektnavn','storrelse','kunde','byggherre','prosjekttype'],'Ikke sendt tilbud':['prosjektnavn','storrelse'],'Vunnet':['prosjektnavn','storrelse','kunde','byggherre','prosjekttype','prosjektansvarlig'],'Tapt':['prosjektnavn','storrelse']};
 const TC={'Totalentreprise Næring':{bg:'rgba(26,39,68,0.65)',border:'#1a2744',dim:'rgba(26,39,68,0.15)'},'Totalentreprise Bolig':{bg:'rgba(230,126,34,0.6)',border:'#e67e22',dim:'rgba(230,126,34,0.12)'},'Totalentreprise Fisk':{bg:'rgba(52,152,219,0.55)',border:'#2980b9',dim:'rgba(52,152,219,0.12)'},'Betongentreprise':{bg:'rgba(39,174,96,0.55)',border:'#27ae60',dim:'rgba(39,174,96,0.12)'}};
 const DALUX_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
 const QD_SVG='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="8" width="3" height="6" rx=".5"/><rect x="5.5" y="4" width="3" height="10" rx=".5"/><rect x="10" y="6" width="3" height="8" rx=".5"/></svg>';
@@ -439,32 +452,34 @@ const COLS=[
   {id:'avdeling',label:'Avdeling',sort:true,f:'avdeling'},
   {id:'kunde',label:'Kunde',sort:true,f:'kunde'},
   {id:'byggherre',label:'Byggherre',sort:true,f:'byggherre'},
-  {id:'storrelse',label:'Størrelse MNOK',sort:true,req:true,f:'storrelse',al:'right'},
+  {id:'storrelse',label:'Est. verdi (MNOK)',sort:true,req:true,f:'storrelse',al:'right'},
   {id:'prosjekttype',label:'Prosjekttype',sort:true,f:'prosjekttype'},
   {id:'prosjektansvarlig',label:'Salgsansvarlig',sort:true,f:'prosjektansvarlig'},
-  {id:'innleveringsdato',label:'Innleveringsdato',sort:true,req:true,f:'innleveringsdato'},
+  {id:'innleveringsdato',label:'Innleveringsdato',sort:true,f:'innleveringsdato'},
   {id:'oppstart',label:'Est. oppstart',sort:true,f:'oppstart'},
-  {id:'lengde',label:'Lengde (mnd)',sort:true,f:'lengde',al:'right'},
+  {id:'lengde',label:'Est. lengde (mnd)',sort:true,f:'lengde',al:'right'},
   {id:'lukkemote',label:'Lukkemøte',sort:true,f:'lukkemote',al:'center'},
   {id:'dalux',label:'Dalux Box',w:'65px',sort:true,f:'daluxLink',al:'center'},
   {id:'pvekt',label:'P-vekt',w:'110px',sort:true,f:'pvekt',al:'center'},
   {id:'weighted',label:'Vektet MNOK',sort:true,al:'right'},
   {id:'lock',label:'Låst',w:'50px',sort:true,f:'locked',al:'center'},
+  {id:'note',label:'Notat',w:'45px',sort:false,al:'center'},
   {id:'delete',label:'',w:'40px',sort:false}
 ];
-let colOrder=['warning','dalux','status','prosjektansvarlig','prosjektnavn','avdeling','kunde','byggherre','prosjekttype','innleveringsdato','oppstart','lengde','lukkemote','storrelse','pvekt','weighted','lock','delete'];
-let visibleCols=new Set(['dalux','status','prosjektansvarlig','prosjektnavn','oppstart','storrelse','pvekt','weighted','lock']);
+let colOrder=['warning','dalux','status','prosjektansvarlig','prosjektnavn','avdeling','kunde','byggherre','prosjekttype','innleveringsdato','oppstart','lengde','lukkemote','storrelse','pvekt','weighted','lock','note','delete'];
+let visibleCols=new Set(['dalux','status','prosjektansvarlig','prosjektnavn','oppstart','lengde','storrelse','pvekt','weighted','lock','note']);
 function gc(id){return COLS.find(c=>c.id===id)}
 
 let data=[
-  {id:1,status:'Gi pris',prosjektnavn:'Stavanger Universitetssykehus Tilbygg',avdeling:'Bryne',kunde:'Helse Vest RHF',byggherre:'Statsbygg',storrelse:520,prosjekttype:'Totalentreprise Næring',prosjektansvarlig:'Øyvind',innleveringsdato:'2026-04-08',lukkemote:false,pvekt:'P3',oppstart:'2026-08-01',lengde:24,daluxLink:''},
-  {id:2,status:'Tilbud sendt',prosjektnavn:'Havneparken Blokk B+C',locked:true,lockLog:[{action:'locked',by:'Olav',date:'2026-03-25',storrelse:480,pvekt:'P4'}],avdeling:'Bryne',kunde:'Havneparken Utvikling AS',byggherre:'Havneparken Utvikling AS',storrelse:480,prosjekttype:'Totalentreprise Bolig',prosjektansvarlig:'Lidvar',innleveringsdato:'2026-03-15',lukkemote:true,lukkemoteDato:'2026-03-10',lukkemoteVarslet:['Daglig leder','Salgsleder','Styreleder','Økonomisjef'],pvekt:'P4',oppstart:'2026-06-01',lengde:20,daluxLink:'https://build.dalux.com/client/project/hbc'},
-  {id:3,status:'Vunnet',prosjektnavn:'Kvernaland Settefiskanlegg',locked:true,lockLog:[{action:'locked',by:'Øyvind',date:'2026-03-15',storrelse:750,pvekt:null}],avdeling:'Bryne',kunde:'Grieg Seafood ASA',byggherre:'Grieg Seafood ASA',storrelse:750,prosjekttype:'Totalentreprise Fisk',prosjektansvarlig:'Jan Arvid',innleveringsdato:'2026-02-01',lukkemote:true,lukkemoteDato:'2026-01-28',lukkemoteVarslet:['Daglig leder','Salgsleder','Styreleder','Leder akvakultur','Økonomisjef'],pvekt:null,oppstart:'2026-04-01',lengde:30,daluxLink:'https://build.dalux.com/client/project/kvernaland'},
-  {id:4,status:'Gi pris',prosjektnavn:'Sola Flyplass Utvidelse P-hus',avdeling:'Stavanger',kunde:'Avinor AS',byggherre:'Avinor AS',storrelse:373,prosjekttype:'Betongentreprise',prosjektansvarlig:'Atle',innleveringsdato:'2026-04-05',lukkemote:false,pvekt:'P4',oppstart:'2026-07-01',lengde:14,daluxLink:'https://build.dalux.com/client/project/sola'},
+  {id:1,status:'Gi pris',prosjektnavn:'Stavanger Universitetssykehus Tilbygg',avdeling:'Bryne',kunde:'Helse Vest RHF',byggherre:'Statsbygg',storrelse:520,prosjekttype:'Totalentreprise Næring',prosjektansvarlig:'Øyvind',innleveringsdato:'',lukkemote:false,pvekt:'P3',oppstart:'2026-08-01',lengde:24,daluxLink:'',note:'Avventer avklaring fra Statsbygg om prekvalifisering. Øyvind følger opp etter påske.'},
+  {id:2,status:'Tilbud sendt',prosjektnavn:'Havneparken Blokk B+C',locked:true,lockLog:[{action:'locked',by:'Olav',date:'2026-03-25',storrelse:480,pvekt:'P4'}],avdeling:'Bryne',kunde:'Havneparken Utvikling AS',byggherre:'Havneparken Utvikling AS',storrelse:480,prosjekttype:'Totalentreprise Bolig',prosjektansvarlig:'Lidvar',innleveringsdato:'',lukkemote:true,lukkemoteDato:'2026-03-10',lukkemoteVarslet:['Daglig leder','Salgsleder','Styreleder','Økonomisjef'],pvekt:'P4',oppstart:'2026-06-01',lengde:20,daluxLink:'https://build.dalux.com/client/project/hbc',note:''},
+  {id:3,status:'Vunnet',prosjektnavn:'Kvernaland Settefiskanlegg',locked:true,lockLog:[{action:'locked',by:'Øyvind',date:'2026-03-15',storrelse:750,pvekt:null}],avdeling:'Bryne',kunde:'Grieg Seafood ASA',byggherre:'Grieg Seafood ASA',storrelse:750,prosjekttype:'Totalentreprise Fisk',prosjektansvarlig:'Jan Arvid',innleveringsdato:'',lukkemote:true,lukkemoteDato:'2026-01-28',lukkemoteVarslet:['Daglig leder','Salgsleder','Styreleder','Leder akvakultur','Økonomisjef'],pvekt:null,oppstart:'2026-04-01',lengde:30,daluxLink:'https://build.dalux.com/client/project/kvernaland',note:'Kontrakt signert. Oppstartsmøte planlagt uke 15. Jan Arvid er prosjektleder.'},
+  {id:4,status:'Gi pris',prosjektnavn:'Sola Flyplass Utvidelse P-hus',avdeling:'Stavanger',kunde:'Avinor AS',byggherre:'Avinor AS',storrelse:373,prosjekttype:'Betongentreprise',prosjektansvarlig:'Atle',innleveringsdato:'',lukkemote:false,pvekt:'P4',oppstart:'2026-07-01',lengde:14,daluxLink:'https://build.dalux.com/client/project/sola',note:''},
 ];
 let activeFilter='all',chartFilter=null,sortCol=null,sortDir='asc',nextId=100,dragSrc=null;
 let currentRole={id:'olav',name:'Olav',avatar:'OB'};
 let chartLockFilter='all';
+let noteOpenId=null;
 const ROLES={olav:{id:'olav',name:'Olav',avatar:'OB'},oyvind:{id:'oyvind',name:'Øyvind',avatar:'ØL'}};
 function switchRole(v){currentRole=ROLES[v];document.getElementById('userAvatar').textContent=currentRole.avatar;document.getElementById('userName').textContent=currentRole.name==='Olav'?'Olav Bang':'Øyvind Lode';}
 
@@ -519,17 +534,18 @@ function renderTable(){
     C.avdeling=`<td><select class="cell-edit" onchange="uf(${r.id},'avdeling',this.value)"><option value="">—</option>${AVDELINGER.map(a=>`<option value="${a}"${a===r.avdeling?' selected':''}>${a}</option>`).join('')}</select></td>`;
     C.kunde=`<td><input class="cell-edit${rq.includes('kunde')&&!r.kunde?' invalid':''}" type="text" value="${esc(r.kunde)}" onchange="uf(${r.id},'kunde',this.value)" placeholder="${rq.includes('kunde')?'Kunde *':'Kunde'}"></td>`;
     C.byggherre=`<td><input class="cell-edit${rq.includes('byggherre')&&!r.byggherre?' invalid':''}" type="text" value="${esc(r.byggherre)}" onchange="uf(${r.id},'byggherre',this.value)" placeholder="${rq.includes('byggherre')?'Byggherre *':'Byggherre'}"></td>`;
-    C.storrelse=`<td><input class="cell-edit${rq.includes('storrelse')&&!r.storrelse?' invalid':''}" type="number" step="0.1" min="0" value="${r.storrelse||''}" onchange="uf(${r.id},'storrelse',parseFloat(this.value)||0)" style="width:80px"><button class="qd-btn${r.oppstart&&r.lengde?' '+(qdOpenId===r.id?'active':''):' disabled'}" onclick="toggleQd(${r.id})" title="${r.oppstart&&r.lengde?'Fordel per kvartal':'Sett oppstart og lengde først'}">${QD_SVG}</button></td>`;
+    C.storrelse=`<td style="text-align:right"><input class="cell-edit${rq.includes('storrelse')&&!r.storrelse?' invalid':''}" type="number" step="0.1" min="0" value="${r.storrelse||''}" onchange="uf(${r.id},'storrelse',parseFloat(this.value)||0)" style="width:80px;text-align:right"><button class="qd-btn${r.oppstart&&r.lengde?' '+(qdOpenId===r.id?'active':''):' disabled'}" onclick="toggleQd(${r.id})" title="${r.oppstart&&r.lengde?'Fordel per kvartal':'Sett oppstart og lengde først'}">${QD_SVG}</button></td>`;
     C.prosjekttype=`<td><select class="cell-edit${rq.includes('prosjekttype')&&!r.prosjekttype?' invalid':''}" onchange="uf(${r.id},'prosjekttype',this.value)"><option value="">—</option>${PROSJEKTTYPER.map(p=>`<option value="${p}"${p===r.prosjekttype?' selected':''}>${p}</option>`).join('')}</select></td>`;
     C.prosjektansvarlig=`<td><select class="cell-edit${rq.includes('prosjektansvarlig')&&!r.prosjektansvarlig?' invalid':''}" onchange="uf(${r.id},'prosjektansvarlig',this.value)">${ANSVARLIGE.map(a=>`<option value="${a}"${a===r.prosjektansvarlig?' selected':''}>${a||'—'}</option>`).join('')}</select></td>`;
     C.innleveringsdato=`<td><input class="cell-edit${rq.includes('innleveringsdato')&&!r.innleveringsdato?' invalid':''}" type="date" value="${r.innleveringsdato||''}" onchange="uf(${r.id},'innleveringsdato',this.value)"></td>`;
     C.oppstart=`<td><input class="cell-edit" type="date" value="${r.oppstart||''}" onchange="uf(${r.id},'oppstart',this.value)"></td>`;
-    C.lengde=`<td><input class="cell-edit" type="number" min="1" max="60" value="${r.lengde||''}" onchange="uf(${r.id},'lengde',parseInt(this.value)||0)" style="width:70px;text-align:right" placeholder="mnd"></td>`;
-    C.lukkemote=r.lukkemote?`<td class="meeting-check"><span class="lm-info" title="${r.lukkemoteDato||''}">&#10003; ${r.lukkemoteDato?mfd(r.lukkemoteDato):'Bekreftet'}</span></td>`:`<td class="meeting-check"><input type="checkbox" onchange="openLm(${r.id},this)"></td>`;
+    C.lengde=`<td style="text-align:right"><input class="cell-edit" type="number" min="1" max="60" value="${r.lengde||''}" onchange="uf(${r.id},'lengde',parseInt(this.value)||0)" style="width:70px;text-align:right" placeholder="mnd"></td>`;
+    C.lukkemote=r.lukkemote?`<td><div class="meeting-check"><span class="lm-info" title="${r.lukkemoteDato||''}">&#10003; ${r.lukkemoteDato?mfd(r.lukkemoteDato):'Bekreftet'}</span></div></td>`:`<td><div class="meeting-check"><input type="checkbox" onchange="openLm(${r.id},this)"></div></td>`;
     C.dalux=`<td style="text-align:center">${r.daluxLink?`<a class="dalux-link" href="${esc(r.daluxLink)}" target="_blank" rel="noopener" title="Åpne i Dalux Box">${DALUX_SVG}</a>`:`<button class="dalux-create" onclick="event.stopPropagation();openDlxCreate(${r.id})" title="Opprett Dalux Box prosjekt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></button>`}</td>`;
     const pvc=cl?'<span class="p-weight" style="color:var(--g400)">N/A</span>':`<select class="cell-edit" style="width:100px;text-align:center;font-size:11px;font-weight:600" onchange="uf(${r.id},'pvekt',this.value)"><option value="">—</option>${P_OPTIONS.map(p=>`<option value="${p.value}"${p.value===r.pvekt?' selected':''}>${p.label}</option>`).join('')}</select>`;
     C.pvekt=`<td>${pvc}</td>`;C.weighted=`<td><span class="weighted-value">${wv}</span></td>`;
     C.lock=lk?`<td style="text-align:center"><span class="lock-icon" onclick="openUnlock(${r.id})" title="Låst — klikk for å låse opp">&#128274;</span></td>`:`<td style="text-align:center"><button class="lock-btn" onclick="lockRow(${r.id})" title="Lås rad">&#128275;</button></td>`;
+    C.note=`<td style="text-align:center"><button class="note-btn${r.note?' has-note':''}" onclick="toggleNote(${r.id})" title="${r.note?'Vis/rediger notat':'Legg til notat'}">${r.note?'&#128221;':'&#128196;'}</button></td>`;
     C.delete=`<td><button class="btn-delete" onclick="dr(${r.id})" title="Slett">&times;</button></td>`;
     let rowHtml=`<tr class="${rowCls}">${getVisCols().map(c=>C[c]||'<td></td>').join('')}</tr>`;
     if(qdOpenId===r.id&&r.oppstart&&r.lengde){
@@ -543,6 +559,12 @@ function renderTable(){
         <div class="qd-grid">${qs.map(q=>`<div class="qd-item"><div class="qd-qlabel">${q.label}</div><input class="qd-input" type="number" step="0.1" min="0" value="${qvals[q.key]||''}" placeholder="0" onchange="qdSet(${r.id},'${q.key}',this.value)"></div>`).join('')}
         <div class="qd-sum"><div class="qd-sum-label">Sum</div><div class="qd-sum-value ${ok?'qd-sum-ok':'qd-sum-err'}">${total.toFixed(1)} / ${(r.storrelse||0).toFixed(1)}</div></div></div>
         ${ok?'<div class="qd-hint">&#10003; Fordeling stemmer med totalverdi</div>':`<div class="qd-hint" style="color:var(--red)">Differanse: ${(total-(r.storrelse||0)).toFixed(1)} MNOK</div>`}
+      </div></td></tr>`;
+    }
+    if(noteOpenId===r.id){
+      rowHtml+=`<tr class="note-row"><td colspan="${getVisCols().length}"><div class="note-panel">
+        <div class="note-head"><div class="note-title">Notat — ${esc(r.prosjektnavn)}</div><div class="note-actions"><button class="note-save" onclick="saveNote(${r.id})">Lagre</button><button class="note-cancel" onclick="toggleNote(null)">Avbryt</button></div></div>
+        <textarea class="note-textarea" id="noteText-${r.id}" placeholder="Skriv et notat...">${esc(r.note||'')}</textarea>
       </div></td></tr>`;
     }
     return rowHtml;
@@ -598,7 +620,7 @@ function ulkConfirm(){
   renderTable();}
 let unlockRowId=null;
 function dr(id){const r=data.find(x=>x.id===id);if(r&&confirm(`Slett "${r.prosjektnavn||'(uten navn)'}"?`)){data=data.filter(x=>x.id!==id);renderTable();}}
-function addNewRow(){data.unshift({id:nextId++,status:'Lead',prosjektnavn:'',avdeling:'',kunde:'',byggherre:'',storrelse:0,prosjekttype:'',prosjektansvarlig:'',innleveringsdato:'',lukkemote:false,pvekt:'P1',oppstart:'',lengde:0,daluxLink:''});activeFilter='all';chartFilter=null;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.status==='all'));renderHeader();renderTable();setTimeout(()=>{const f=document.querySelector('tbody tr:first-child input[type="text"]');if(f)f.focus();},50);}
+function addNewRow(){data.unshift({id:nextId++,status:'Lead',prosjektnavn:'',avdeling:'',kunde:'',byggherre:'',storrelse:0,prosjekttype:'',prosjektansvarlig:'',innleveringsdato:'',lukkemote:false,pvekt:'P1',oppstart:'',lengde:0,daluxLink:'',note:''});activeFilter='all';chartFilter=null;document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.status==='all'));renderHeader();renderTable();setTimeout(()=>{const f=document.querySelector('tbody tr:first-child input[type="text"]');if(f)f.focus();},50);}
 
 // ═══ COLUMN VISIBILITY ═══
 function toggleColMenu(){document.getElementById('colMenu').classList.toggle('open');}
@@ -726,7 +748,9 @@ function qKeyToMonths(key){
   const sm=(q-1)*3;
   return[0,1,2].map(i=>{const d=new Date(y,sm+i,1);return mkey(d);});
 }
-function toggleQd(id){qdOpenId=qdOpenId===id?null:id;renderTable();}
+function toggleQd(id){qdOpenId=qdOpenId===id?null:id;noteOpenId=null;renderTable();}
+function toggleNote(id){noteOpenId=noteOpenId===id?null:id;qdOpenId=null;renderTable();if(id)setTimeout(()=>{const ta=document.getElementById('noteText-'+id);if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);}},50);}
+function saveNote(id){const ta=document.getElementById('noteText-'+id);if(!ta)return;const r=data.find(x=>x.id===id);if(!r)return;r.note=ta.value.trim();noteOpenId=null;renderTable();}
 function qdSet(id,qkey,val){const r=data.find(x=>x.id===id);if(!r)return;r.qdist=r.qdist||{};r.qdist[qkey]=parseFloat(val)||0;renderTable();}
 function qdEven(id){const r=data.find(x=>x.id===id);if(!r||!r.storrelse)return;const qs=getQuarters(r);if(!qs.length)return;const per=Math.round(r.storrelse/qs.length*10)/10;r.qdist={};qs.forEach((q,i)=>{r.qdist[q.key]=i<qs.length-1?per:Math.round((r.storrelse-per*(qs.length-1))*10)/10;});renderTable();}
 function getMonthlyValue(r,monthKey){
