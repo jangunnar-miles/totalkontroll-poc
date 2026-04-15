@@ -67,7 +67,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .filter-btn:hover { border-color:var(--text-dim); color:var(--text-primary); }
 .filter-btn.active { border-color:var(--tb-orange); color:var(--tb-orange); background:var(--tb-orange-bg); }
 
-.summary-strip { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:24px; }
+.summary-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:24px; }
 .summary-card { background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow-sm); }
 .summary-card .label { font-size:11px; color:var(--text-dim); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
 .summary-card .value { font-size:26px; font-weight:700; font-family:'JetBrains Mono',monospace; }
@@ -284,7 +284,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
   .kpi-grid { grid-template-columns:repeat(2,1fr); }
   .kpi-card.wide { grid-column:span 2; }
   .kpi-card.full { grid-column:span 2; }
-  .summary-strip { grid-template-columns:repeat(2,1fr); }
+  .summary-strip { grid-template-columns:repeat(3,1fr); }
   .health-breakdown-grid { grid-template-columns:repeat(3,1fr); }
 }
 @media (max-width:768px) {
@@ -618,9 +618,19 @@ function renderOverview(){
     return`<th class="${c.cls} ${active?'sorted':''}" onclick="toggleSort('${c.key}')">${c.label}<span class="sort-arrow">${arrow}</span></th>`;
   }).join('');
 
+  // Aggregate KPIs across portfolio
+  const totalHms=filtered.reduce((s,p)=>s+p.hms.open,0);
+  const behindPlan=filtered.filter(p=>p.fremdrift.weeksOff<0).length;
+  const avgLik=filtered.length>0?+(filtered.reduce((s,p)=>s+p.likviditet.pct,0)/filtered.length).toFixed(1):0;
+  const totalFaktura=filtered.reduce((s,p)=>s+p.faktura.total,0);
+  const likColor=avgLik>=15?'green':avgLik>=10?'yellow':'red';
+
   document.getElementById('summaryStrip').innerHTML=`
-    <div class="summary-card"><div class="label">Snitt prosjekthelse</div><div class="value ${ar}">${avg}</div><div class="meta">${filtered.length} aktive prosjekter</div></div>
-    <div class="summary-card"><div class="label">Samlet kontraktsverdi</div><div class="value">${totalContract}</div><div class="meta">MNOK</div></div>`;
+    <div class="summary-card"><div class="label">Prosjekthelse</div><div class="value ${ar}">${avg}</div><div class="meta">Snitt ${filtered.length} prosjekter</div></div>
+    <div class="summary-card"><div class="label">HMS — åpne avvik</div><div class="value ${totalHms>15?'red':totalHms>8?'yellow':'green'}">${totalHms}</div><div class="meta">Totalt på tvers</div></div>
+    <div class="summary-card"><div class="label">Fremdrift</div><div class="value ${behindPlan>filtered.length/2?'red':behindPlan>0?'yellow':'green'}">${behindPlan} av ${filtered.length}</div><div class="meta">Prosjekter bak plan</div></div>
+    <div class="summary-card"><div class="label">Likviditet</div><div class="value ${likColor}">${avgLik}%</div><div class="meta">Snitt på tvers</div></div>
+    <div class="summary-card"><div class="label">Fakturaflyt</div><div class="value ${totalFaktura>30?'red':totalFaktura>15?'yellow':'green'}">${totalFaktura}</div><div class="meta">Ubehandlede totalt</div></div>`;
   document.getElementById('projectTableBody').innerHTML=sorted.map(p=>{
     const h=evaluateKpis(p);
     const pips=h.results.map(r=>`<span class="score-pip ${!r.set?'y':r.pass?'g':'r'}"></span>`).join('');
@@ -1200,9 +1210,17 @@ function renderOverviewForPeriod() {
     const arrow=active?(sortDir==='asc'?'▲':'▼'):'▲';
     return`<th class="${c.cls} ${active?'sorted':''}" onclick="toggleSort('${c.key}')">${c.label}<span class="sort-arrow">${arrow}</span></th>`;
   }).join('');
+  const totalHmsH=histFiltered.reduce((s,p)=>s+p.hms.open,0);
+  const behindPlanH=histFiltered.filter(p=>p.fremdrift.weeksOff<0).length;
+  const avgLikH=histFiltered.length>0?+(histFiltered.reduce((s,p)=>s+p.likviditet.pct,0)/histFiltered.length).toFixed(1):0;
+  const totalFakturaH=histFiltered.reduce((s,p)=>s+p.faktura.total,0);
+  const likColorH=avgLikH>=15?'green':avgLikH>=10?'yellow':'red';
   document.getElementById('summaryStrip').innerHTML=`
-    <div class="summary-card"><div class="label">Snitt prosjekthelse</div><div class="value ${ar}">${avg}</div><div class="meta">${histFiltered.length} prosjekter</div></div>
-    <div class="summary-card"><div class="label">Samlet kontraktsverdi</div><div class="value">${totalContract}</div><div class="meta">MNOK</div></div>`;
+    <div class="summary-card"><div class="label">Prosjekthelse</div><div class="value ${ar}">${avg}</div><div class="meta">Snitt ${histFiltered.length} prosjekter</div></div>
+    <div class="summary-card"><div class="label">HMS — åpne avvik</div><div class="value ${totalHmsH>15?'red':totalHmsH>8?'yellow':'green'}">${totalHmsH}</div><div class="meta">Totalt på tvers</div></div>
+    <div class="summary-card"><div class="label">Fremdrift</div><div class="value ${behindPlanH>histFiltered.length/2?'red':behindPlanH>0?'yellow':'green'}">${behindPlanH} av ${histFiltered.length}</div><div class="meta">Prosjekter bak plan</div></div>
+    <div class="summary-card"><div class="label">Likviditet</div><div class="value ${likColorH}">${avgLikH}%</div><div class="meta">Snitt på tvers</div></div>
+    <div class="summary-card"><div class="label">Fakturaflyt</div><div class="value ${totalFakturaH>30?'red':totalFakturaH>15?'yellow':'green'}">${totalFakturaH}</div><div class="meta">Ubehandlede totalt</div></div>`;
   document.getElementById('projectTableBody').innerHTML=sorted.map(p=>{
     const h=evaluateKpis(p);
     const pips=h.results.map(r=>`<span class="score-pip ${!r.set?'y':r.pass?'g':'r'}"></span>`).join('');
