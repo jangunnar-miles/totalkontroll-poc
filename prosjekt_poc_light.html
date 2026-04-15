@@ -67,7 +67,14 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .filter-btn:hover { border-color:var(--text-dim); color:var(--text-primary); }
 .filter-btn.active { border-color:var(--tb-orange); color:var(--tb-orange); background:var(--tb-orange-bg); }
 
-.summary-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:24px; }
+.summary-health { background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); padding:14px 20px; box-shadow:var(--shadow-sm); margin-bottom:12px; display:flex; align-items:center; gap:20px; }
+.summary-health .sh-score { font-size:36px; font-weight:700; font-family:'JetBrains Mono',monospace; }
+.summary-health .sh-score.green { color:var(--green); }
+.summary-health .sh-score.yellow { color:var(--yellow); }
+.summary-health .sh-score.red { color:var(--red); }
+.summary-health .sh-label { font-size:13px; font-weight:600; color:var(--text-primary); }
+.summary-health .sh-meta { font-size:11px; color:var(--text-dim); margin-top:2px; }
+.summary-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
 .summary-card { background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow-sm); }
 .summary-card .label { font-size:11px; color:var(--text-dim); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
 .summary-card .value { font-size:26px; font-weight:700; font-family:'JetBrains Mono',monospace; }
@@ -284,7 +291,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
   .kpi-grid { grid-template-columns:repeat(2,1fr); }
   .kpi-card.wide { grid-column:span 2; }
   .kpi-card.full { grid-column:span 2; }
-  .summary-strip { grid-template-columns:repeat(3,1fr); }
+  .summary-strip { grid-template-columns:repeat(2,1fr); }
   .health-breakdown-grid { grid-template-columns:repeat(3,1fr); }
 }
 @media (max-width:768px) {
@@ -394,6 +401,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
     <div class="content">
       <div id="overviewBanner"></div>
       <div class="page-header"><div><div class="page-title">Prosjektoversikt</div><div class="page-subtitle" id="overviewSubtitle"></div></div><div class="filter-bar" id="filterBar"></div></div>
+      <div class="summary-health" id="summaryHealth"></div>
       <div class="summary-strip" id="summaryStrip"></div>
       <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
         <button class="update-kpi-btn" onclick="showReportPage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Oppdater KPI-data</button>
@@ -625,8 +633,10 @@ function renderOverview(){
   const totalFaktura=filtered.reduce((s,p)=>s+p.faktura.total,0);
   const likColor=avgLik>=15?'green':avgLik>=10?'yellow':'red';
 
+  document.getElementById('summaryHealth').innerHTML=`
+    <div class="sh-score ${ar}">${avg}</div>
+    <div><div class="sh-label">Porteføljehelse</div><div class="sh-meta">Snitt ${filtered.length} prosjekter, beregnet fra 4 KPI-er under</div></div>`;
   document.getElementById('summaryStrip').innerHTML=`
-    <div class="summary-card"><div class="label">Prosjekthelse</div><div class="value ${ar}">${avg}</div><div class="meta">Snitt ${filtered.length} prosjekter</div></div>
     <div class="summary-card"><div class="label">HMS — åpne avvik</div><div class="value ${totalHms>15?'red':totalHms>8?'yellow':'green'}">${totalHms}</div><div class="meta">Totalt på tvers</div></div>
     <div class="summary-card"><div class="label">Fremdrift</div><div class="value ${behindPlan>filtered.length/2?'red':behindPlan>0?'yellow':'green'}">${behindPlan} av ${filtered.length}</div><div class="meta">Prosjekter bak plan</div></div>
     <div class="summary-card"><div class="label">Likviditet</div><div class="value ${likColor}">${avgLik}%</div><div class="meta">Snitt på tvers</div></div>
@@ -1215,8 +1225,10 @@ function renderOverviewForPeriod() {
   const avgLikH=histFiltered.length>0?+(histFiltered.reduce((s,p)=>s+p.likviditet.pct,0)/histFiltered.length).toFixed(1):0;
   const totalFakturaH=histFiltered.reduce((s,p)=>s+p.faktura.total,0);
   const likColorH=avgLikH>=15?'green':avgLikH>=10?'yellow':'red';
+  document.getElementById('summaryHealth').innerHTML=`
+    <div class="sh-score ${ar}">${avg}</div>
+    <div><div class="sh-label">Porteføljehelse</div><div class="sh-meta">Snitt ${histFiltered.length} prosjekter, beregnet fra 4 KPI-er under</div></div>`;
   document.getElementById('summaryStrip').innerHTML=`
-    <div class="summary-card"><div class="label">Prosjekthelse</div><div class="value ${ar}">${avg}</div><div class="meta">Snitt ${histFiltered.length} prosjekter</div></div>
     <div class="summary-card"><div class="label">HMS — åpne avvik</div><div class="value ${totalHmsH>15?'red':totalHmsH>8?'yellow':'green'}">${totalHmsH}</div><div class="meta">Totalt på tvers</div></div>
     <div class="summary-card"><div class="label">Fremdrift</div><div class="value ${behindPlanH>histFiltered.length/2?'red':behindPlanH>0?'yellow':'green'}">${behindPlanH} av ${histFiltered.length}</div><div class="meta">Prosjekter bak plan</div></div>
     <div class="summary-card"><div class="label">Likviditet</div><div class="value ${likColorH}">${avgLikH}%</div><div class="meta">Snitt på tvers</div></div>
