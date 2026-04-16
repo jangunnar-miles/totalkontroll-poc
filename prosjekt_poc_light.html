@@ -355,6 +355,41 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .report-legend .dot.auto { background:#DBEEFE; border:1px solid #82BEE8; }
 .report-legend .dot.manual { background:#FEF3E2; border:1px solid #E5A94E; }
 
+/* Punch edit modal */
+.pe-modal { background:var(--bg-white); border-radius:var(--radius-lg); padding:24px; width:460px; max-width:90vw; box-shadow:0 8px 32px rgba(0,0,0,0.15); }
+.pe-header { font-size:14px; font-weight:700; color:var(--navy); margin-bottom:2px; }
+.pe-sub { font-size:11px; color:var(--text-dim); margin-bottom:16px; }
+.pe-field { margin-bottom:16px; }
+.pe-field label { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim); display:block; margin-bottom:5px; }
+.pe-field input[type="number"], .pe-field input[type="text"] { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; outline:none; }
+.pe-field input:focus { border-color:var(--tb-orange); box-shadow:0 0 0 3px rgba(232,119,34,0.1); }
+.pe-field textarea { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-family:'DM Sans',sans-serif; font-size:12px; outline:none; resize:vertical; min-height:60px; }
+.pe-field textarea:focus { border-color:var(--tb-orange); box-shadow:0 0 0 3px rgba(232,119,34,0.1); }
+.pe-history { margin-bottom:18px; max-height:160px; overflow-y:auto; }
+.pe-history-title { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim); margin-bottom:8px; }
+.pe-history-item { display:flex; gap:10px; padding:6px 0; border-bottom:1px solid var(--border-light); font-size:11px; }
+.pe-history-item:last-child { border-bottom:none; }
+.pe-history-meta { min-width:80px; color:var(--text-dim); font-family:'JetBrains Mono',monospace; font-size:10px; flex-shrink:0; }
+.pe-history-val { font-weight:600; color:var(--text-primary); font-family:'JetBrains Mono',monospace; min-width:50px; flex-shrink:0; }
+.pe-history-note { color:var(--text-secondary); font-style:italic; }
+.pe-history-empty { font-size:11px; color:var(--text-dim); font-style:italic; padding:8px 0; }
+.pe-btns { display:flex; gap:10px; justify-content:flex-end; }
+.pe-btns .btn { padding:9px 22px; }
+
+/* Note indicator on cells */
+.rt-cell { position:relative; cursor:cell; padding:6px 8px; border-radius:5px; border:1px solid transparent; transition:all 0.12s; min-height:32px; display:flex; align-items:center; justify-content:center; }
+.rt-cell:hover { background:rgba(232,119,34,0.05); border-color:var(--tb-orange); }
+.rt-cell .rt-val { font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; color:var(--text-primary); }
+.rt-cell .note-dot { position:absolute; top:2px; right:2px; width:6px; height:6px; border-radius:50%; background:var(--tb-orange); }
+.rt-cell.locked { cursor:pointer; opacity:0.6; }
+.rt-cell.locked:hover { background:rgba(37,99,235,0.04); border-color:var(--blue); }
+
+/* Confirm no-note dialog */
+.pe-confirm { background:var(--bg-white); border-radius:var(--radius-lg); padding:24px; width:380px; max-width:90vw; box-shadow:0 8px 32px rgba(0,0,0,0.15); text-align:center; }
+.pe-confirm h3 { font-size:15px; font-weight:700; margin-bottom:8px; }
+.pe-confirm p { font-size:12px; color:var(--text-secondary); margin-bottom:20px; }
+.pe-confirm .pe-btns { justify-content:center; }
+
 /* ── Update KPI button ── */
 .update-kpi-btn { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:8px; font-size:12px; font-weight:600; font-family:inherit; cursor:pointer; border:1px solid var(--tb-orange); background:var(--bg-white); color:var(--tb-orange); transition:all 0.12s; }
 .update-kpi-btn:hover { background:var(--tb-orange); color:#fff; }
@@ -460,6 +495,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
         <span><span class="dot auto"></span> Automatisk kilde (read-only)</span>
         <span><span class="dot manual"></span> Manuell registrering</span>
       </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text-dim)">Klikk på en verdi for å redigere og se historikk</div>
     </div>
   </div>
 </main>
@@ -485,6 +521,31 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
     <div class="modal-btns">
       <button class="btn btn-cancel" onclick="document.getElementById('unlockModal').classList.add('hidden')">Avbryt</button>
       <button class="btn btn-save" style="background:var(--red)" onclick="confirmUnlock()">Lås opp og varsle</button>
+    </div>
+  </div>
+</div>
+<!-- Punch edit modal -->
+<div class="modal-overlay hidden" id="peModal" onclick="if(event.target===this)closePE()">
+  <div class="pe-modal">
+    <div class="pe-header" id="peHeader"></div>
+    <div class="pe-sub" id="peSub"></div>
+    <div class="pe-field"><label>Verdi</label><input id="peValue" type="number"></div>
+    <div class="pe-field"><label>Merknad (valgfritt)</label><textarea id="peNote" placeholder="Beskriv hva som har endret seg siden forrige periode og hvorfor"></textarea></div>
+    <div class="pe-history" id="peHistory"></div>
+    <div class="pe-btns">
+      <button class="btn btn-cancel" onclick="closePE()">Avbryt</button>
+      <button class="btn btn-save" onclick="savePE()">Lagre</button>
+    </div>
+  </div>
+</div>
+<!-- Confirm no-note dialog -->
+<div class="modal-overlay hidden" id="peConfirm" onclick="if(event.target===this)document.getElementById('peConfirm').classList.add('hidden')">
+  <div class="pe-confirm">
+    <h3>Lagre uten merknad?</h3>
+    <p>Justert verdi blir loggført, men uten forklarende merknad.</p>
+    <div class="pe-btns">
+      <button class="btn btn-cancel" onclick="document.getElementById('peConfirm').classList.add('hidden')">Avbryt</button>
+      <button class="btn btn-save" onclick="confirmPEnoNote()">Ja, endringen krever ingen merknad</button>
     </div>
   </div>
 </div>
@@ -966,17 +1027,16 @@ let reportMonthIdx = 0; // 0 = current (2026-04)
 // (declared early, populated by initPunchStore below)
 
 function initPunchStore() {
+  const mn=v=>typeof v==='string'?parseFloat(v):v; // strip MNOK
   projects.forEach(p => {
     if(p.targets.hmsMax == null) return;
     punchStore[p.id] = {};
-    // Seed historical months as locked, with historical auto-values
     const hmsBase = p.hms.open;
     const fakBase = p.faktura.total;
-    punchStore[p.id]['2026-03'] = { fremdriftPct: p.fremdrift.pct-6, fremdriftOff: p.fremdrift.weeksOff+1, likviditetPct: +(p.likviditet.pct+1.2).toFixed(1), kalPrognose: p.kalkyle.prognose, kalSist: p.kalkyle.sistPrognose, hmsSnapshot: Math.max(0,hmsBase-1), fakturaSnapshot: Math.max(0,fakBase-2), locked:true, lockedBy:p.leader, lockedAt:'2026-04-02 09:00' };
-    punchStore[p.id]['2026-02'] = { fremdriftPct: p.fremdrift.pct-12, fremdriftOff: p.fremdrift.weeksOff+2, likviditetPct: +(p.likviditet.pct+2.5).toFixed(1), kalPrognose: p.kalkyle.sistPrognose, kalSist: p.kalkyle.kalkulert, hmsSnapshot: Math.max(0,hmsBase-2), fakturaSnapshot: Math.max(0,fakBase-3), locked:true, lockedBy:p.leader, lockedAt:'2026-03-03 10:00' };
-    punchStore[p.id]['2026-01'] = { fremdriftPct: p.fremdrift.pct-18, fremdriftOff: p.fremdrift.weeksOff+2, likviditetPct: +(p.likviditet.pct+3.0).toFixed(1), kalPrognose: p.kalkyle.kalkulert, kalSist: p.kalkyle.kalkulert, hmsSnapshot: Math.max(0,hmsBase-3), fakturaSnapshot: Math.max(1,fakBase-4), locked:true, lockedBy:p.leader, lockedAt:'2026-02-04 08:30' };
-    // Current month open with live values (auto = live, no snapshot yet)
-    punchStore[p.id]['2026-04'] = { fremdriftPct: p.fremdrift.pct, fremdriftOff: p.fremdrift.weeksOff, likviditetPct: p.likviditet.pct, kalPrognose: p.kalkyle.prognose, kalSist: p.kalkyle.sistPrognose, locked:false };
+    punchStore[p.id]['2026-03'] = { fremdriftPct: p.fremdrift.pct-6, fremdriftOff: p.fremdrift.weeksOff+1, likviditetPct: +(p.likviditet.pct+1.2).toFixed(1), kalPrognose: mn(p.kalkyle.prognose), kalSist: mn(p.kalkyle.sistPrognose), hmsSnapshot: Math.max(0,hmsBase-1), fakturaSnapshot: Math.max(0,fakBase-2), locked:true, lockedBy:p.leader, lockedAt:'2026-04-02 09:00' };
+    punchStore[p.id]['2026-02'] = { fremdriftPct: p.fremdrift.pct-12, fremdriftOff: p.fremdrift.weeksOff+2, likviditetPct: +(p.likviditet.pct+2.5).toFixed(1), kalPrognose: mn(p.kalkyle.sistPrognose), kalSist: mn(p.kalkyle.kalkulert), hmsSnapshot: Math.max(0,hmsBase-2), fakturaSnapshot: Math.max(0,fakBase-3), locked:true, lockedBy:p.leader, lockedAt:'2026-03-03 10:00' };
+    punchStore[p.id]['2026-01'] = { fremdriftPct: p.fremdrift.pct-18, fremdriftOff: p.fremdrift.weeksOff+2, likviditetPct: +(p.likviditet.pct+3.0).toFixed(1), kalPrognose: mn(p.kalkyle.kalkulert), kalSist: mn(p.kalkyle.kalkulert), hmsSnapshot: Math.max(0,hmsBase-3), fakturaSnapshot: Math.max(1,fakBase-4), locked:true, lockedBy:p.leader, lockedAt:'2026-02-04 08:30' };
+    punchStore[p.id]['2026-04'] = { fremdriftPct: p.fremdrift.pct, fremdriftOff: p.fremdrift.weeksOff, likviditetPct: p.likviditet.pct, kalPrognose: mn(p.kalkyle.prognose), kalSist: mn(p.kalkyle.sistPrognose), locked:false };
   });
 }
 initPunchStore();
@@ -1032,8 +1092,8 @@ function renderReportPage() {
     <th class="manual-col">Fremdrift %<span class="th-source">Excel (Manuelt)</span></th>
     <th class="manual-col">Fremdrift avvik<span class="th-source">Uker +/−</span></th>
     <th class="manual-col">Likviditet %<span class="th-source">Excel (Manuelt)</span></th>
-    <th class="manual-col">Prognose<span class="th-source">Byggoffice (Manuelt)</span></th>
-    <th class="manual-col">Sist prognose<span class="th-source">Byggoffice (Manuelt)</span></th>
+    <th class="manual-col">Prognose MNOK<span class="th-source">Byggoffice (Manuelt)</span></th>
+    <th class="manual-col">Sist prognose MNOK<span class="th-source">Byggoffice (Manuelt)</span></th>
     <th>Status</th>
   </tr></thead>`;
 
@@ -1046,20 +1106,23 @@ function renderReportPage() {
     const ps = punchStore[p.id]?.[month];
     if(!ps) return '';
     const locked = ps.locked;
-    const dis = locked ? 'disabled' : '';
+    const lck = locked ? ' locked' : '';
     // Auto-sources: live for current month, snapshot for historical
     const hmsVal = isCurrent ? p.hms.open + ' avvik' : (ps.hmsSnapshot != null ? ps.hmsSnapshot + ' avvik' : '—');
     const fakVal = isCurrent ? p.faktura.total + ' stk' : (ps.fakturaSnapshot != null ? ps.fakturaSnapshot + ' stk' : '—');
+    // Note indicators
+    function nd(key){const notes=punchNotes[p.id]?.[month]?.[key];return notes&&notes.length?'<span class="note-dot"></span>':'';}
+    function cl(key,label,val,type){return locked?`<td class="manual-col"><div class="rt-cell locked" onclick="openPE('${p.id}','${month}','${key}','${label}','${p.name}','${type}',true)"><span class="rt-val">${val}</span>${nd(key)}</div></td>`:`<td class="manual-col"><div class="rt-cell" onclick="openPE('${p.id}','${month}','${key}','${label}','${p.name}','${type}',false)"><span class="rt-val">${val}</span>${nd(key)}</div></td>`;}
 
     return `<tr>
       <td><div class="rt-project">${p.name}<span class="pnr">${p.pnr}</span></div></td>
       <td class="auto-col"><span class="rt-auto">${fakVal}</span><span class="rt-auto-ts">${autoTs}</span></td>
       <td class="auto-col"><span class="rt-auto">${hmsVal}</span><span class="rt-auto-ts">${autoTs}</span></td>
-      <td class="manual-col"><input class="rt-input" type="number" value="${ps.fremdriftPct}" ${dis} onchange="punchVal('${p.id}','${month}','fremdriftPct',this.value)"></td>
-      <td class="manual-col"><input class="rt-input" type="number" value="${ps.fremdriftOff}" ${dis} onchange="punchVal('${p.id}','${month}','fremdriftOff',this.value)"></td>
-      <td class="manual-col"><input class="rt-input" type="number" step="0.1" value="${ps.likviditetPct}" ${dis} onchange="punchVal('${p.id}','${month}','likviditetPct',this.value)"></td>
-      <td class="manual-col"><input class="rt-input wide" type="text" value="${ps.kalPrognose}" ${dis} onchange="punchVal('${p.id}','${month}','kalPrognose',this.value)"></td>
-      <td class="manual-col"><input class="rt-input wide" type="text" value="${ps.kalSist}" ${dis} onchange="punchVal('${p.id}','${month}','kalSist',this.value)"></td>
+      ${cl('fremdriftPct','Fremdrift %',ps.fremdriftPct,'number')}
+      ${cl('fremdriftOff','Fremdrift avvik',ps.fremdriftOff,'number')}
+      ${cl('likviditetPct','Likviditet %',ps.likviditetPct,'number')}
+      ${cl('kalPrognose','Prognose (MNOK)',ps.kalPrognose,'number')}
+      ${cl('kalSist','Sist prognose (MNOK)',ps.kalSist,'number')}
       <td>${locked
         ? `<span class="rt-status locked">🔒 Låst</span><button class="rt-lock-btn unlock" onclick="requestUnlock('${p.id}','${month}')">Lås opp</button><span class="rt-lock-info">${ps.lockedBy}, ${ps.lockedAt?ps.lockedAt.slice(5,16):''}</span>`
         : `<span class="rt-status open">Åpen</span><button class="rt-lock-btn" onclick="lockRow('${p.id}','${month}')">Lås</button>`
@@ -1070,6 +1133,110 @@ function renderReportPage() {
   document.getElementById('reportTable').innerHTML = thead + '<tbody>' + tbody + '</tbody>';
 }
 
+// Punch notes store: punchNotes[pid][month][kpiKey] = [{value, note, user, date}]
+const punchNotes = {};
+function seedNotes() {
+  projects.forEach(p => {
+    if(p.targets.hmsMax == null) return;
+    punchNotes[p.id] = {};
+    punchNotes[p.id]['2026-03'] = {
+      fremdriftPct: [{value:p.fremdrift.pct-6, note:'Justert etter fremdriftsmåling uke 13', user:p.leader, date:'2026-04-01 09:15'}],
+      likviditetPct: [{value:+(p.likviditet.pct+1.2).toFixed(1), note:'Oppdatert fra økonomirapport mars', user:p.leader, date:'2026-04-01 09:22'}]
+    };
+    punchNotes[p.id]['2026-02'] = {
+      fremdriftPct: [{value:p.fremdrift.pct-12, note:'Værforhold forsinket betongarbeid uke 7-8', user:p.leader, date:'2026-03-02 14:40'}]
+    };
+  });
+}
+seedNotes();
+
+let peCtx = null; // {pid, month, key, label, projectName, type, readonly}
+
+function openPE(pid, month, key, label, projectName, type, readonly) {
+  const ps = punchStore[pid]?.[month];
+  if(!ps) return;
+  peCtx = {pid, month, key, label, projectName, type, readonly};
+  document.getElementById('peHeader').textContent = label + ' — ' + projectName;
+  const MONTH_NAMES = {'2026-04':'April 2026','2026-03':'Mars 2026','2026-02':'Februar 2026','2026-01':'Januar 2026','2025-12':'Desember 2025'};
+  document.getElementById('peSub').textContent = (MONTH_NAMES[month] || month) + (readonly ? ' (låst periode, kun visning)' : '');
+  const valInput = document.getElementById('peValue');
+  valInput.type = type === 'text' ? 'text' : 'number';
+  if(type === 'number') valInput.step = (key === 'likviditetPct' || key === 'kalPrognose' || key === 'kalSist') ? '0.1' : '1';
+  valInput.value = ps[key] != null ? ps[key] : '';
+  valInput.disabled = readonly;
+  const noteEl = document.getElementById('peNote');
+  noteEl.value = '';
+  noteEl.disabled = readonly;
+  noteEl.placeholder = readonly ? '' : 'Beskriv hva som har endret seg siden forrige periode og hvorfor';
+  // Show/hide buttons
+  const btns = document.querySelector('#peModal .pe-btns');
+  if(readonly) {
+    btns.innerHTML = '<button class="btn btn-cancel" onclick="closePE()">Lukk</button>';
+  } else {
+    btns.innerHTML = '<button class="btn btn-cancel" onclick="closePE()">Avbryt</button><button class="btn btn-save" onclick="savePE()">Lagre</button>';
+  }
+  // Hide note field in readonly mode
+  document.getElementById('peNote').parentElement.style.display = readonly ? 'none' : '';
+  // Render history
+  const notes = punchNotes[pid]?.[month]?.[key] || [];
+  const histEl = document.getElementById('peHistory');
+  if(notes.length > 0) {
+    histEl.innerHTML = '<div class="pe-history-title">Tidligere endringer</div>' + notes.map(n =>
+      `<div class="pe-history-item"><span class="pe-history-meta">${n.date}</span><span class="pe-history-val">${n.value}</span><span style="font-size:10px;color:var(--text-dim);min-width:70px">${n.user}</span><span class="pe-history-note">${n.note || '(ingen merknad)'}</span></div>`
+    ).join('');
+  } else {
+    histEl.innerHTML = '<div class="pe-history-title">Tidligere endringer</div><div class="pe-history-empty">Ingen tidligere endringer for denne verdien</div>';
+  }
+  document.getElementById('peModal').classList.remove('hidden');
+  if(!readonly) valInput.focus();
+}
+
+function closePE() {
+  document.getElementById('peModal').classList.add('hidden');
+  peCtx = null;
+}
+
+function savePE() {
+  if(!peCtx) return;
+  const note = document.getElementById('peNote').value.trim();
+  if(!note) {
+    // Show confirm dialog
+    document.getElementById('peConfirm').classList.remove('hidden');
+    return;
+  }
+  doSavePE(note);
+}
+
+function confirmPEnoNote() {
+  document.getElementById('peConfirm').classList.add('hidden');
+  doSavePE('');
+}
+
+function doSavePE(note) {
+  if(!peCtx) return;
+  const {pid, month, key, type} = peCtx;
+  const rawVal = document.getElementById('peValue').value;
+  const val = type === 'text' ? rawVal : (isNaN(parseFloat(rawVal)) ? rawVal : parseFloat(rawVal));
+  // Update punchStore
+  if(!punchStore[pid]) punchStore[pid] = {};
+  if(!punchStore[pid][month]) punchStore[pid][month] = {locked:false};
+  punchStore[pid][month][key] = val;
+  // Store note
+  if(!punchNotes[pid]) punchNotes[pid] = {};
+  if(!punchNotes[pid][month]) punchNotes[pid][month] = {};
+  if(!punchNotes[pid][month][key]) punchNotes[pid][month][key] = [];
+  const p = projects.find(x=>x.id===pid);
+  punchNotes[pid][month][key].unshift({
+    value: val,
+    note: note || '',
+    user: p?.leader || 'Ukjent',
+    date: new Date().toISOString().slice(0,16).replace('T',' ')
+  });
+  closePE();
+  renderReportPage();
+}
+
+// Keep old punchVal for backwards compat (not used in UI anymore)
 function punchVal(pid, month, field, val) {
   if(!punchStore[pid]) punchStore[pid]={};
   if(!punchStore[pid][month]) punchStore[pid][month]={locked:false};
