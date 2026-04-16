@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOTALKontroll — Bærekraft</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --tb-orange: #E87722; --tb-orange-bg: rgba(232,119,34,0.06);
+  --navy: #1B2A4A; --bg-page: #F4F5F7; --bg-white: #FFFFFF; --bg-sidebar: #1B2A4A; --bg-card: #FFFFFF;
+  --border: #E2E6EC; --border-light: #EEF0F4;
+  --text-primary: #1B2A4A; --text-secondary: #5A6578; --text-dim: #9BA5B5;
+  --text-inverse-muted: #8B99B0; --text-inverse-dim: #5A6A82;
+  --green: #1B9E4B; --green-bg: rgba(27,158,75,0.08); --green-text: #15803D;
+  --yellow: #CA8A04; --yellow-bg: rgba(202,138,4,0.08); --yellow-text: #A16207;
+  --red: #DC2626; --red-bg: rgba(220,38,38,0.07); --red-text: #B91C1C;
+  --blue: #2563EB; --blue-bg: rgba(37,99,235,0.06);
+  --radius: 12px; --radius-sm: 8px;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--text-primary);min-height:100vh;overflow-x:hidden}
+
+.password-gate{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:9999}
+.password-box{text-align:center;color:#fff}
+.password-box h2{font-size:22px;margin:16px 0 4px}.password-box h2 em{font-style:normal;color:var(--tb-orange)}
+.password-box p{font-size:13px;color:var(--text-dim);margin-bottom:24px}
+.password-box input{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:12px 20px;color:#fff;font-size:14px;width:240px;text-align:center;outline:none;font-family:inherit}
+.password-box input:focus{border-color:var(--tb-orange)}
+.password-box .error{color:var(--red);font-size:12px;margin-top:8px;display:none}
+.logo-gate svg{width:60px;height:54px}
+
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:228px;background:var(--bg-sidebar);display:flex;flex-direction:column;z-index:100}
+.sidebar-logo{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px}
+.sidebar-logo .logo-svg{width:30px;height:30px;flex-shrink:0}
+.sidebar-logo .logo-text{display:flex;flex-direction:column;line-height:1.15}
+.sidebar-logo .logo-text .brand{font-weight:700;font-size:13px;color:#fff}
+.sidebar-logo .logo-text .brand em{font-style:normal;color:var(--tb-orange)}
+.sidebar-logo .logo-text .sub{font-size:9.5px;color:var(--text-inverse-dim);font-weight:500;letter-spacing:0.8px;text-transform:uppercase;margin-top:1px}
+.sidebar-nav{padding:14px 0;flex:1}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 18px;color:var(--text-inverse-muted);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;border-left:3px solid transparent}
+.nav-item:hover{color:#E8ECF2;background:rgba(255,255,255,0.04)}
+.nav-item.active{color:var(--tb-orange);border-left-color:var(--tb-orange);background:rgba(232,119,34,0.08)}
+.nav-item svg{width:17px;height:17px;flex-shrink:0}
+.nav-sub{padding-left:18px}
+.nav-sub .nav-item{padding:6px 18px 6px 32px;font-size:12px}
+.nav-sub .nav-item svg{width:14px;height:14px}
+.sidebar-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.06);font-size:10px;color:var(--text-inverse-dim);line-height:1.5}
+
+.main{margin-left:228px;min-height:100vh}
+.topbar{background:var(--bg-white);border-bottom:1px solid var(--border);padding:0 32px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-breadcrumb{font-size:13px;color:var(--text-dim);font-weight:500}
+.topbar-breadcrumb .current{color:var(--text-primary);font-weight:600}
+.content{padding:28px 32px}
+
+/* Tabs */
+.tab-bar{display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid var(--border)}
+.tab{padding:10px 20px;font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.15s}
+.tab.active{color:var(--tb-orange);border-bottom-color:var(--tb-orange)}
+.tab:hover:not(.active){color:var(--text-primary)}
+.tab-badge{background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;margin-left:6px;font-weight:700}
+
+/* Cards */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow-sm);margin-bottom:20px}
+.card-title{font-size:15px;font-weight:700;color:var(--navy)}
+.card-subtitle{font-size:12px;color:var(--text-dim);margin-top:2px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow-sm)}
+.kpi-label{font-size:11px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.kpi-value{font-size:26px;font-weight:700;color:var(--navy);font-family:'JetBrains Mono',monospace}
+.kpi-unit{font-size:12px;color:var(--text-dim);margin-top:2px}
+.kpi-trend{font-size:11px;font-weight:600;margin-top:4px}
+
+/* Tables */
+.st{width:100%;border-collapse:collapse;font-size:13px}
+.st th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);font-weight:600;padding:10px 12px;border-bottom:2px solid var(--border)}
+.st td{padding:10px 12px;border-bottom:1px solid var(--border-light);vertical-align:middle}
+.st tr:hover{background:rgba(232,119,34,0.02)}
+.st tr:last-child td{border-bottom:none}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:var(--green-bg);color:var(--green-text)}
+.badge-yellow{background:var(--yellow-bg);color:var(--yellow-text)}
+.badge-red{background:var(--red-bg);color:var(--red-text)}
+.badge-gray{background:#F1F3F5;color:var(--text-dim)}
+.badge-blue{background:var(--blue-bg);color:var(--blue)}
+.qbadge{cursor:pointer;transition:transform 0.1s,box-shadow 0.1s}
+.qbadge:hover{transform:scale(1.2);box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+
+/* Inputs */
+.input-row{display:grid;grid-template-columns:1fr 120px 70px 180px;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light)}
+.input-row:last-child{border-bottom:none}
+.input-row.header{font-weight:600;font-size:11px;text-transform:uppercase;color:var(--text-dim);letter-spacing:0.5px;border-bottom:2px solid var(--border);padding-bottom:10px}
+.input-label{font-size:13px;color:var(--text-primary)}
+.input-field{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:'JetBrains Mono',monospace;text-align:right;width:100%;background:var(--bg-white);color:var(--text-primary);outline:none}
+.input-field:focus{border-color:var(--tb-orange);box-shadow:0 0 0 2px rgba(232,119,34,0.12)}
+.input-field.filled{background:rgba(27,158,75,0.04);border-color:var(--green)}
+.input-unit{font-size:12px;color:var(--text-dim)}
+.src-tag{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600}
+.src-visma{background:#EDE9FE;color:#5B21B6}
+.src-tidsbanken{background:#DBEAFE;color:#1E40AF}
+.src-manual{background:#F1F3F5;color:var(--text-dim)}
+.src-auto{background:var(--green-bg);color:var(--green-text)}
+.src-simployer{background:#FEF3C7;color:#92400E}
+
+/* Form grid (personell) */
+.form-grid{display:grid;grid-template-columns:1fr 120px 160px;gap:0;font-size:13px}
+.form-grid .fh{font-weight:600;font-size:11px;text-transform:uppercase;color:var(--text-dim);letter-spacing:0.5px;padding:10px 8px;border-bottom:2px solid var(--border)}
+.form-grid .fc{padding:8px;border-bottom:1px solid var(--border-light);display:flex;align-items:center}
+.form-grid .fc input{width:100px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12px;text-align:right;outline:none;background:var(--bg-white)}
+.form-grid .fc input:focus{border-color:var(--tb-orange)}
+.form-grid .fc input.filled{background:rgba(27,158,75,0.04);border-color:var(--green)}
+.form-grid .fc input[readonly]{cursor:default}
+.form-grid .section-head{grid-column:1/-1;padding:14px 8px 6px;font-weight:700;font-size:13px;color:var(--navy);border-bottom:1px solid var(--border)}
+
+/* Selskap tabs */
+.selskap-tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--border)}
+.selskap-tab{padding:10px 20px;font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px}
+.selskap-tab.active{color:var(--tb-orange);border-bottom-color:var(--tb-orange)}
+
+/* Category collapse */
+.cat-section{margin-bottom:20px}
+.cat-header{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:2px solid var(--border);margin-bottom:8px;cursor:pointer}
+.cat-title{font-size:14px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px}
+.cat-count{font-size:11px;color:var(--text-dim);font-weight:500}
+.cat-chevron{color:var(--text-dim);transition:transform 0.2s;width:16px;height:16px}
+.cat-chevron.open{transform:rotate(180deg)}
+
+/* Buttons */
+.btn{padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all 0.15s}
+.btn-primary{background:var(--tb-orange);color:#fff}.btn-primary:hover{background:#d06a1c}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--text-secondary)}.btn-outline:hover{border-color:var(--tb-orange);color:var(--tb-orange)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.export-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;background:var(--green);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.export-btn:hover{background:#178a40}
+.export-btn svg{width:14px;height:14px}
+
+/* Aggregation table */
+.agg-bar{height:8px;background:var(--border-light);border-radius:4px;overflow:hidden;min-width:80px}
+.agg-fill{height:100%;border-radius:4px;background:var(--green)}
+
+/* Period selector */
+.period-select{display:flex;align-items:center;gap:8px}
+.period-select select{padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;background:var(--bg-white);cursor:pointer;outline:none}
+.period-label{font-size:12px;color:var(--text-dim);font-weight:600}
+
+/* Monthly grid for elektrisitet */
+.month-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.month-cell{text-align:center;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:11px}
+.month-cell .ml{color:var(--text-dim);font-weight:600;margin-bottom:4px}
+.month-cell input{width:100%;border:none;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;background:transparent}
+.month-cell.filled{border-color:var(--green);background:rgba(27,158,75,0.04)}
+.month-cell.current{border-color:var(--tb-orange);background:var(--tb-orange-bg)}
+
+/* Modal overlay */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;backdrop-filter:blur(2px)}
+.modal-content{background:var(--bg-white);border-radius:16px;width:100%;max-width:860px;box-shadow:0 20px 60px rgba(0,0,0,0.2);animation:modalIn 0.2s ease-out}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg-white);border-radius:16px 16px 0 0;z-index:1}
+.modal-body{padding:24px 28px;max-height:calc(100vh - 160px);overflow-y:auto}
+
+@media(min-width:1800px){body{zoom:1.5}}
+@media(min-width:1400px) and (max-width:1799px){body{zoom:1.25}}
+@media(min-width:1100px) and (max-width:1399px){body{zoom:1.1}}
+@media(max-width:1100px){.kpi-row{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr 100px 120px}}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.kpi-row{grid-template-columns:1fr}.content{padding:20px 16px}.month-grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<svg style="display:none"><symbol id="tb-logo" viewBox="0 0 100 90"><rect x="8" y="0" width="84" height="24" rx="2" fill="#E87722"/><rect x="8" y="30" width="36" height="56" rx="2" fill="#E87722"/><rect x="56" y="30" width="36" height="56" rx="2" fill="#E87722"/></symbol></svg>
+
+<div class="password-gate" id="gate"><div class="password-box"><div class="logo-gate"><svg viewBox="0 0 100 90"><use href="#tb-logo"/></svg></div><h2><em>TOTAL</em>Kontroll</h2><p>Bærekraft — PoC</p><input type="password" id="pw" placeholder="Passord" autocomplete="off"><div class="error" id="pwError">Feil passord</div></div></div>
+
+<div id="app" style="display:none">
+<nav class="sidebar">
+  <div class="sidebar-logo"><svg class="logo-svg" viewBox="0 0 100 90"><use href="#tb-logo"/></svg><div class="logo-text"><span class="brand"><em>TOTAL</em>Kontroll</span><span class="sub">Ledelsessystem</span></div></div>
+  <div class="sidebar-nav">
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Min side</div>
+    <div class="nav-item" onclick="window.open('TOTALKontroll_Salg_PoC.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> Salg</div>
+    <div class="nav-sub">
+      <div class="nav-item" onclick="window.open('TOTALKontroll_Muligheter.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Muligheter</div>
+      <div class="nav-item" onclick="window.open('TOTALKontroll_Markedsanalyse.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Markedsanalyse</div>
+    </div>
+    <div class="nav-item" onclick="window.open('prosjekt_poc_light.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Prosjekt</div>
+    <div class="nav-sub">
+      <div class="nav-item" onclick="window.open('TOTALKontroll_Fremdriftsplan.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Fremdriftsplan</div>
+      <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/></svg> Bærekraft</div>
+    </div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Håndbok</div>
+  </div>
+  <div class="sidebar-footer" style="color:var(--text-inverse-muted);font-size:11px;font-weight:500;">Konseptvisning, kun demo data</div>
+</nav>
+
+<main class="main">
+<div class="topbar">
+  <div class="topbar-breadcrumb">TOTALKontroll / Prosjekt / <span class="current" id="breadcrumbCurrent">Bærekraft</span></div>
+  <div style="display:flex;gap:8px">
+    <button class="export-btn" onclick="alert('Genererer Endúr-rapporteringspakke for valgt år i Excel-format.\n\nAlle faner (Personell, Utslipp, Avfall, Ressursforbruk, Annen info) fylles automatisk fra registrerte data.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Eksporter Endúr-rapport</button>
+  </div>
+</div>
+<div class="content">
+
+<!-- Selskap -->
+<div style="margin-bottom:16px">
+  <div class="selskap-tabs" style="margin-bottom:0">
+    <div class="selskap-tab active" style="display:flex;align-items:center;gap:8px"><svg viewBox="0 0 100 90" style="width:22px;height:20px;flex-shrink:0"><rect x="8" y="0" width="84" height="24" rx="2" fill="#E87722"/><rect x="8" y="30" width="36" height="56" rx="2" fill="#E87722"/><rect x="56" y="30" width="36" height="56" rx="2" fill="#E87722"/></svg> Totalbetong AS</div>
+    <div class="selskap-tab" style="opacity:0.4;cursor:default;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 80 40" style="width:28px;height:14px;flex-shrink:0"><rect width="80" height="40" rx="4" fill="#2D5A27"/><text x="40" y="27" text-anchor="middle" fill="#fff" font-family="DM Sans,sans-serif" font-weight="700" font-size="22">GT</text></svg> Gann Tre AS</div>
+    <div class="selskap-tab" style="opacity:0.4;cursor:default;display:flex;align-items:center;gap:8px"><svg viewBox="0 0 80 40" style="width:28px;height:14px;flex-shrink:0"><rect width="80" height="40" rx="4" fill="#1a3a6b"/><text x="40" y="27" text-anchor="middle" fill="#fff" font-family="DM Sans,sans-serif" font-weight="700" font-size="22">ET</text></svg> Engelsen Total</div>
+  </div>
+</div>
+
+<!-- Main tab bar -->
+<div class="tab-bar" id="mainTabs">
+  <div class="tab active" data-tab="oversikt" onclick="switchTab('oversikt')">Oversikt & KPI</div>
+  <div class="tab" data-tab="personell" onclick="switchTab('personell')">Personell & HMS</div>
+  <div class="tab" data-tab="elektrisitet" onclick="switchTab('elektrisitet')">Elektrisitet</div>
+  <div class="tab" data-tab="prosjektstatus" onclick="switchTab('prosjektstatus')">Prosjektleder input<span class="tab-badge">3</span></div>
+</div>
+
+<!-- ═══════ TAB: OVERSIKT & KPI ═══════ -->
+<div class="tab-content" id="tab-oversikt">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div style="font-size:14px;color:var(--text-dim)">Aggregerte tall for Endúr-rapportering</div>
+    <div class="period-select">
+      <span class="period-label">År:</span>
+      <select><option>2026</option><option selected>2025</option><option>2024</option></select>
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-label">Total CO₂ (Scope 1)</div>
+      <div class="kpi-value">382</div>
+      <div class="kpi-unit">tonn CO₂e, drivstoff</div>
+      <div class="kpi-trend" style="color:var(--green-text)">↓ 8% fra 2024</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Innkjøpt elektrisitet (Scope 2)</div>
+      <div class="kpi-value">747 599</div>
+      <div class="kpi-unit">kWh</div>
+      <div class="kpi-trend" style="color:var(--green-text)">↓ 3% fra 2024</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Sorteringsgrad</div>
+      <div class="kpi-value">84.6<span style="font-size:16px">%</span></div>
+      <div class="kpi-unit">vektet snitt alle prosjekter</div>
+      <div class="kpi-trend" style="color:var(--green-text)">↑ 2.1% fra 2024</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Rapporteringsstatus</div>
+      <div class="kpi-value" style="font-size:22px">7<span style="font-size:16px;color:var(--text-dim)"> / 10</span></div>
+      <div class="kpi-unit">prosjekter har levert 2025</div>
+      <div class="kpi-trend" style="color:var(--yellow-text)">3 utestående</div>
+    </div>
+  </div>
+
+  <!-- Avfall aggregert -->
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Avfall, aggregert på tvers av prosjekter</div><div class="card-subtitle">2025, topp 15 NS-koder etter volum, Totalbetong AS. Total: 1 694 tonn</div></div>
+    </div>
+    <table class="st">
+      <thead><tr><th>NS-kode</th><th>Kategori</th><th style="text-align:right">Tonn</th><th style="width:120px">Andel</th><th>Type</th></tr></thead>
+      <tbody>
+        <tr><td>1149</td><td>Blandet bearbeidet trevirke</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">393.3</td><td><div class="agg-bar"><div class="agg-fill" style="width:62%"></div></div></td><td><span class="badge badge-green">Ikke-farlig</span></td></tr>
+        <tr><td>9912</td><td>Blandet næringsavfall</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">261.6</td><td><div class="agg-bar"><div class="agg-fill" style="width:41%"></div></div></td><td><span class="badge badge-green">Ikke-farlig</span></td></tr>
+        <tr><td>1141</td><td>Rent trevirke</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">244.5</td><td><div class="agg-bar"><div class="agg-fill" style="width:39%"></div></div></td><td><span class="badge badge-green">Ikke-farlig</span></td></tr>
+        <tr><td>1452</td><td>Blandede metaller</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">143.8</td><td><div class="agg-bar"><div class="agg-fill" style="width:23%"></div></div></td><td><span class="badge badge-green">Ikke-farlig</span></td></tr>
+        <tr><td>1699</td><td>Blandet uorganisk materiale</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">106.4</td><td><div class="agg-bar"><div class="agg-fill" style="width:17%"></div></div></td><td><span class="badge badge-green">Ikke-farlig</span></td></tr>
+        <tr><td>1611</td><td>Betong uten armeringsjern</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">98.4</td><td><div class="agg-bar"><div class="agg-fill" style="width:15%"></div></div></td><td><span class="badge badge-green">Ikke-farlig</span></td></tr>
+        <tr><td>1615</td><td>Gips</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">57.5</td><td><div class="agg-bar"><div class="agg-fill" style="width:9%"></div></div></td><td><span class="badge badge-green">Ikke-farlig</span></td></tr>
+        <tr><td>1722</td><td>Hardplast, annen</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">50.7</td><td><div class="agg-bar"><div class="agg-fill" style="width:8%"></div></div></td><td><span class="badge badge-green">Ikke-farlig</span></td></tr>
+        <tr><td>1799</td><td>Blandet plast, blandede fraksjoner</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">44.6</td><td><div class="agg-bar"><div class="agg-fill" style="width:7%"></div></div></td><td><span class="badge badge-green">Ikke-farlig</span></td></tr>
+        <tr><td>1499</td><td>Blandede metaller m/andre materialer</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">42.9</td><td><div class="agg-bar"><div class="agg-fill" style="width:7%"></div></div></td><td><span class="badge badge-green">Ikke-farlig</span></td></tr>
+        <tr style="border-top:2px solid var(--border)"><td colspan="2" style="font-weight:700;color:var(--navy)">Øvrige 35 koder</td><td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700">250.3</td><td></td><td></td></tr>
+        <tr style="background:var(--tb-orange-bg)"><td colspan="2" style="font-weight:700;color:var(--navy);font-size:14px">Totalt alle koder</td><td style="text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px">1 694.0</td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Ressursforbruk aggregert -->
+  <div class="card">
+    <div class="card-header"><div><div class="card-title">Ressursforbruk, aggregert</div><div class="card-subtitle">2025, Totalbetong AS, summert fra alle prosjekter</div></div></div>
+    <table class="st">
+      <thead><tr><th>Materialkategori</th><th style="text-align:right">Mengde</th><th>Enhet</th><th>Ant. leverandører</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:600">Ferdigblandet betong</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">43 130</td><td>tonn</td><td>10 leverandører</td></tr>
+        <tr><td style="font-weight:600">Prefab. betongkomponenter</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">21 869</td><td>tonn</td><td>5 leverandører</td></tr>
+        <tr><td style="font-weight:600">Armeringsstål</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">2 401</td><td>tonn</td><td>3 leverandører</td></tr>
+        <tr><td style="font-weight:600">Konstruksjonsstål</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">2 981</td><td>tonn</td><td>5 leverandører</td></tr>
+        <tr><td style="font-weight:600">Masser (kjøpt eksternt)</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">1 539</td><td>tonn</td><td>2 leverandører</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Drivstoff aggregert -->
+  <div class="card">
+    <div class="card-header"><div><div class="card-title">Drivstoff (Scope 1), aggregert</div><div class="card-subtitle">2025, Totalbetong AS, rapportert av prosjektledere</div></div></div>
+    <table class="st">
+      <thead><tr><th>Drivstofftype</th><th style="text-align:right">Forbruk</th><th>Enhet</th><th>Rapportert av</th></tr></thead>
+      <tbody>
+        <tr><td>Diesel</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">86 867</td><td>liter</td><td>Prosjektledere</td></tr>
+        <tr><td>Anleggsdiesel (100% fossil)</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">54 425</td><td>liter</td><td>Prosjektledere</td></tr>
+        <tr><td>Bensin</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">3 155</td><td>liter</td><td>Prosjektledere</td></tr>
+        <tr><td>Elbil-lading</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">3 237</td><td>kWh</td><td style="color:var(--tb-orange);font-weight:600">Jeanette (sentralt)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════ TAB: PERSONELL & HMS ═══════ -->
+<div class="tab-content" id="tab-personell" style="display:none">
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Personell og HMS — årsrapportering</div><div class="card-subtitle">Fylles ut i januar hvert år. Kilde: Visma, Tidsbanken, Simployer.</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="period-select"><span class="period-label">År:</span><select id="personellYear" onchange="switchPersonellYear(this.value)"><option value="2026">2026</option><option value="2025" selected>2025</option><option value="2024">2024</option></select></div>
+        <span class="badge" id="personellBadge" style="background:var(--green-bg);color:var(--green-text)">Levert 28. jan 2026</span>
+        <button class="btn btn-outline btn-sm" id="personellEditBtn" onclick="togglePersonellEdit()">Rediger</button>
+      </div>
+    </div>
+
+    <div id="personellForm">
+      <div class="form-grid" style="grid-template-columns:1fr 120px 160px">
+        <div class="fh">Post</div><div class="fh" style="text-align:right">Verdi</div><div class="fh">Kilde</div>
+
+        <div class="section-head">Ansatte</div>
+        <div class="fc">Ansatte per årsslutt (kvinner)</div><div class="fc"><input class="filled pf" value="19" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Ansatte per årsslutt (menn)</div><div class="fc"><input class="filled pf" value="117" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Ansatte (ikke rapportert kjønn)</div><div class="fc"><input class="filled pf" value="0" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Årsverk (kvinner)</div><div class="fc"><input class="filled pf" value="17.4" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Årsverk (menn)</div><div class="fc"><input class="filled pf" value="121.5" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Deltidsansatte (kvinner)</div><div class="fc"><input class="filled pf" value="0" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Deltidsansatte (menn)</div><div class="fc"><input class="filled pf" value="0" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Midlertidige ansatte (kvinner)</div><div class="fc"><input class="filled pf" value="0" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Midlertidige ansatte (menn)</div><div class="fc"><input class="filled pf" value="0" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Nyansatte (kvinner)</div><div class="fc"><input class="filled pf" value="5" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Nyansatte (menn)</div><div class="fc"><input class="filled pf" value="16" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Sluttet (kvinner)</div><div class="fc"><input class="filled pf" value="4" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Sluttet (menn)</div><div class="fc"><input class="filled pf" value="22" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Lærlinger (kvinner)</div><div class="fc"><input class="filled pf" value="2" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Lærlinger (menn)</div><div class="fc"><input class="filled pf" value="3" readonly></div><div class="fc"><span class="src-tag src-visma">Visma</span></div>
+        <div class="fc">Innleide (årsverk)</div><div class="fc"><input class="filled pf" value="28" readonly></div><div class="fc"><span class="src-tag src-manual">Manuell</span></div>
+
+        <div class="section-head">Sykefravær</div>
+        <div class="fc">Sykefravær % (menn)</div><div class="fc"><input class="filled pf" value="5.09" readonly></div><div class="fc"><span class="src-tag src-tidsbanken">Tidsbanken</span></div>
+        <div class="fc">Sykefravær % (kvinner)</div><div class="fc"><input class="filled pf" value="0.38" readonly></div><div class="fc"><span class="src-tag src-tidsbanken">Tidsbanken</span></div>
+        <div class="fc">Sykefravær % (totalt)</div><div class="fc"><input class="filled pf" value="5.46" readonly></div><div class="fc"><span class="src-tag src-tidsbanken">Tidsbanken</span></div>
+        <div class="fc">Sykefravær timer (totalt)</div><div class="fc"><input class="filled pf" value="11 902" readonly></div><div class="fc"><span class="src-tag src-tidsbanken">Tidsbanken</span></div>
+
+        <div class="section-head">Aldersfordeling</div>
+        <div class="fc">Kvinner &lt; 30 år</div><div class="fc"><input class="filled pf" value="10" readonly></div><div class="fc"><span class="src-tag src-simployer">Simployer</span></div>
+        <div class="fc">Kvinner 30-50 år</div><div class="fc"><input class="filled pf" value="11" readonly></div><div class="fc"><span class="src-tag src-simployer">Simployer</span></div>
+        <div class="fc">Kvinner &gt; 50 år</div><div class="fc"><input class="filled pf" value="1" readonly></div><div class="fc"><span class="src-tag src-simployer">Simployer</span></div>
+        <div class="fc">Menn &lt; 30 år</div><div class="fc"><input class="filled pf" value="34" readonly></div><div class="fc"><span class="src-tag src-simployer">Simployer</span></div>
+        <div class="fc">Menn 30-50 år</div><div class="fc"><input class="filled pf" value="77" readonly></div><div class="fc"><span class="src-tag src-simployer">Simployer</span></div>
+        <div class="fc">Menn &gt; 50 år</div><div class="fc"><input class="filled pf" value="29" readonly></div><div class="fc"><span class="src-tag src-simployer">Simployer</span></div>
+
+        <div class="section-head">HMS-hendelser</div>
+        <div class="fc">RUH (rapporterte uønskede hendelser)</div><div class="fc"><input class="filled pf" value="2 119" readonly></div><div class="fc"><span class="src-tag src-manual">SharePoint/Dalux</span></div>
+        <div class="fc">H1-hendelser (fravær)</div><div class="fc"><input class="filled pf" value="0" readonly></div><div class="fc"><span class="src-tag src-manual">Manuell</span></div>
+        <div class="fc">H2-hendelser (med/uten fravær)</div><div class="fc"><input class="filled pf" value="2" readonly></div><div class="fc"><span class="src-tag src-manual">Manuell</span></div>
+        <div class="fc">H2-verdi</div><div class="fc"><input class="filled pf" value="0.55" readonly></div><div class="fc"><span class="src-tag src-auto">Beregnet</span></div>
+        <div class="fc">Arbeidede timer (egne + innleide)</div><div class="fc"><input class="filled pf" value="329 668" readonly></div><div class="fc"><span class="src-tag src-tidsbanken">Tidsbanken</span></div>
+        <div class="fc">Arbeidede timer inkl. UE</div><div class="fc"><input class="filled pf" value="3 630 698" readonly></div><div class="fc"><span class="src-tag src-manual">PL + UE</span></div>
+        <div class="fc">Arbeidsrelatert dødsfall (egne)</div><div class="fc"><input class="filled pf" value="0" readonly></div><div class="fc"><span class="src-tag src-manual">Manuell</span></div>
+        <div class="fc">Arbeidsrelatert dødsfall (UE)</div><div class="fc"><input class="filled pf" value="0" readonly></div><div class="fc"><span class="src-tag src-manual">Manuell</span></div>
+
+        <div class="section-head">Stillingsfordeling (kvinner / menn)</div>
+        <div class="fc">Ledergruppe</div><div class="fc"><input class="filled pf" value="1 / 1" readonly></div><div class="fc"><span class="src-tag src-manual">Manuell</span></div>
+        <div class="fc">Mellomledere</div><div class="fc"><input class="filled pf" value="6 / 34" readonly></div><div class="fc"><span class="src-tag src-manual">Manuell</span></div>
+        <div class="fc">Adm. og støttefunksjoner</div><div class="fc"><input class="filled pf" value="9 / 19" readonly></div><div class="fc"><span class="src-tag src-manual">Manuell</span></div>
+        <div class="fc">Andre ansatte</div><div class="fc"><input class="filled pf" value="3 / 63" readonly></div><div class="fc"><span class="src-tag src-manual">Manuell</span></div>
+      </div>
+    </div>
+
+    <!-- Edit mode save bar (hidden by default) -->
+    <div id="personellSaveBar" style="display:none;margin-top:16px;padding:16px 0;border-top:1px solid var(--border);display:none;justify-content:flex-end;gap:8px">
+      <button class="btn btn-outline" onclick="togglePersonellEdit()">Avbryt</button>
+      <button class="btn btn-primary" onclick="togglePersonellEdit();alert('Personell-data for valgt år er lagret.')">Lagre</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TAB: ELEKTRISITET ═══════ -->
+<div class="tab-content" id="tab-elektrisitet" style="display:none">
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Innkjøpt elektrisitet</div><div class="card-subtitle">Månedlig registrering fra strømleverandør-faktura. Enhet: kWh.</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="period-select"><span class="period-label">År:</span><select><option>2026</option><option selected>2025</option><option>2024</option></select></div>
+        <button class="btn btn-primary btn-sm">Lagre</button>
+      </div>
+    </div>
+    <div class="month-grid">
+      <div class="month-cell filled"><div class="ml">Jan</div><input value="58 420"></div>
+      <div class="month-cell filled"><div class="ml">Feb</div><input value="62 180"></div>
+      <div class="month-cell filled"><div class="ml">Mar</div><input value="65 340"></div>
+      <div class="month-cell filled"><div class="ml">Apr</div><input value="59 870"></div>
+      <div class="month-cell filled"><div class="ml">Mai</div><input value="55 210"></div>
+      <div class="month-cell filled"><div class="ml">Jun</div><input value="48 930"></div>
+      <div class="month-cell filled"><div class="ml">Jul</div><input value="42 610"></div>
+      <div class="month-cell filled"><div class="ml">Aug</div><input value="51 780"></div>
+      <div class="month-cell filled"><div class="ml">Sep</div><input value="63 420"></div>
+      <div class="month-cell filled"><div class="ml">Okt</div><input value="72 350"></div>
+      <div class="month-cell filled"><div class="ml">Nov</div><input value="85 190"></div>
+      <div class="month-cell filled"><div class="ml">Des</div><input value="82 299"></div>
+    </div>
+    <div style="margin-top:12px;text-align:right;font-size:14px;font-weight:700;color:var(--navy);font-family:'JetBrains Mono',monospace">Sum: 747 599 kWh</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Elbil-lading (firmabiler)</div><div class="card-subtitle">Månedlig registrering fra ladeleverandør-portal. Enhet: kWh.</div></div>
+    </div>
+    <div class="month-grid">
+      <div class="month-cell filled"><div class="ml">Jan</div><input value="245"></div>
+      <div class="month-cell filled"><div class="ml">Feb</div><input value="280"></div>
+      <div class="month-cell filled"><div class="ml">Mar</div><input value="310"></div>
+      <div class="month-cell filled"><div class="ml">Apr</div><input value="275"></div>
+      <div class="month-cell filled"><div class="ml">Mai</div><input value="260"></div>
+      <div class="month-cell filled"><div class="ml">Jun</div><input value="240"></div>
+      <div class="month-cell filled"><div class="ml">Jul</div><input value="195"></div>
+      <div class="month-cell filled"><div class="ml">Aug</div><input value="255"></div>
+      <div class="month-cell filled"><div class="ml">Sep</div><input value="290"></div>
+      <div class="month-cell filled"><div class="ml">Okt</div><input value="305"></div>
+      <div class="month-cell filled"><div class="ml">Nov</div><input value="310"></div>
+      <div class="month-cell filled"><div class="ml">Des</div><input value="272"></div>
+    </div>
+    <div style="margin-top:12px;text-align:right;font-size:14px;font-weight:700;color:var(--navy);font-family:'JetBrains Mono',monospace">Sum: 3 237 kWh</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div><div class="card-title">ISO-sertifiseringer og annet</div><div class="card-subtitle">Årlig bekreftelse for Endúr-rapporten</div></div></div>
+    <table class="st">
+      <thead><tr><th>Sertifisering</th><th>Status 2025</th></tr></thead>
+      <tbody>
+        <tr><td>ISO 9001:2015</td><td><span class="badge badge-green">Ja</span></td></tr>
+        <tr><td>ISO 14001:2015</td><td><span class="badge badge-green">Ja</span></td></tr>
+        <tr><td>ISO 45001:2018</td><td><span class="badge badge-green">Ja</span></td></tr>
+        <tr><td>Startbank</td><td><span class="badge badge-green">Ja</span></td></tr>
+        <tr><td>Miljøfyrtårn</td><td><span class="badge badge-gray">Nei</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════ TAB: PROSJEKTSTATUS (Prosjektleder input) ═══════ -->
+<div class="tab-content" id="tab-prosjektstatus" style="display:none">
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Prosjektleder input — kvartalsvis rapportering</div><div class="card-subtitle">Prosjektleder rapporterer utslipp, avfall og ressursforbruk per kvartal.</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="period-select">
+          <span class="period-label">År:</span>
+          <select><option>2026</option><option selected>2025</option><option>2024</option></select>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="alert('Sender purring til prosjektledere med utestående rapportering via e-post/varsling.')">Send purring</button>
+      </div>
+    </div>
+    <table class="st">
+      <thead><tr><th>Prosjekt</th><th>Prosjektleder</th><th style="text-align:center">Q1</th><th style="text-align:center">Q2</th><th style="text-align:center">Q3</th><th style="text-align:center">Q4</th><th>Sorteringsgrad</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>1270 Bispegata Hognestadgate</strong></td><td>Gerhard Gravdal</td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1270 Bispegata Hognestadgate','Gerhard Gravdal','Q1')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1270 Bispegata Hognestadgate','Gerhard Gravdal','Q2')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1270 Bispegata Hognestadgate','Gerhard Gravdal','Q3')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1270 Bispegata Hognestadgate','Gerhard Gravdal','Q4')">✓</span></td>
+          <td style="font-family:'JetBrains Mono',monospace">87%</td>
+        </tr>
+        <tr>
+          <td><strong>1246 ASU Vest Nippon Gases</strong></td><td>Ole Kaldheim</td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1246 ASU Vest Nippon Gases','Ole Kaldheim','Q1')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1246 ASU Vest Nippon Gases','Ole Kaldheim','Q2')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1246 ASU Vest Nippon Gases','Ole Kaldheim','Q3')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1246 ASU Vest Nippon Gases','Ole Kaldheim','Q4')">✓</span></td>
+          <td style="font-family:'JetBrains Mono',monospace">76%</td>
+        </tr>
+        <tr>
+          <td><strong>1180 Baker Hughes</strong></td><td>Fredrik Meidell</td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1180 Baker Hughes','Fredrik Meidell','Q1')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1180 Baker Hughes','Fredrik Meidell','Q2')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-yellow qbadge" onclick="openModal('1180 Baker Hughes','Fredrik Meidell','Q3')">◐</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1180 Baker Hughes','Fredrik Meidell','Q4')">✓</span></td>
+          <td style="font-family:'JetBrains Mono',monospace">81%</td>
+        </tr>
+        <tr>
+          <td><strong>0979 Hima Rjukan</strong></td><td>Atle Braut</td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('0979 Hima Rjukan','Atle Braut','Q1')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('0979 Hima Rjukan','Atle Braut','Q2')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('0979 Hima Rjukan','Atle Braut','Q3')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('0979 Hima Rjukan','Atle Braut','Q4')">✓</span></td>
+          <td style="font-family:'JetBrains Mono',monospace">89%</td>
+        </tr>
+        <tr>
+          <td><strong>1239 Cermaq Anleggsbetong</strong></td><td>Stig Andre Vigre</td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1239 Cermaq Anleggsbetong','Stig Andre Vigre','Q1')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1239 Cermaq Anleggsbetong','Stig Andre Vigre','Q2')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1239 Cermaq Anleggsbetong','Stig Andre Vigre','Q3')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1239 Cermaq Anleggsbetong','Stig Andre Vigre','Q4')">✓</span></td>
+          <td style="font-family:'JetBrains Mono',monospace">83%</td>
+        </tr>
+        <tr>
+          <td><strong>1200 The Box</strong></td><td>Krister Austerheim</td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1200 The Box','Krister Austerheim','Q1')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1200 The Box','Krister Austerheim','Q2')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-yellow qbadge" onclick="openModal('1200 The Box','Krister Austerheim','Q3')">◐</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1200 The Box','Krister Austerheim','Q4')">✓</span></td>
+          <td style="font-family:'JetBrains Mono',monospace">78%</td>
+        </tr>
+        <tr>
+          <td><strong>1182 Kiwi Nærbø</strong></td><td>Vegard Bue</td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1182 Kiwi Nærbø','Vegard Bue','Q1')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1182 Kiwi Nærbø','Vegard Bue','Q2')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1182 Kiwi Nærbø','Vegard Bue','Q3')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('1182 Kiwi Nærbø','Vegard Bue','Q4')">✓</span></td>
+          <td style="font-family:'JetBrains Mono',monospace">91%</td>
+        </tr>
+        <tr style="background:var(--red-bg)">
+          <td><strong>Jåtunparken BT1</strong></td><td>Fredrik Meidell</td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('Jåtunparken BT1','Fredrik Meidell','Q1')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('Jåtunparken BT1','Fredrik Meidell','Q2')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-red qbadge" onclick="openModal('Jåtunparken BT1','Fredrik Meidell','Q3')">✗</span></td>
+          <td style="text-align:center"><span class="badge badge-red qbadge" onclick="openModal('Jåtunparken BT1','Fredrik Meidell','Q4')">✗</span></td>
+          <td>—</td>
+        </tr>
+        <tr style="background:var(--red-bg)">
+          <td><strong>Trivium</strong></td><td>Ole Kaldheim</td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('Trivium','Ole Kaldheim','Q1')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('Trivium','Ole Kaldheim','Q2')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-yellow qbadge" onclick="openModal('Trivium','Ole Kaldheim','Q3')">◐</span></td>
+          <td style="text-align:center"><span class="badge badge-red qbadge" onclick="openModal('Trivium','Ole Kaldheim','Q4')">✗</span></td>
+          <td>—</td>
+        </tr>
+        <tr style="background:var(--red-bg)">
+          <td><strong>Sandnes Kulturhus</strong></td><td>Jørgen Skipevåg</td>
+          <td style="text-align:center"><span class="badge badge-green qbadge" onclick="openModal('Sandnes Kulturhus','Jørgen Skipevåg','Q1')">✓</span></td>
+          <td style="text-align:center"><span class="badge badge-red qbadge" onclick="openModal('Sandnes Kulturhus','Jørgen Skipevåg','Q2')">✗</span></td>
+          <td style="text-align:center"><span class="badge badge-red qbadge" onclick="openModal('Sandnes Kulturhus','Jørgen Skipevåg','Q3')">✗</span></td>
+          <td style="text-align:center"><span class="badge badge-red qbadge" onclick="openModal('Sandnes Kulturhus','Jørgen Skipevåg','Q4')">✗</span></td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: Prosjektleder input ═══════ -->
+<div class="modal-overlay" id="editModal" style="display:none">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px"><div style="font-size:18px;font-weight:700;color:var(--navy)" id="modalTitle">1270 Bispegata Hognestadgate</div><span class="badge badge-blue" id="modalQuarter">Q4 2025</span></div>
+        <div style="font-size:12px;color:var(--text-dim)" id="modalSub">Prosjektleder: Gerhard Gravdal</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline" onclick="closeModal()">Avbryt</button>
+        <button class="btn btn-primary" onclick="closeModal();alert('Rapportering lagret.')">Lagre</button>
+      </div>
+    </div>
+    <div class="modal-body">
+
+      <!-- Utslipp -->
+      <div class="cat-section">
+        <div class="cat-header" onclick="toggleCat(this)"><div class="cat-title"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0110 10c0 5.523-4.477 10-10 10S2 17.523 2 12"/><path d="M12 6v6l4 2"/></svg> Drivstoff (Scope 1)</div><svg class="cat-chevron open" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="cat-body">
+          <div class="input-row header"><div>Post</div><div style="text-align:right">Mengde</div><div>Enhet</div><div>Kilde</div></div>
+          <div class="input-row"><div class="input-label">Bensin</div><div><input class="input-field filled" value="412.50"></div><div class="input-unit">liter</div><div><span class="src-tag src-manual">Manuell</span></div></div>
+          <div class="input-row"><div class="input-label">Diesel</div><div><input class="input-field filled" value="8 240.30"></div><div class="input-unit">liter</div><div><span class="src-tag src-manual">Manuell</span></div></div>
+          <div class="input-row"><div class="input-label">Anleggsdiesel (100% fossil)</div><div><input class="input-field filled" value="6 120.00"></div><div class="input-unit">liter</div><div><span class="src-tag src-manual">Manuell</span></div></div>
+          <div class="input-row"><div class="input-label">Biodiesel HVO/FAME</div><div><input class="input-field" value="0"></div><div class="input-unit">liter</div><div><span class="src-tag src-manual">Manuell</span></div></div>
+          <div class="input-row"><div class="input-label">Propan/LPG</div><div><input class="input-field" value="0"></div><div class="input-unit">liter</div><div><span class="src-tag src-manual">Manuell</span></div></div>
+        </div>
+      </div>
+
+      <!-- Avfall -->
+      <div class="cat-section">
+        <div class="cat-header" onclick="toggleCat(this)"><div class="cat-title"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> Avfall (NS-koder)</div><svg class="cat-chevron open" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="cat-body">
+          <div class="input-row header"><div>NS-kode / Kategori</div><div style="text-align:right">Mengde</div><div>Enhet</div><div>Kilde</div></div>
+          <div class="input-row"><div class="input-label">1141 Rent trevirke</div><div><input class="input-field filled" value="29.70"></div><div class="input-unit">tonn</div><div><span class="src-tag src-auto">Avfallslev.</span></div></div>
+          <div class="input-row"><div class="input-label">1149 Blandet bearb. trevirke</div><div><input class="input-field filled" value="74.85"></div><div class="input-unit">tonn</div><div><span class="src-tag src-auto">Avfallslev.</span></div></div>
+          <div class="input-row"><div class="input-label">1452 Blandede metaller</div><div><input class="input-field filled" value="42.76"></div><div class="input-unit">tonn</div><div><span class="src-tag src-auto">Avfallslev.</span></div></div>
+          <div class="input-row"><div class="input-label">1611 Betong uten armering</div><div><input class="input-field filled" value="57.54"></div><div class="input-unit">tonn</div><div><span class="src-tag src-auto">Avfallslev.</span></div></div>
+          <div class="input-row"><div class="input-label">1615 Gips</div><div><input class="input-field filled" value="12.34"></div><div class="input-unit">tonn</div><div><span class="src-tag src-auto">Avfallslev.</span></div></div>
+          <div class="input-row"><div class="input-label">1299 Blandet papir/papp/kartong</div><div><input class="input-field filled" value="20.14"></div><div class="input-unit">tonn</div><div><span class="src-tag src-auto">Avfallslev.</span></div></div>
+          <div class="input-row"><div class="input-label">1729 Blandet myk/hard plastemb.</div><div><input class="input-field filled" value="31.84"></div><div class="input-unit">tonn</div><div><span class="src-tag src-auto">Avfallslev.</span></div></div>
+          <div class="input-row"><div class="input-label">9912 Blandet næringsavfall</div><div><input class="input-field filled" value="10.81"></div><div class="input-unit">tonn</div><div><span class="src-tag src-auto">Avfallslev.</span></div></div>
+          <div style="padding:10px 0;text-align:center"><button class="btn btn-outline btn-sm">+ Vis alle NS-koder</button></div>
+        </div>
+      </div>
+
+      <!-- Ressursforbruk -->
+      <div class="cat-section">
+        <div class="cat-header" onclick="toggleCat(this)"><div class="cat-title"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> Ressursforbruk (materialer)</div><svg class="cat-chevron open" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+        <div class="cat-body">
+          <div class="input-row header"><div>Materialkategori</div><div style="text-align:right">Mengde</div><div>Enhet</div><div>Leverandør</div></div>
+          <div style="padding:6px 0;font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.5px">Betong/sement</div>
+          <div class="input-row"><div class="input-label">Ferdigblandet sement</div><div><input class="input-field filled" value="4 210.00"></div><div class="input-unit">tonn</div><div style="font-size:12px;color:var(--text-dim)">Vigrestad betong</div></div>
+          <div class="input-row"><div class="input-label">Prefab. betongkomp.</div><div><input class="input-field filled" value="54.41"></div><div class="input-unit">tonn</div><div style="font-size:12px;color:var(--text-dim)">Vigrestad betong</div></div>
+          <div class="input-row"><div class="input-label">Mørtel/avrettingsmasse</div><div><input class="input-field" value="0"></div><div class="input-unit">tonn</div><div><span class="src-tag src-manual">Manuell</span></div></div>
+          <div style="padding:6px 0;font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.5px;margin-top:8px">Stålprodukter</div>
+          <div class="input-row"><div class="input-label">Armeringsstål</div><div><input class="input-field filled" value="186.40"></div><div class="input-unit">tonn</div><div style="font-size:12px;color:var(--text-dim)">AK mekaniske</div></div>
+          <div class="input-row"><div class="input-label">Konstruksjonsstål</div><div><input class="input-field filled" value="42.80"></div><div class="input-unit">tonn</div><div style="font-size:12px;color:var(--text-dim)">AK mekaniske</div></div>
+          <div style="padding:6px 0;font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.5px;margin-top:8px">Masser</div>
+          <div class="input-row"><div class="input-label">Masser (kjøpt eksternt)</div><div><input class="input-field filled" value="320.00"></div><div class="input-unit">tonn</div><div><span class="src-tag src-manual">Manuell</span></div></div>
+        </div>
+      </div>
+
+      <!-- Merknad -->
+      <div style="margin-top:16px">
+        <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px">Merknad</div>
+        <textarea style="width:100%;min-height:60px;padding:10px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:13px;resize:vertical;outline:none" placeholder="Kommentar til rapporteringen...">Betong fra Vigrestad betong, kontrollert mot leveringssedler. Stål fra AK mekaniske.</textarea>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</div><!-- content -->
+</main>
+</div><!-- app -->
+
+<script>
+document.getElementById('pw').addEventListener('keydown', function(e) {
+  if (e.key==='Enter') {
+    if (this.value==='DF2026') { document.getElementById('gate').style.display='none'; document.getElementById('app').style.display=''; sessionStorage.setItem('tk_auth','1'); }
+    else { document.getElementById('pwError').style.display='block'; this.value=''; }
+  }
+});
+if (sessionStorage.getItem('tk_auth')==='1') { document.getElementById('gate').style.display='none'; document.getElementById('app').style.display=''; }
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display='none');
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+tab).style.display='';
+  const tabEl = document.querySelector('[data-tab="'+tab+'"]');
+  if (tabEl) tabEl.classList.add('active');
+  const names = {oversikt:'Bærekraft',personell:'Personell & HMS',elektrisitet:'Elektrisitet',prosjektstatus:'Prosjektleder input'};
+  document.getElementById('breadcrumbCurrent').textContent = names[tab] || 'Bærekraft';
+}
+
+function openModal(name, pl, quarter) {
+  document.getElementById('modalTitle').textContent = name;
+  document.getElementById('modalSub').textContent = 'Prosjektleder: ' + pl;
+  document.getElementById('modalQuarter').textContent = quarter + ' 2025';
+  document.getElementById('editModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('editModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function toggleCat(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.cat-chevron');
+  if (body.style.display==='none') { body.style.display=''; chevron.classList.add('open'); }
+  else { body.style.display='none'; chevron.classList.remove('open'); }
+}
+
+// Personell year switching
+function switchPersonellYear(year) {
+  const badge = document.getElementById('personellBadge');
+  const btn = document.getElementById('personellEditBtn');
+  const fields = document.querySelectorAll('.pf');
+  if (year === '2025') {
+    badge.textContent = 'Levert 28. jan 2026';
+    badge.style.background = 'var(--green-bg)'; badge.style.color = 'var(--green-text)';
+    btn.textContent = 'Rediger'; btn.style.display = '';
+    fields.forEach(f => { f.readOnly = true; f.classList.add('filled'); f.style.opacity = '1'; });
+  } else if (year === '2026') {
+    badge.textContent = 'Ikke påbegynt';
+    badge.style.background = 'var(--yellow-bg)'; badge.style.color = 'var(--yellow-text)';
+    btn.textContent = 'Start utfylling'; btn.style.display = '';
+    fields.forEach(f => { f.readOnly = true; f.value = ''; f.classList.remove('filled'); f.style.opacity = '0.5'; });
+  } else {
+    badge.textContent = 'Historisk (skrivebeskyttet)';
+    badge.style.background = '#F1F3F5'; badge.style.color = 'var(--text-dim)';
+    btn.style.display = 'none';
+    fields.forEach(f => { f.readOnly = true; f.classList.add('filled'); f.style.opacity = '0.6'; });
+  }
+  document.getElementById('personellSaveBar').style.display = 'none';
+}
+
+var personellEditing = false;
+function togglePersonellEdit() {
+  personellEditing = !personellEditing;
+  const fields = document.querySelectorAll('.pf');
+  const saveBar = document.getElementById('personellSaveBar');
+  const btn = document.getElementById('personellEditBtn');
+  if (personellEditing) {
+    fields.forEach(f => { f.readOnly = false; f.style.opacity = '1'; });
+    saveBar.style.display = 'flex';
+    btn.style.display = 'none';
+  } else {
+    fields.forEach(f => { f.readOnly = true; });
+    saveBar.style.display = 'none';
+    btn.style.display = '';
+    btn.textContent = 'Rediger';
+  }
+}
+</script>
+</body>
+</html>
