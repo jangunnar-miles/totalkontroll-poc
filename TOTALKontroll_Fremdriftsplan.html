@@ -7,15 +7,30 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--navy:#1B2A4A;--tb-orange:#E87722;--tb-orange-bg:rgba(232,119,34,0.06);--bg-page:#F4F5F7;--bg-white:#FFF;--border:#E2E5EA;--border-light:#ECEEF1;--text-primary:#1B2A4A;--text-secondary:#5A6577;--text-dim:#8B95A5;--text-inverse:#FFF;--text-inverse-muted:rgba(255,255,255,0.5);--text-inverse-dim:rgba(255,255,255,0.3);--green:#16A34A;--green-bg:rgba(22,163,74,0.08);--green-text:#15803D;--yellow:#CA8A04;--yellow-bg:rgba(202,138,4,0.08);--yellow-text:#A16207;--red:#DC2626;--red-bg:rgba(220,38,38,0.06);--red-text:#B91C1C;--blue:#2563EB;--shadow-sm:0 1px 3px rgba(0,0,0,0.04);--shadow-md:0 4px 12px rgba(0,0,0,0.06);--radius-lg:12px;--sidebar-w:210px}
+:root{--bg-sidebar:#1B2A4A;--navy:#1B2A4A;--tb-orange:#E87722;--tb-orange-bg:rgba(232,119,34,0.06);--bg-page:#F4F5F7;--bg-white:#FFF;--border:#E2E5EA;--border-light:#ECEEF1;--text-primary:#1B2A4A;--text-secondary:#5A6577;--text-dim:#8B95A5;--text-inverse:#FFF;--text-inverse-muted:#8B99B0;--text-inverse-dim:#5A6A82;--green:#16A34A;--green-bg:rgba(22,163,74,0.08);--green-text:#15803D;--yellow:#CA8A04;--yellow-bg:rgba(202,138,4,0.08);--yellow-text:#A16207;--red:#DC2626;--red-bg:rgba(220,38,38,0.06);--red-text:#B91C1C;--blue:#2563EB;--shadow-sm:0 1px 3px rgba(0,0,0,0.04);--shadow-md:0 4px 12px rgba(0,0,0,0.06);--radius-lg:12px;--sidebar-w:210px}
 body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--text-primary);min-height:100vh;overflow-x:hidden}
 @media(min-width:1800px){body{zoom:1.5}}@media(min-width:1400px)and(max-width:1799px){body{zoom:1.25}}@media(min-width:1100px)and(max-width:1399px){body{zoom:1.1}}@media(max-width:1099px){body{zoom:1.0}}
 
 /* Sidebar */
-.sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--navy);position:fixed;top:0;left:0;z-index:100;display:flex;flex-direction:column}.sidebar-logo{display:flex;align-items:center;gap:10px;padding:18px 18px 22px;border-bottom:1px solid rgba(255,255,255,0.06)}.logo-svg{width:30px;height:30px;flex-shrink:0}.logo-text{display:flex;flex-direction:column;gap:1px}.logo-text .brand{font-size:14px;font-weight:700;color:var(--text-inverse);letter-spacing:.3px}.logo-text .brand em{font-style:normal;color:var(--tb-orange)}.logo-text .sub{font-size:9.5px;color:var(--text-inverse-dim);letter-spacing:.8px;text-transform:uppercase}.sidebar-nav{padding:14px 0;flex:1}.nav-item{display:flex;align-items:center;gap:11px;padding:9px 18px;color:var(--text-inverse-muted);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border-left:3px solid transparent;text-decoration:none}.nav-item:hover{color:var(--text-inverse);background:rgba(255,255,255,0.04)}.nav-item.active{color:var(--tb-orange);border-left-color:var(--tb-orange);background:rgba(232,119,34,0.08)}.nav-item svg{width:17px;height:17px;flex-shrink:0}.nav-sub .nav-item{padding-left:32px;font-size:12px}.nav-sub .nav-item svg{width:14px;height:14px}.sidebar-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:var(--text-inverse-muted);font-weight:500}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:228px;background:var(--bg-sidebar);display:flex;flex-direction:column;z-index:100}
+.sidebar-logo{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px}
+.sidebar-logo .logo-svg{width:30px;height:30px;flex-shrink:0}
+.sidebar-logo .logo-text{display:flex;flex-direction:column;line-height:1.15}
+.sidebar-logo .logo-text .brand{font-weight:700;font-size:13px;color:#fff}
+.sidebar-logo .logo-text .brand em{font-style:normal;color:var(--tb-orange)}
+.sidebar-logo .logo-text .sub{font-size:9.5px;color:var(--text-inverse-dim);font-weight:500;letter-spacing:0.8px;text-transform:uppercase;margin-top:1px}
+.sidebar-nav{padding:14px 0;flex:1}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 18px;color:var(--text-inverse-muted);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;border-left:3px solid transparent}
+.nav-item:hover{color:#E8ECF2;background:rgba(255,255,255,0.04)}
+.nav-item.active{color:var(--tb-orange);border-left-color:var(--tb-orange);background:rgba(232,119,34,0.08)}
+.nav-item svg{width:17px;height:17px;flex-shrink:0}
+.nav-sub{padding-left:18px}
+.nav-sub .nav-item{padding:6px 18px 6px 32px;font-size:12px}
+.nav-sub .nav-item svg{width:14px;height:14px}
+.sidebar-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.06);font-size:10px;color:var(--text-inverse-dim);line-height:1.5}
 
 /* Main */
-.main{margin-left:var(--sidebar-w);min-height:100vh}.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:var(--bg-white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}.topbar-breadcrumb{font-size:12px;color:var(--text-dim);font-weight:500}.topbar-breadcrumb .current{color:var(--text-primary);font-weight:600}.content{padding:20px 24px}.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--text-secondary);cursor:pointer;margin-bottom:16px;padding:4px 0;transition:color .12s}.back-btn:hover{color:var(--tb-orange)}
+.main{margin-left:228px;min-height:100vh}.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:var(--bg-white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}.topbar-breadcrumb{font-size:12px;color:var(--text-dim);font-weight:500}.topbar-breadcrumb .current{color:var(--text-primary);font-weight:600}.content{padding:20px 24px}.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--text-secondary);cursor:pointer;margin-bottom:16px;padding:4px 0;transition:color .12s}.back-btn:hover{color:var(--tb-orange)}
 
 /* Gate */
 .password-gate{position:fixed;inset:0;background:var(--navy);z-index:9999;display:flex;align-items:center;justify-content:center}.password-gate.hidden{display:none}.password-box{background:var(--bg-white);border-radius:16px;padding:40px;width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)}.password-box h2{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:4px}.password-box h2 em{font-style:normal;color:var(--tb-orange)}.password-box p{font-size:13px;color:var(--text-dim);margin-bottom:24px}.password-box input{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-size:14px;text-align:center;outline:none;font-family:inherit;letter-spacing:2px}.password-box input:focus{border-color:var(--tb-orange);box-shadow:0 0 0 3px rgba(232,119,34,0.1)}.password-box .error{font-size:12px;color:var(--red);margin-top:8px;display:none}
@@ -96,13 +111,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--text
   <div class="sidebar-logo"><svg class="logo-svg" viewBox="0 0 100 90"><use href="#tb-logo"/></svg><div class="logo-text"><span class="brand"><em>TOTAL</em>Kontroll</span><span class="sub">Ledelsessystem</span></div></div>
   <div class="sidebar-nav">
     <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Min side</div>
-    <a class="nav-item" href="TOTALKontroll_Salg_PoC.html" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> Salg</a>
-    <div class="nav-sub"><a class="nav-item" href="TOTALKontroll_Muligheter.html" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Muligheter</a><a class="nav-item" href="TOTALKontroll_Markedsanalyse.html" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Markedsanalyse</a></div>
-    <a class="nav-item" href="prosjekt_poc_light.html" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Prosjekt</a>
-    <div class="nav-sub"><div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Fremdriftsplan</div></div>
-    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Handbok</div>
+    <div class="nav-item" onclick="window.open('TOTALKontroll_Salg_PoC.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> Salg</div>
+    <div class="nav-sub">
+      <div class="nav-item" onclick="window.open('TOTALKontroll_Muligheter.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Muligheter</div>
+      <div class="nav-item" onclick="window.open('TOTALKontroll_Markedsanalyse.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Markedsanalyse</div>
+    </div>
+    <div class="nav-item" onclick="window.open('prosjekt_poc_light.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Prosjekt</div>
+    <div class="nav-sub">
+      <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Fremdriftsplan</div>
+      <div class="nav-item" onclick="window.open('TOTALKontroll_Baerekraft_PoC.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/></svg> Bærekraft</div>
+    </div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Håndbok</div>
   </div>
-  <div class="sidebar-footer">Konseptvisning, kun demo data</div>
+  <div class="sidebar-footer" style="color:var(--text-inverse-muted);font-size:11px;font-weight:500;">Konseptvisning, kun demo data</div>
 </nav>
 <main class="main">
   <div id="pgSel">

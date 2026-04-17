@@ -185,6 +185,26 @@
   .create-cancel{background:var(--white);color:var(--g600);border:1px solid var(--g300);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit}.create-cancel:hover{background:var(--g50)}
   .create-confirm{background:var(--orange);color:var(--white);border:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}.create-confirm:hover{background:#d35400}
   .archive-origin{font-size:10px;color:var(--g500);font-style:italic;margin-left:8px}
+  /* PORTAL CHOOSER */
+  .portal-chooser{display:flex;gap:20px;margin-top:12px}
+  .portal-card{flex:1;background:var(--white);border:2px solid var(--g200);border-radius:16px;padding:32px 28px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+  .portal-card:hover{border-color:var(--g400);box-shadow:0 4px 16px rgba(0,0,0,0.06);transform:translateY(-2px)}
+  .portal-card .portal-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px}
+  .portal-card .portal-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px}
+  .portal-card .portal-desc{font-size:13px;color:var(--g600);line-height:1.6;margin-bottom:16px}
+  .portal-card .portal-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:inherit;transition:all .15s}
+  .portal-card.manual .portal-icon{background:rgba(26,39,68,0.08);color:var(--navy)}
+  .portal-card.manual .portal-btn{background:var(--navy);color:var(--white)}.portal-card.manual .portal-btn:hover{background:#2d3f63}
+  .portal-card.manual:hover{border-color:var(--navy)}
+  .portal-card.ai .portal-icon{background:var(--orange-faded);color:var(--orange)}
+  .portal-card.ai .portal-btn{background:var(--orange);color:var(--white)}.portal-card.ai .portal-btn:hover{background:#d35400}
+  .portal-card.ai:hover{border-color:var(--orange)}
+  .portal-card.ai{border-style:dashed}
+  .portal-badge{position:absolute;top:16px;right:16px;padding:4px 12px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .portal-badge.demo{background:var(--orange-faded);color:var(--orange)}
+  .portal-badge.prod{background:var(--green-bg);color:var(--green)}
+  .portal-count{font-size:12px;color:var(--g500);font-weight:500;margin-top:8px}
+  .section-back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--g600);cursor:pointer;background:none;border:none;font-family:inherit;font-weight:500;padding:0;margin-bottom:16px;transition:color .15s}.section-back:hover{color:var(--navy)}
 
   @media(max-width:1200px){.sidebar{width:60px}.sidebar .logo-text,.sidebar .nav-label,.nav-badge,.nav-sub{display:none}.sidebar-logo{padding:16px;justify-content:center}.nav-item{padding:12px;justify-content:center}.main{margin-left:60px}}
   .login-overlay{position:fixed;inset:0;background:#1a2744;z-index:9999;display:flex;align-items:center;justify-content:center}
@@ -236,47 +256,91 @@
     <div class="page-header">
       <div>
         <div class="page-title">Muligheter</div>
-        <div class="page-subtitle">Automatisk identifiserte prosjektmuligheter fra offentlige kilder</div>
+        <div class="page-subtitle">Finn og registrer nye prosjektmuligheter</div>
       </div>
-      <button class="btn-add-manual" onclick="openCreate()">+ Registrer mulighet</button>
     </div>
 
-    <!-- DEMO BANNER -->
-    <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(230,126,34,0.08);border:1px solid rgba(230,126,34,0.2);border-radius:10px;margin-bottom:16px;font-size:13px;color:var(--g700)">
-      <span style="font-size:18px">&#9888;</span>
-      <span><strong style="color:var(--orange)">Demo</strong> — Alle treff er simulerte eksempler for å illustrere funksjonalitet. Ingen reelle data eller kilder er koblet til.</span>
-    </div>
-
-    <!-- STATUS BANNER -->
-    <div class="status-banner" id="statusBanner">
-      <div class="status-icon ok" id="statusIcon">&#10003;</div>
-      <div class="status-info">
-        <div class="status-title" id="statusTitle">Siste kjøring fullført</div>
-        <div class="status-detail" id="statusDetail">I dag kl. 06:00 — 14 kilder gjennomgått — varighet 2 min 34 sek</div>
+    <!-- PORTAL CHOOSER -->
+    <div id="portalChooser">
+      <div class="portal-chooser">
+        <div class="portal-card manual" onclick="enterSection('manual')">
+          <span class="portal-badge prod">Klar til bruk</span>
+          <div class="portal-icon">&#9998;</div>
+          <div class="portal-title">Manuell registrering</div>
+          <div class="portal-desc">Registrer og følg opp muligheter manuelt. Konverter til leads når de er klare for salgspipeline.</div>
+          <div class="portal-count" id="manualCount"></div>
+          <button class="portal-btn">Åpne &#8594;</button>
+        </div>
+        <div class="portal-card ai" onclick="enterSection('ai')">
+          <span class="portal-badge demo">Demo / PoC</span>
+          <div class="portal-icon">&#9883;</div>
+          <div class="portal-title">AI-assistert søk</div>
+          <div class="portal-desc">Automatisk identifisering av prosjektmuligheter fra offentlige kilder. Simulerte eksempler, ikke koblet til reelle datakilder.</div>
+          <div class="portal-count" id="aiCount"></div>
+          <button class="portal-btn">Åpne demo &#8594;</button>
+        </div>
       </div>
-      <div class="status-stats">
-        <div class="stat"><div class="stat-value" id="statNew">0</div><div class="stat-label">Nye treff</div></div>
-        <div class="stat"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Ubehandlet</div></div>
+    </div>
+
+    <!-- MANUAL SECTION -->
+    <div id="manualSection" style="display:none">
+      <button class="section-back" onclick="backToPortal()">&#8592; Tilbake til oversikt</button>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">
+        <div>
+          <div style="font-size:20px;font-weight:700;color:var(--navy)">Manuell registrering</div>
+          <div style="font-size:13px;color:var(--g600);margin-top:4px">Registrer og følg opp prosjektmuligheter manuelt</div>
+        </div>
+        <button class="btn-add-manual" onclick="openCreate()">+ Registrer mulighet</button>
       </div>
-      <button class="btn-run" onclick="simulateRun()">&#9654; Kjør nå</button>
+      <div class="filter-row" id="manualFilterRow"></div>
+      <div class="opp-list" id="manualOppList"></div>
+      <div class="empty-state" id="manualEmptyState" style="display:none">
+        <div class="icon">&#9998;</div>
+        <div class="msg">Ingen manuelt registrerte muligheter</div>
+      </div>
     </div>
 
-    <!-- FILTERS -->
-    <div class="filter-row" id="filterRow"></div>
-
-    <!-- OPPORTUNITY LIST -->
-    <div class="opp-list" id="oppList"></div>
-
-    <!-- EMPTY STATE -->
-    <div class="empty-state" id="emptyState" style="display:none">
-      <div class="icon">&#9745;</div>
-      <div class="msg">Ingen ubehandlede muligheter i denne kategorien</div>
-    </div>
-
-    <!-- IGNORED RULES -->
-    <div class="ignored-rules" id="ignoredSection" style="display:none">
-      <h3 onclick="toggleIgnored()">&#9660; Permanent ignorerte søkeord <span id="ignoreCount"></span></h3>
-      <div class="rule-list" id="ruleList"></div>
+    <!-- AI SECTION -->
+    <div id="aiSection" style="display:none">
+      <button class="section-back" onclick="backToPortal()">&#8592; Tilbake til oversikt</button>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:20px;font-weight:700;color:var(--navy)">AI-assistert søk</div>
+          <div style="font-size:13px;color:var(--g600);margin-top:4px">Automatisk identifiserte prosjektmuligheter fra offentlige kilder</div>
+        </div>
+      </div>
+      <!-- DEMO BANNER -->
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(230,126,34,0.08);border:1px solid rgba(230,126,34,0.2);border-radius:10px;margin-bottom:16px;font-size:13px;color:var(--g700)">
+        <span style="font-size:18px">&#9888;</span>
+        <span><strong style="color:var(--orange)">Demo / PoC</strong> — Alle treff er simulerte eksempler for å illustrere funksjonalitet. Ingen reelle data eller kilder er koblet til.</span>
+      </div>
+      <!-- STATUS BANNER -->
+      <div class="status-banner" id="statusBanner">
+        <div class="status-icon ok" id="statusIcon">&#10003;</div>
+        <div class="status-info">
+          <div class="status-title" id="statusTitle">Siste kjøring fullført</div>
+          <div class="status-detail" id="statusDetail">I dag kl. 06:00 — 14 kilder gjennomgått — varighet 2 min 34 sek</div>
+        </div>
+        <div class="status-stats">
+          <div class="stat"><div class="stat-value" id="statNew">0</div><div class="stat-label">Nye treff</div></div>
+          <div class="stat"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Ubehandlet</div></div>
+        </div>
+        <button class="btn-run" onclick="simulateRun()">&#9654; Kjør nå</button>
+      </div>
+      <!-- FILTERS -->
+      <div class="filter-row" id="filterRow"></div>
+      <!-- OPPORTUNITY LIST -->
+      <div class="opp-list" id="oppList"></div>
+      <!-- EMPTY STATE -->
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="icon">&#9745;</div>
+        <div class="msg">Ingen ubehandlede muligheter i denne kategorien</div>
+      </div>
+      <!-- IGNORED RULES -->
+      <div class="ignored-rules" id="ignoredSection" style="display:none">
+        <h3 onclick="toggleIgnored()">&#9660; Permanent ignorerte søkeord <span id="ignoreCount"></span></h3>
+        <div class="rule-list" id="ruleList"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -332,7 +396,9 @@ let opps=[
 ];
 // statuses: new, hold, converted, ignored, blocked
 let ignoredRules=[{id:1,text:'Haugesund Svømmehall',type:'project'},{id:2,text:'Asfaltarbeider',type:'keyword'}];
-let viewMode='new'; // new, hold, manual, archive
+let activeSection='portal'; // portal, manual, ai
+let viewMode='new'; // AI views: new, hold, archive
+let manualViewMode='active'; // Manual views: active, archive
 let showIgnored=false;
 let holdTargetId=null;
 
@@ -346,51 +412,73 @@ function esc(s){return(s||'').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
 function fmtD(d){if(!d)return'—';return new Date(d).toLocaleDateString('nb-NO',{day:'numeric',month:'short',year:'numeric'});}
 function toast(ic,msg){const t=document.getElementById('toast');t.querySelector('.toast-icon').innerHTML=ic;t.querySelector('.toast-text').textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 
-// ═══ RENDER ═══
-function render(){
+// ═══ NAVIGATION ═══
+function enterSection(s){activeSection=s;renderAll();}
+function backToPortal(){activeSection='portal';renderAll();}
+function renderAll(){
+  document.getElementById('portalChooser').style.display=activeSection==='portal'?'block':'none';
+  document.getElementById('manualSection').style.display=activeSection==='manual'?'block':'none';
+  document.getElementById('aiSection').style.display=activeSection==='ai'?'block':'none';
+  updatePortalCounts();
+  if(activeSection==='manual')renderManualSection();
+  if(activeSection==='ai')renderAISection();
+}
+function updatePortalCounts(){
+  const mc=manualOpps.filter(o=>o.status==='active').length;
+  const ac=opps.filter(o=>o.status==='new').length;
+  document.getElementById('manualCount').textContent=mc?mc+' aktive muligheter':'Ingen registrerte ennå';
+  document.getElementById('aiCount').textContent=ac+' simulerte treff';
+  document.getElementById('navBadge').textContent=ac;
+}
+
+// ═══ RENDER MANUAL ═══
+function renderManualSection(){
+  const allActive=manualOpps.filter(o=>o.status==='active');
+  const allArchived=manualOpps.filter(o=>o.status==='converted');
+  let fh=`<button class="filter-tab ${manualViewMode==='active'?'active':''}" onclick="setManualView('active')">Aktive<span class="ft-count">(${allActive.length})</span></button>`;
+  fh+=`<button class="filter-tab ${manualViewMode==='archive'?'active':''}" onclick="setManualView('archive')">Arkiv<span class="ft-count">(${allArchived.length})</span></button>`;
+  document.getElementById('manualFilterRow').innerHTML=fh;
+  const items=manualViewMode==='active'?allActive:allArchived;
+  if(!items.length){
+    document.getElementById('manualOppList').innerHTML='';
+    document.getElementById('manualEmptyState').style.display='block';
+    document.getElementById('manualEmptyState').querySelector('.msg').textContent=manualViewMode==='active'?'Ingen aktive muligheter. Trykk "+ Registrer mulighet" for å legge til.':'Ingen konverterte muligheter i arkivet.';
+  } else {
+    document.getElementById('manualEmptyState').style.display='none';
+    if(manualViewMode==='active') document.getElementById('manualOppList').innerHTML=items.map(o=>renderManualCard(o)).join('');
+    else document.getElementById('manualOppList').innerHTML=items.map(o=>renderManualArchiveCard(o)).join('');
+  }
+}
+function setManualView(v){manualViewMode=v;renderManualSection();}
+
+// ═══ RENDER AI ═══
+function renderAISection(){
   const allNew=opps.filter(o=>o.status==='new');
   const allHold=opps.filter(o=>o.status==='hold');
-  const allManual=manualOpps.filter(o=>o.status==='active');
   const allArchiveAI=opps.filter(o=>['converted','ignored','blocked'].includes(o.status));
-  const allArchiveManual=manualOpps.filter(o=>o.status==='converted');
-  const allArchive=[...allArchiveAI,...allArchiveManual];
-  document.getElementById('navBadge').textContent=allNew.length;
   document.getElementById('statNew').textContent=opps.filter(o=>o.published==='2026-03-25'||o.published==='2026-03-24').length;
   document.getElementById('statTotal').textContent=allNew.length;
 
-  // Filter tabs
   let fh=`<button class="filter-tab ${viewMode==='new'?'active':''}" onclick="setView('new')">Alle nye<span class="ft-count">(${allNew.length})</span></button>`;
   fh+=`<button class="filter-tab ${viewMode==='hold'?'active':''}" onclick="setView('hold')">&#9202; På hold<span class="ft-count">(${allHold.length})</span></button>`;
-  fh+=`<button class="filter-tab ${viewMode==='manual'?'active':''}" onclick="setView('manual')">&#9998; Manuelt registrerte<span class="ft-count">(${allManual.length})</span></button>`;
-  fh+=`<button class="filter-tab ${viewMode==='archive'?'active':''}" onclick="setView('archive')">Arkiv<span class="ft-count">(${allArchive.length})</span></button>`;
+  fh+=`<button class="filter-tab ${viewMode==='archive'?'active':''}" onclick="setView('archive')">Arkiv<span class="ft-count">(${allArchiveAI.length})</span></button>`;
   document.getElementById('filterRow').innerHTML=fh;
 
   let items=[];
   if(viewMode==='new') items=allNew;
   else if(viewMode==='hold') items=allHold;
-  else if(viewMode==='manual') items=allManual;
-  else items=allArchive;
+  else items=allArchiveAI;
 
-  const emptyMsgs={new:'Ingen nye muligheter',hold:'Ingen muligheter på hold',manual:'Ingen manuelt registrerte muligheter',archive:'Arkivet er tomt'};
+  const emptyMsgs={new:'Ingen nye muligheter',hold:'Ingen muligheter på hold',archive:'Arkivet er tomt'};
   if(!items.length){
     document.getElementById('oppList').innerHTML='';
     document.getElementById('emptyState').style.display='block';
     document.getElementById('emptyState').querySelector('.msg').textContent=emptyMsgs[viewMode]||'Ingen elementer';
   } else {
     document.getElementById('emptyState').style.display='none';
-    if(viewMode==='manual'){
-      document.getElementById('oppList').innerHTML=items.map(o=>renderManualCard(o)).join('');
-    } else if(viewMode==='archive'){
-      document.getElementById('oppList').innerHTML=items.map(o=>{
-        if(o.source===undefined && o.created!==undefined) return renderManualArchiveCard(o);
-        return renderCard(o);
-      }).join('');
-    } else {
-      document.getElementById('oppList').innerHTML=items.map(o=>renderCard(o)).join('');
-    }
+    document.getElementById('oppList').innerHTML=items.map(o=>renderCard(o)).join('');
   }
 
-  // Ignored rules
   if(ignoredRules.length){
     document.getElementById('ignoredSection').style.display='block';
     document.getElementById('ignoreCount').textContent=`(${ignoredRules.length})`;
@@ -411,6 +499,10 @@ function render(){
     document.getElementById('ignoredSection').style.display='none';
   }
 }
+
+// Legacy render wrapper
+function render(){renderAll();}
+
 
 function renderCard(o){
   const rc=o.relevance==='high'?'rel-high':o.relevance==='med'?'rel-med':'rel-low';
@@ -439,13 +531,13 @@ function renderCard(o){
 }
 
 // ═══ ACTIONS (AI) ═══
-function doConvert(id){const o=opps.find(x=>x.id===id);if(!o)return;o.status='converted';o._origin='ai';toast('&#10003;','"'+o.name+'" lagt til i salgspipeline');render();}
-function doIgnore(id){const o=opps.find(x=>x.id===id);if(!o)return;o.status='ignored';toast('&#128473;','Mulighet ignorert');render();}
+function doConvert(id){const o=opps.find(x=>x.id===id);if(!o)return;o.status='converted';o._origin='ai';toast('&#10003;','"'+o.name+'" lagt til i salgspipeline');renderAISection();updatePortalCounts();}
+function doIgnore(id){const o=opps.find(x=>x.id===id);if(!o)return;o.status='ignored';toast('&#128473;','Mulighet ignorert');renderAISection();updatePortalCounts();}
 function doBlock(id){const o=opps.find(x=>x.id===id);if(!o)return;
   const kw=o.name.split(',')[0].trim();
   if(confirm('Permanent ignorere fremtidige treff som ligner "'+kw+'"?\n\nDu kan redigere regelen senere.')){
     o.status='blocked';ignoredRules.push({id:Date.now(),text:kw,type:'project'});
-    toast('&#128275;','Fremtidige treff for "'+kw+'" filtreres bort');render();
+    toast('&#128275;','Fremtidige treff for "'+kw+'" filtreres bort');renderAISection();updatePortalCounts();
   }
 }
 
@@ -460,8 +552,8 @@ function renderManualArchiveCard(o){
 }
 
 // ═══ MANUAL ACTIONS ═══
-function convertManual(id){const o=manualOpps.find(x=>x.id===id);if(!o)return;o.status='converted';toast('&#10003;','"'+o.name+'" lagt til i salgspipeline');render();}
-function deleteManual(id){if(!confirm('Er du sikker på at du vil slette denne muligheten?'))return;manualOpps=manualOpps.filter(x=>x.id!==id);toast('&#128465;','Mulighet slettet');render();}
+function convertManual(id){const o=manualOpps.find(x=>x.id===id);if(!o)return;o.status='converted';toast('&#10003;','"'+o.name+'" lagt til i salgspipeline');renderManualSection();updatePortalCounts();}
+function deleteManual(id){if(!confirm('Er du sikker på at du vil slette denne muligheten?'))return;manualOpps=manualOpps.filter(x=>x.id!==id);toast('&#128465;','Mulighet slettet');renderManualSection();updatePortalCounts();}
 
 // ═══ CREATE MANUAL ═══
 function openCreate(){document.getElementById('createOverlay').classList.add('open');document.getElementById('cName').value='';document.getElementById('cType').value='Totalentreprise Fisk';document.getElementById('cRegion').value='';document.getElementById('cSize').value='';document.getElementById('cNote').value='';setTimeout(()=>document.getElementById('cName').focus(),200);}
@@ -470,7 +562,7 @@ function saveManual(){
   const name=document.getElementById('cName').value.trim();
   if(!name){document.getElementById('cName').style.borderColor='var(--red)';setTimeout(()=>document.getElementById('cName').style.borderColor='',1500);return;}
   manualOpps.unshift({id:Date.now(),name,type:document.getElementById('cType').value,region:document.getElementById('cRegion').value.trim(),estSize:parseFloat(document.getElementById('cSize').value)||0,note:document.getElementById('cNote').value.trim(),status:'active',created:new Date().toISOString().split('T')[0]});
-  closeCreate();viewMode='manual';toast('&#10003;','"'+name+'" registrert');render();
+  closeCreate();manualViewMode='active';toast('&#10003;','"'+name+'" registrert');renderManualSection();updatePortalCounts();
 }
 
 // ═══ HOLD ═══
@@ -490,14 +582,14 @@ function holdConfirm(){
   const untilDate=new Date(now.getTime()+weeks*7*24*60*60*1000);
   const untilWeek=getISOWeek(untilDate);
   o.status='hold';o.holdWeeks=weeks;o.holdUntilWeek=untilWeek;
-  holdClose();toast('&#9202;','"'+o.name+'" satt på hold i '+weeks+' uker');render();
+  holdClose();toast('&#9202;','"'+o.name+'" satt på hold i '+weeks+' uker');renderAISection();updatePortalCounts();
 }
 function getISOWeek(d){const t=new Date(d);t.setHours(0,0,0,0);t.setDate(t.getDate()+3-(t.getDay()+6)%7);const w1=new Date(t.getFullYear(),0,4);return 1+Math.round(((t-w1)/864e5-3+(w1.getDay()+6)%7)/7);}
 
 // ═══ VIEWS & RULES ═══
-function setView(v){viewMode=v;render();}
-function toggleIgnored(){showIgnored=!showIgnored;render();}
-function removeRule(id){ignoredRules=ignoredRules.filter(r=>r.id!==id);toast('&#128275;','Regel fjernet');render();}
+function setView(v){viewMode=v;renderAISection();}
+function toggleIgnored(){showIgnored=!showIgnored;renderAISection();}
+function removeRule(id){ignoredRules=ignoredRules.filter(r=>r.id!==id);toast('&#128275;','Regel fjernet');renderAISection();}
 function updateRule(id,field,val){const r=ignoredRules.find(x=>x.id===id);if(r)r[field]=val;}
 
 function simulateRun(){
@@ -506,11 +598,11 @@ function simulateRun(){
   setTimeout(()=>{
     opps.unshift({id:Date.now(),name:'Nytt kontorbygg Forus, K8 Eiendom',type:'Totalentreprise Næring',region:'Stavanger',estSize:90,source:'Byggfakta',sourceUrl:'#',deadline:'2026-08-15',published:new Date().toISOString().split('T')[0],relevance:'med',reason:'Forus-området, passende størrelse. Kontorbygg er kjerneprodukt for totalentreprise næring.',status:'new'});
     ic.className='status-icon ok';ic.innerHTML='&#10003;';ti.textContent='Kjøring fullført';de.textContent='Nettopp — 14 kilder gjennomgått — 1 nytt treff funnet';
-    viewMode='new';toast('&#10003;','1 ny mulighet identifisert');render();
+    viewMode='new';toast('&#10003;','1 ny mulighet identifisert');renderAISection();updatePortalCounts();
   },3500);
 }
 
-render();
+renderAll();
 </script>
 </body>
 </html>
