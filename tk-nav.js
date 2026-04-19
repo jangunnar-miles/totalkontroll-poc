@@ -28,17 +28,17 @@
     },
     {
       label: 'Salg',
-      file: 'salg_work17.html',
+      file: 'TOTALKontroll_Salg_PoC.html',
       icon: '<path d="M18 20V10M12 20V4M6 20v-6"/>',
       sub: [
         {
           label: 'Muligheter',
-          file: 'mul_work3.html',
+          file: 'TOTALKontroll_Muligheter.html',
           icon: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>'
         },
         {
           label: 'Markedsanalyse',
-          file: 'markedsanalyse.html',
+          file: 'TOTALKontroll_Markedsanalyse.html',
           icon: '<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>'
         }
       ]
@@ -52,6 +52,11 @@
           label: 'Fremdriftsplan',
           file: 'TOTALKontroll_Fremdriftsplan.html',
           icon: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'
+        },
+        {
+          label: 'Bærekraft',
+          file: 'TOTALKontroll_Baerekraft_PoC.html',
+          icon: '<path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/>'
         }
       ]
     },
@@ -60,12 +65,12 @@
       file: 'handbok.html',
       icon: '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>'
     },
+    {
+      label: 'Arrangement',
+      file: 'TOTALKontroll_Arrangement.html',
+      icon: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>'
+    },
     // ── Legg til nye moduler her ──
-    // {
-    //   label: 'Arrangement',
-    //   file: 'TOTALKontroll_Arrangement.html',
-    //   icon: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>'
-    // },
   ];
 
   // ══════════════════════════════════════════════════════
