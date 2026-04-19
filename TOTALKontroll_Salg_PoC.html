@@ -4,34 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TOTALKontroll — Salg</title>
+<script src="tk-nav.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
   *{margin:0;padding:0;box-sizing:border-box}
-  :root{--text-inverse-muted:#8B99B0;--text-inverse-dim:#5A6A82;--tb-orange:#E87722;--bg-sidebar:#1B2A4A;--navy:#1a2744;--orange:#e67e22;--orange-faded:rgba(230,126,34,0.08);--white:#fff;--g50:#f8f9fa;--g100:#f1f3f5;--g200:#e9ecef;--g300:#dee2e6;--g400:#ced4da;--g500:#adb5bd;--g600:#868e96;--g700:#495057;--g800:#343a40;--red:#e74c3c;--red-bg:rgba(231,76,60,0.06);--red-border:rgba(231,76,60,0.25);--green:#27ae60;--green-bg:rgba(39,174,96,0.1);--sidebar-w:228px}
-
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:228px;background:var(--bg-sidebar);display:flex;flex-direction:column;z-index:100}
-.sidebar-logo{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px}
-.sidebar-logo .logo-svg{width:30px;height:30px;flex-shrink:0}
-.sidebar-logo .logo-text{display:flex;flex-direction:column;line-height:1.15}
-.sidebar-logo .logo-text .brand{font-weight:700;font-size:13px;color:#fff}
-.sidebar-logo .logo-text .brand em{font-style:normal;color:var(--tb-orange)}
-.sidebar-logo .logo-text .sub{font-size:9.5px;color:var(--text-inverse-dim);font-weight:500;letter-spacing:0.8px;text-transform:uppercase;margin-top:1px}
-.sidebar-nav{padding:14px 0;flex:1}
-.nav-item{display:flex;align-items:center;gap:11px;padding:9px 18px;color:var(--text-inverse-muted);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;border-left:3px solid transparent}
-.nav-item:hover{color:#E8ECF2;background:rgba(255,255,255,0.04)}
-.nav-item.active{color:var(--tb-orange);border-left-color:var(--tb-orange);background:rgba(232,119,34,0.08)}
-.nav-item svg{width:17px;height:17px;flex-shrink:0}
-.nav-sub{padding-left:18px}
-.nav-sub .nav-item{padding:6px 18px 6px 32px;font-size:12px}
-.nav-sub .nav-item svg{width:14px;height:14px}
-.sidebar-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.06);font-size:10px;color:var(--text-inverse-dim);line-height:1.5}
-
+  :root{--navy:#1a2744;--orange:#e67e22;--orange-faded:rgba(230,126,34,0.08);--white:#fff;--g50:#f8f9fa;--g100:#f1f3f5;--g200:#e9ecef;--g300:#dee2e6;--g400:#ced4da;--g500:#adb5bd;--g600:#868e96;--g700:#495057;--g800:#343a40;--red:#e74c3c;--red-bg:rgba(231,76,60,0.06);--red-border:rgba(231,76,60,0.25);--green:#27ae60;--green-bg:rgba(39,174,96,0.1)}
   body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--g50);color:var(--g800);min-height:100vh;display:flex}
-  .logo-icon{width:34px;height:34px;background:var(--orange);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:var(--white)}
-  
-  .nav-icon{font-size:18px;width:22px;text-align:center}
-  .main{margin-left:228px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+  .main{flex:1;display:flex;flex-direction:column;min-height:100vh}
   .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:var(--white);border-bottom:1px solid var(--g200);gap:16px}
   .topbar-user{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--g700)}
   .role-selector{display:flex;align-items:center}
@@ -215,9 +195,6 @@
   .note-save{padding:6px 14px;background:var(--navy);color:var(--white);border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}.note-save:hover{background:#2d3f63}
   .note-cancel{padding:6px 14px;background:var(--white);color:var(--g600);border:1px solid var(--g300);border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}.note-cancel:hover{background:var(--g50)}
   .note-textarea{width:100%;min-height:80px;padding:10px 12px;border:1px solid var(--g300);border-radius:8px;font-size:13px;font-family:inherit;color:var(--g800);resize:vertical;outline:none;line-height:1.5;transition:border-color .15s}.note-textarea:focus{border-color:var(--orange);box-shadow:0 0 0 2px rgba(230,126,34,0.1)}
-  @media(max-width:1200px){
-    .sidebar{display:none}.main{margin-left:0}
-  }
   @media(max-width:1400px){
     .content{padding:20px 20px}
     .topbar{padding:10px 20px}
@@ -274,52 +251,9 @@
     .chart-expand-inner{padding:0 14px 14px}
     .chart-header{margin-bottom:10px}
   }
-  /* LOGIN */
-  .login-overlay{position:fixed;inset:0;background:var(--navy);z-index:9999;display:flex;align-items:center;justify-content:center}
-  .login-overlay.hidden{display:none}
-  .login-box{background:var(--white);border-radius:16px;padding:40px;width:360px;max-width:90vw;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
-  .login-logo{width:50px;height:50px;background:var(--orange);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;color:var(--white);margin-bottom:16px}
-  .login-title{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:4px}
-  .login-sub{font-size:13px;color:var(--g500);margin-bottom:24px}
-  .login-input{width:100%;padding:12px 16px;border:1px solid var(--g300);border-radius:10px;font-size:14px;font-family:inherit;outline:none;text-align:center;transition:border-color .15s;letter-spacing:2px}.login-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(230,126,34,0.1)}
-  .login-input.err{border-color:var(--red);animation:shake .3s}
-  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-  .login-btn{width:100%;padding:12px;background:var(--orange);color:var(--white);border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:12px;transition:background .15s}.login-btn:hover{background:#d35400}
-  .login-err{font-size:12px;color:var(--red);margin-top:8px;min-height:18px}
 </style>
 </head>
 <body>
-<!-- LOGIN -->
-<div class="login-overlay" id="loginOverlay">
-  <div class="login-box">
-    <div style="margin-bottom:16px"><svg viewBox="0 0 100 90" style="width:50px;height:50px"><rect x="8" y="4" width="84" height="18" rx="2" fill="#E87722"/><rect x="8" y="30" width="36" height="56" rx="2" fill="#E87722"/><rect x="56" y="30" width="36" height="56" rx="2" fill="#E87722"/></svg></div>
-    <div class="login-title"><span style="color:#E87722">TOTAL</span>Kontroll</div>
-    <div class="login-sub">Ledelsessystem — DEMO</div>
-    <input class="login-input" id="loginPw" type="password" placeholder="Passord" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">Logg inn</button>
-    <div class="login-err" id="loginErr"></div>
-  </div>
-</div>
-</div>
-<svg style="display:none"><symbol id="tb-logo" viewBox="0 0 100 90"><rect x="8" y="4" width="84" height="18" rx="2" fill="#E87722"/><rect x="8" y="30" width="36" height="56" rx="2" fill="#E87722"/><rect x="56" y="30" width="36" height="56" rx="2" fill="#E87722"/></symbol></svg>
-<nav class="sidebar">
-  <div class="sidebar-logo"><svg class="logo-svg" viewBox="0 0 100 90"><use href="#tb-logo"/></svg><div class="logo-text"><span class="brand"><em>TOTAL</em>Kontroll</span><span class="sub">Ledelsessystem</span></div></div>
-  <div class="sidebar-nav">
-    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Min side</div>
-    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> Salg</div>
-    <div class="nav-sub">
-      <div class="nav-item" onclick="window.open('TOTALKontroll_Muligheter.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Muligheter</div>
-      <div class="nav-item" onclick="window.open('TOTALKontroll_Markedsanalyse.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Markedsanalyse</div>
-    </div>
-    <div class="nav-item" onclick="window.open('prosjekt_poc_light.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Prosjekt</div>
-    <div class="nav-sub">
-      <div class="nav-item" onclick="window.open('TOTALKontroll_Fremdriftsplan.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Fremdriftsplan</div>
-      <div class="nav-item" onclick="window.open('TOTALKontroll_Baerekraft_PoC.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/></svg> Bærekraft</div>
-    </div>
-    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Håndbok</div>
-  </div>
-  <div class="sidebar-footer" style="color:var(--text-inverse-muted);font-size:11px;font-weight:500;">Konseptvisning, kun demo data</div>
-</nav>
 <div class="main">
   <div class="topbar">
     <div></div>
@@ -390,7 +324,11 @@
       <div id="dlxBody">
         <div style="font-size:14px;color:var(--g700);margin-bottom:6px">Prosjekt:</div>
         <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:16px" id="dlxProjName"></div>
-        <div style="font-size:13px;color:var(--g600);line-height:1.6;margin-bottom:20px;padding:12px;background:var(--g50);border-radius:8px">Dette vil opprette et nytt prosjekt i Dalux Box via API og koble det til denne salgsmuligheten.</div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+          <div><div style="font-size:12px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">Prosjektstandard</div><select id="dlxType" style="width:100%;padding:10px 14px;border:1px solid var(--g300);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:var(--white);cursor:pointer"><option value="Totalentreprise Næring">Totalentreprise Næring</option><option value="Totalentreprise Bolig">Totalentreprise Bolig</option><option value="Totalentreprise Fisk">Totalentreprise Fisk</option><option value="Betongentreprise">Betongentreprise</option></select></div>
+          <div style="display:flex;gap:12px"><div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">Status</div><select id="dlxStatus" style="width:100%;padding:10px 14px;border:1px solid var(--g300);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:var(--white);cursor:pointer"><option value="Tidligfase">Tidligfase</option><option value="Pågående">Pågående</option></select></div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--g600);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px">Ansvarlig</div><select id="dlxOwner" style="width:100%;padding:10px 14px;border:1px solid var(--g300);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:var(--white);cursor:pointer"></select></div></div>
+        </div>
+        <div style="font-size:12px;color:var(--g500);line-height:1.5;padding:10px 12px;background:var(--g50);border-radius:8px">Prosjektet opprettes i Dalux Box via API og kobles til denne salgsmuligheten.</div>
       </div>
       <div id="dlxResult" style="display:none"></div>
       <div class="modal-actions" id="dlxActions">
@@ -447,9 +385,6 @@
   </div>
 </div>
 <script>
-// ═══ LOGIN ═══
-function doLogin(){const pw=document.getElementById('loginPw').value;if(pw==='DF2026'){document.getElementById('loginOverlay').classList.add('hidden');sessionStorage.setItem('tk_auth','1');}else{document.getElementById('loginPw').classList.add('err');document.getElementById('loginErr').textContent='Feil passord';setTimeout(()=>{document.getElementById('loginPw').classList.remove('err');},300);}}
-if(sessionStorage.getItem('tk_auth')==='1')document.getElementById('loginOverlay').classList.add('hidden');
 const STATUS_OPTIONS=['Lead','Gi pris','Tilbud sendt','Ikke sendt tilbud','Vunnet','Tapt'];
 const AVDELINGER=['Bryne','Stavanger','Bodø','Oslo'];
 const PROSJEKTTYPER=['Totalentreprise Næring','Totalentreprise Bolig','Totalentreprise Fisk','Betongentreprise'];
@@ -662,11 +597,25 @@ function openDlxCreate(id){
   document.getElementById('dlxResult').style.display='none';
   document.getElementById('dlxResult').innerHTML='';
   document.getElementById('dlxCreateBtn').style.display='';
+  document.getElementById('dlxCreateBtn').disabled=false;
+  document.getElementById('dlxCreateBtn').textContent='Opprett Dalux Box prosjekt';
+  document.querySelector('#dlxActions .btn-secondary').textContent='Avbryt';
+  // Pre-fill type from row
+  const typeEl=document.getElementById('dlxType');
+  if(r.prosjekttype){typeEl.value=r.prosjekttype;}else{typeEl.selectedIndex=0;}
+  // Reset status
+  document.getElementById('dlxStatus').value='Tidligfase';
+  // Populate owner dropdown from ANSVARLIGE.filter(a=>a)
+  const ownerEl=document.getElementById('dlxOwner');
+  ownerEl.innerHTML=ANSVARLIGE.filter(a=>a).map(s=>`<option value="${s}"${s===r.prosjektansvarlig?' selected':''}>${s}</option>`).join('');
   document.getElementById('dlxOverlay').classList.add('open');
 }
 function dlxClose(){document.getElementById('dlxOverlay').classList.remove('open');dlxTargetId=null;}
 function dlxCreate(){
   const btn=document.getElementById('dlxCreateBtn');
+  const dlxType=document.getElementById('dlxType').value;
+  const dlxStatus=document.getElementById('dlxStatus').value;
+  const dlxOwner=document.getElementById('dlxOwner').value;
   btn.disabled=true;btn.textContent='Oppretter...';
   document.getElementById('dlxBody').style.display='none';
   document.getElementById('dlxResult').style.display='block';
@@ -675,7 +624,7 @@ function dlxCreate(){
     const r=data.find(x=>x.id===dlxTargetId);if(!r){dlxClose();return;}
     const fakeId='DLX-'+String(Math.floor(100000+Math.random()*900000));
     r.daluxLink='https://build.dalux.com/client/project/'+fakeId.toLowerCase();
-    document.getElementById('dlxResult').innerHTML=`<div style="text-align:center;padding:20px"><div style="width:48px;height:48px;border-radius:50%;background:var(--green-bg);display:inline-flex;align-items:center;justify-content:center;font-size:24px;color:var(--green);margin-bottom:12px">&#10003;</div><div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px">Prosjekt opprettet</div><div style="font-size:13px;color:var(--g600);margin-bottom:12px">Dalux Box prosjekt er opprettet og koblet til salgsmuligheten.</div><div style="padding:10px 14px;background:var(--g50);border-radius:8px;font-size:13px"><span style="color:var(--g500)">Prosjekt-ID:</span> <strong style="color:var(--navy)">${fakeId}</strong></div></div>`;
+    document.getElementById('dlxResult').innerHTML=`<div style="text-align:center;padding:20px"><div style="width:48px;height:48px;border-radius:50%;background:var(--green-bg);display:inline-flex;align-items:center;justify-content:center;font-size:24px;color:var(--green);margin-bottom:12px">&#10003;</div><div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:12px">Prosjekt opprettet</div><div style="display:flex;flex-direction:column;gap:6px;padding:12px 14px;background:var(--g50);border-radius:8px;font-size:13px;text-align:left"><div><span style="color:var(--g500)">Prosjekt-ID:</span> <strong style="color:var(--navy)">${fakeId}</strong></div><div><span style="color:var(--g500)">Standard:</span> ${esc(dlxType)}</div><div><span style="color:var(--g500)">Status:</span> ${esc(dlxStatus)}</div><div><span style="color:var(--g500)">Ansvarlig:</span> ${esc(dlxOwner)}</div></div></div>`;
     btn.style.display='none';
     document.querySelector('#dlxActions .btn-secondary').textContent='Lukk';
     renderTable();
