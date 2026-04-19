@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOTALKontroll — Arrangement</title>
+<script src="tk-nav.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--tb-orange:#E87722;--tb-orange-bg:rgba(232,119,34,0.06);--navy:#1B2A4A;--bg-page:#F4F5F7;--bg-white:#FFFFFF;--bg-card:#FFFFFF;--border:#E2E6EC;--border-light:#EEF0F4;--text-primary:#1B2A4A;--text-secondary:#5A6578;--text-dim:#9BA5B5;--green:#1B9E4B;--green-bg:rgba(27,158,75,0.08);--green-text:#15803D;--yellow:#CA8A04;--yellow-bg:rgba(202,138,4,0.08);--yellow-text:#A16207;--red:#DC2626;--red-bg:rgba(220,38,38,0.07);--red-text:#B91C1C;--blue:#2563EB;--blue-bg:rgba(37,99,235,0.06);--radius:12px;--radius-sm:8px;--shadow-sm:0 1px 2px rgba(0,0,0,0.04),0 1px 3px rgba(0,0,0,0.06);--shadow-md:0 4px 12px rgba(0,0,0,0.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--text-primary);min-height:100vh;overflow-x:hidden}
+.main{min-height:100vh}
+.topbar{background:var(--bg-white);border-bottom:1px solid var(--border);padding:0 32px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-breadcrumb{font-size:13px;color:var(--text-dim);font-weight:500}.topbar-breadcrumb .current{color:var(--text-primary);font-weight:600}
+.content{padding:28px 32px;max-width:1200px}
+.tab-bar{display:flex;gap:0;margin-bottom:24px;border-bottom:2px solid var(--border)}
+.tab{padding:10px 20px;font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all 0.15s}
+.tab.active{color:var(--tb-orange);border-bottom-color:var(--tb-orange)}.tab:hover:not(.active){color:var(--text-primary)}
+.tab svg{vertical-align:-2px;margin-right:4px}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);margin-bottom:16px;overflow:hidden}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between}
+.card-body{padding:16px 20px}
+.card-title{font-size:15px;font-weight:700;color:var(--navy)}.card-subtitle{font-size:12px;color:var(--text-dim);margin-top:2px}
+.btn{padding:8px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all 0.15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--tb-orange);color:#fff}.btn-primary:hover{background:#d06a1c}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--text-secondary)}.btn-outline:hover{border-color:var(--tb-orange);color:var(--tb-orange)}
+.btn-danger{background:var(--red-bg);color:var(--red-text);border:1px solid rgba(220,38,38,0.15)}
+.btn-sm{padding:5px 12px;font-size:12px}.btn-block{width:100%;justify-content:center}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:var(--green-bg);color:var(--green-text)}.badge-yellow{background:var(--yellow-bg);color:var(--yellow-text)}.badge-red{background:var(--red-bg);color:var(--red-text)}.badge-blue{background:var(--blue-bg);color:var(--blue)}.badge-orange{background:var(--tb-orange-bg);color:var(--tb-orange)}.badge-gray{background:#F1F3F5;color:var(--text-dim)}
+.hero-card{background:linear-gradient(135deg,#1B2A4A 0%,#2a4a6e 50%,#1B2A4A 100%);border-radius:var(--radius);padding:28px 28px 24px;position:relative;overflow:hidden;margin-bottom:24px;color:#fff}
+.hero-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--tb-orange),#f1c40f,var(--tb-orange))}
+.section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text-dim);margin-bottom:12px;margin-top:24px}
+.section-title:first-child{margin-top:0}
+.form-group{margin-bottom:14px}.form-label{font-size:12px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;display:block}
+.form-input{width:100%;padding:9px 14px;border:1px solid var(--border);border-radius:6px;font-size:14px;font-family:inherit;color:var(--text-primary);background:var(--bg-white);outline:none}
+.form-input:focus{border-color:var(--tb-orange);box-shadow:0 0 0 2px rgba(232,119,34,0.12)}
+.form-row{display:grid;gap:12px}.form-row-2{grid-template-columns:1fr 1fr}
+.rank-badge{width:28px;height:28px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0}
+.rank-badge.gold{background:linear-gradient(135deg,#f1c40f,#e67e22);color:#fff}.rank-badge.silver{background:linear-gradient(135deg,#bdc3c7,#95a5a6);color:#fff}.rank-badge.bronze{background:linear-gradient(135deg,#e67e22,#d35400);color:#fff}.rank-badge.other{background:#F1F3F5;color:var(--text-dim)}
+.player-avatar{border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#fff;flex-shrink:0}
+.company-dot{width:8px;height:8px;border-radius:4px;flex-shrink:0;display:inline-block}
+.row{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border-light)}.row:last-child{border-bottom:none}
+.detail-back{display:inline-flex;align-items:center;gap:4px;color:var(--text-dim);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px;background:none;border:none;font-family:inherit;padding:0}.detail-back:hover{color:var(--tb-orange)}
+.opt-group{display:flex;gap:8px;flex-wrap:wrap}
+.opt-card{flex:1;min-width:120px;padding:12px 14px;border:2px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.15s;text-align:center}
+.opt-card:hover{border-color:var(--tb-orange)}.opt-card.selected{border-color:var(--tb-orange);background:var(--tb-orange-bg)}
+.opt-card .opt-icon{font-size:20px;margin-bottom:4px}.opt-card .opt-label{font-size:13px;font-weight:600;color:var(--navy)}.opt-card .opt-desc{font-size:11px;color:var(--text-dim);margin-top:2px}
+.sc-grid{display:grid;grid-template-columns:50px 1fr 60px 80px;gap:0;font-size:13px}
+.sc-header{font-weight:600;font-size:11px;text-transform:uppercase;color:var(--text-dim);letter-spacing:0.5px;padding:10px 8px;border-bottom:2px solid var(--border);background:#FAFBFC}
+.sc-cell{padding:10px 8px;border-bottom:1px solid var(--border-light);display:flex;align-items:center}
+.sc-input{width:60px;padding:7px 8px;border:1px solid var(--border);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:14px;text-align:center;outline:none;background:var(--bg-white)}
+.sc-input:focus{border-color:var(--tb-orange);box-shadow:0 0 0 2px rgba(232,119,34,0.12)}
+.sc-total{background:var(--tb-orange-bg);font-weight:700}
+.sc-par{color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-weight:500}
+.sc-diff{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px}
+.sc-diff.under{color:var(--green-text)}.sc-diff.over{color:var(--red-text)}.sc-diff.even{color:var(--text-dim)}
+.season-bar{height:6px;background:var(--border-light);border-radius:3px;overflow:hidden}
+.season-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--tb-orange),#f1c40f);transition:width 0.5s}
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:12px;margin:8px auto 28px;max-width:400px}
+.podium-col{display:flex;flex-direction:column;align-items:center;flex:1}
+.podium-bar{width:100%;border-radius:8px 8px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff}
+.team-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+.team-players{display:flex;gap:12px;flex-wrap:wrap}
+.team-player{display:flex;align-items:center;gap:8px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;backdrop-filter:blur(2px)}
+.modal-content{background:var(--bg-white);border-radius:16px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,0.2);animation:modalIn 0.2s ease-out}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
+.modal-body{padding:24px}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-dim);padding:4px}
+.info-box{padding:14px 16px;border-radius:8px;font-size:13px;line-height:1.6;margin-bottom:16px}
+.info-box.orange{background:var(--tb-orange-bg);border:1px solid rgba(232,119,34,0.15)}
+.info-box.blue{background:var(--blue-bg);border:1px solid rgba(37,99,235,0.15)}
+.info-box strong{color:var(--navy)}
+.t-item{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border-light);cursor:pointer;transition:background 0.1s}
+.t-item:hover{background:rgba(232,119,34,0.02)}.t-item:last-child{border-bottom:none}
+.t-date-box{width:48px;height:48px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.admin-tab{margin-left:auto}
+.subtabs{display:flex;gap:2px;background:var(--border-light);border-radius:8px;padding:3px;margin-bottom:20px}
+.subtab{flex:1;padding:8px 4px;border-radius:6px;border:none;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;text-align:center;transition:all 0.15s}
+.subtab.active{background:var(--bg-white);color:var(--navy);box-shadow:var(--shadow-sm)}
+.subtab:not(.active){background:transparent;color:var(--text-dim)}
+
+@media(min-width:1800px){body{zoom:1.5}}
+@media(min-width:1400px) and (max-width:1799px){body{zoom:1.25}}
+@media(min-width:1100px) and (max-width:1399px){body{zoom:1.1}}
+@media(max-width:768px){.content{padding:20px 16px}.opt-group{flex-direction:column}.sc-grid{grid-template-columns:44px 1fr 50px 70px}.podium{max-width:100%}.form-row-2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="main">
+<div class="topbar"><div class="topbar-breadcrumb">TOTALKontroll / <span class="current" id="bc">Arrangement</span></div></div>
+<div class="content" id="root"></div>
+</main>
+<div class="modal-overlay" id="regModal" style="display:none" onclick="if(event.target===this)closeReg()"><div class="modal-content"><div class="modal-header"><div><div style="font-size:16px;font-weight:700" id="rmTitle"></div><div style="font-size:13px;color:var(--text-dim)" id="rmSub"></div></div><button class="modal-close" onclick="closeReg()">&times;</button></div><div class="modal-body" id="rmBody"></div></div></div>
+
+<script>
+const CO=[{id:'tb',name:'Totalbetong AS',color:'#E87722',short:'TB'},{id:'gt',name:'Gann Tre AS',color:'#2D5A27',short:'GT'},{id:'ig',name:'Igang Totalentreprenør',color:'#2563EB',short:'IG'}];
+const COURSES=[
+  {id:'stavanger',name:'Stavanger Golfklubb',loc:'Hafrsfjord',holes:18,pars:[4,4,3,5,4,3,4,5,4,4,3,5,4,4,3,5,4,4]},
+  {id:'randaberg',name:'Randaberg Golfklubb',loc:'Randaberg',holes:9,pars:[4,3,5,4,3,4,5,3,4]},
+  {id:'sola-sol',name:'Sola Golfklubb, Solastranden',loc:'Sola',holes:18,pars:[4,3,4,4,3,5,4,4,5,4,3,4,4,3,5,4,4,4]},
+  {id:'sola-for',name:'Sola Golfklubb, Forus',loc:'Forus',holes:9,pars:[4,4,3,5,4,3,4,5,4]},
+  {id:'sandnes',name:'Sandnes Golfklubb',loc:'Sandnes',holes:9,pars:[4,5,3,4,4,3,5,4,4]},
+  {id:'jaeren',name:'Jæren Golfklubb',loc:'Klepp',holes:9,pars:[4,3,5,4,3,4,5,3,4]},
+  {id:'ogna',name:'Ogna Golfklubb',loc:'Hå',holes:9,pars:[4,3,4,5,3,4,4,3,5]},
+  {id:'egersund',name:'Egersund Golfklubb',loc:'Egersund',holes:18,pars:[4,4,3,5,4,3,4,5,4,4,3,5,4,4,3,5,4,4]}
+];
+const PL=[{id:1,name:'Ole Kaldheim',co:'tb',av:'OK',xp:'regular',hcp:18,eq:'own'},{id:2,name:'Fredrik Meidell',co:'tb',av:'FM',xp:'some',hcp:null,eq:'own'},{id:3,name:'Gerhard Gravdal',co:'tb',av:'GG',xp:'regular',hcp:12,eq:'own'},{id:4,name:'Birgitte Kielsen',co:'tb',av:'BK',xp:'none',hcp:null,eq:'need'},{id:5,name:'Jørgen Skipevåg',co:'tb',av:'JS',xp:'some',hcp:null,eq:'own'},{id:6,name:'Krister Austerheim',co:'tb',av:'KA',xp:'regular',hcp:15,eq:'own'},{id:7,name:'Thomas Haugen',co:'gt',av:'TH',xp:'some',hcp:20,eq:'own'},{id:8,name:'Siri Vestbø',co:'gt',av:'SV',xp:'none',hcp:null,eq:'need'},{id:9,name:'Arne Tvedt',co:'gt',av:'AT',xp:'regular',hcp:16,eq:'own'},{id:10,name:'Kristin Bore',co:'ig',av:'KB',xp:'none',hcp:null,eq:'need'},{id:11,name:'Morten Ree',co:'ig',av:'MR',xp:'regular',hcp:14,eq:'own'},{id:12,name:'Linn Soma',co:'ig',av:'LS',xp:'none',hcp:null,eq:'need'}];
+const SPTS=[10,8,6,5,4,3,2,1];
+let T=[
+  {id:1,name:'Sesongåpning',date:'2026-05-09',time:'12:00',cid:'jaeren',maxT:20,dl:'2026-05-07',status:'completed',reg:[1,2,3,4,5,7,8,11],teams:[{id:101,p:[3,8],name:'Team Gravdal/Vestbø'},{id:102,p:[11,4],name:'Team Ree/Kielsen'},{id:103,p:[1,7],name:'Team Kaldheim/Haugen'},{id:104,p:[5,2],name:'Team Skipevåg/Meidell'}],res:[{tid:101,sc:[4,3,5,4,4,4,5,3,4],tot:36},{tid:102,sc:[4,3,6,4,3,5,5,4,4],tot:38},{tid:103,sc:[5,3,5,5,3,4,6,3,5],tot:39},{tid:104,sc:[5,4,6,5,4,5,5,4,5],tot:43}]},
+  {id:2,name:'Jæren Open',date:'2026-06-13',time:'11:00',cid:'sandnes',maxT:20,dl:'2026-06-11',status:'completed',reg:[1,3,6,7,9,10,11,12],teams:[{id:201,p:[6,10],name:'Team Austerheim/Bore'},{id:202,p:[3,12],name:'Team Gravdal/Soma'},{id:203,p:[11,7],name:'Team Ree/Haugen'},{id:204,p:[9,1],name:'Team Tvedt/Kaldheim'}],res:[{tid:201,sc:[4,5,3,4,4,3,5,4,3],tot:35},{tid:202,sc:[4,5,3,4,4,4,5,4,4],tot:37},{tid:203,sc:[5,5,3,4,5,3,5,4,4],tot:38},{tid:204,sc:[4,5,4,5,4,4,6,5,4],tot:41}]},
+  {id:3,name:'Midsommerturneringen',date:'2026-07-04',time:'10:00',cid:'stavanger',maxT:24,dl:'2026-07-02',status:'upcoming',reg:[3,5,6,7,11],teams:[],res:[],img:'stavanger_golfklubb.jpg'},
+  {id:4,name:'Solastranden Classic',date:'2026-08-15',time:'11:00',cid:'sola-sol',maxT:20,dl:'2026-08-13',status:'upcoming',reg:[3],teams:[],res:[]},
+  {id:5,name:'Høstfinalen',date:'2026-09-19',time:'10:00',cid:'jaeren',maxT:24,dl:'2026-09-17',status:'upcoming',reg:[],teams:[],res:[]}
+];
+const CUR=1;
+const MO=['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
+const DA=['Søndag','Mandag','Tirsdag','Onsdag','Torsdag','Fredag','Lørdag'];
+const fD=d=>{const x=new Date(d+'T00:00:00');return DA[x.getDay()]+' '+x.getDate()+'. '+MO[x.getMonth()];};
+const fS=d=>{const x=new Date(d+'T00:00:00');return x.getDate()+'. '+MO[x.getMonth()];};
+const dU=d=>Math.ceil((new Date(d+'T00:00:00')-new Date())/864e5);
+const gc=id=>CO.find(c=>c.id===id);const gCr=id=>COURSES.find(c=>c.id===id);const gP=id=>PL.find(p=>p.id===id);
+const xpL={none:'Helt ny',some:'Har spilt litt',regular:'Spiller jevnlig'};
+const av=(p,s)=>`<div class="player-avatar" style="width:${s||36}px;height:${s||36}px;font-size:${Math.round((s||36)*.36)}px;background:${gc(p.co).color}">${p.av}</div>`;
+const rb=p=>p===1?'gold':p===2?'silver':p===3?'bronze':'other';
+function sRank(){const m={};PL.forEach(p=>m[p.id]={pid:p.id,pts:0,rnd:0,wins:0});T.filter(t=>t.status==='completed').forEach(t=>{const s=[...t.res].sort((a,b)=>a.tot-b.tot);s.forEach((r,i)=>{const pts=SPTS[i]||1;const tm=t.teams.find(x=>x.id===r.tid);if(!tm)return;tm.p.forEach(pid=>{m[pid].pts+=pts;m[pid].rnd++;if(i===0)m[pid].wins++;});});});return Object.values(m).filter(p=>p.rnd>0).sort((a,b)=>b.pts-a.pts);}
+function cRank(){const r=sRank();return CO.map(c=>{const ps=r.filter(x=>gP(x.pid)?.co===c.id);const t=ps.reduce((s,p)=>s+p.pts,0);return{...c,total:t,avg:ps.length?Math.round(t/ps.length):0,cnt:ps.length};}).sort((a,b)=>b.total-a.total);}
+
+// Init
+vLanding();
+
+// ═══ VIEWS ═══
+let gTab='kalender',aTab='turneringer';
+function $(id){return document.getElementById(id);}
+function R(){return $('root');}
+
+function vLanding(){
+  $('bc').textContent='Arrangement';
+  const n=new Set(T.flatMap(t=>t.reg)).size;
+  R().innerHTML=`<div style="cursor:pointer;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-md);max-width:900px;transition:transform 0.2s" onclick="vGolf()" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+    <div style="position:relative;width:100%;height:0;padding-bottom:33%;overflow:hidden;background:#1B2A4A"><img src="golfcup_hero.jpg" alt="GolfCup 2026" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
+    <div style="background:var(--bg-white);padding:20px 24px;display:flex;align-items:center;gap:16px;border-top:3px solid var(--tb-orange)">
+      <div style="flex:1"><div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:2px">Totalbetong GolfCup 2026</div><div style="font-size:13px;color:var(--text-dim)">Scramble-turnering på lag, på tvers av hele konsernet</div></div>
+      <div style="display:flex;gap:12px;align-items:center;flex-shrink:0">
+        <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--navy);font-family:'JetBrains Mono',monospace">${T.length}</div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px">Turneringer</div></div>
+        <div style="width:1px;height:32px;background:var(--border)"></div>
+        <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--navy);font-family:'JetBrains Mono',monospace">${n}</div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px">Spillere</div></div>
+        <div style="width:1px;height:32px;background:var(--border)"></div>
+        <span class="badge badge-green" style="font-size:12px;padding:5px 14px">Sesong aktiv</span>
+      </div>
+    </div></div>`;
+}
+
+function vGolf(){$('bc').textContent='Arrangement / GolfCup 2026';gTab='kalender';rShell();}
+
+function rShell(){
+  R().innerHTML=`<div style="margin-bottom:4px"><button class="detail-back" onclick="vLanding()">← Arrangement</button></div>
+  <div class="tab-bar" id="gTabs">
+    <div class="tab ${gTab==='kalender'?'active':''}" data-t="kalender" onclick="sG('kalender')"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Kalender</div>
+    <div class="tab ${gTab==='ranking'?'active':''}" data-t="ranking" onclick="sG('ranking')"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 010-5H6M18 9h1.5a2.5 2.5 0 000-5H18M4 22h16M18 2H6v7a6 6 0 0012 0V2z"/></svg> Ranking</div>
+    <div class="tab ${gTab==='lag'?'active':''}" data-t="lag" onclick="sG('lag')"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg> Lag & resultater</div>
+    <div class="tab admin-tab ${gTab==='admin'?'active':''}" data-t="admin" onclick="sG('admin')"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68 1.65 1.65 0 0010 3.17V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> Admin</div>
+  </div><div id="gC"></div>`;rTab();}
+
+function sG(t){gTab=t;document.querySelectorAll('#gTabs .tab').forEach(el=>el.classList.toggle('active',el.dataset.t===t));rTab();}
+function rTab(){const el=$('gC');if(gTab==='kalender')rCal(el);else if(gTab==='ranking')rRank(el);else if(gTab==='lag')rLag(el);else if(gTab==='admin')rAdmin(el);}
+
+// ═══ CALENDAR ═══
+function rCal(el){
+  const up=T.filter(t=>t.status==='upcoming').sort((a,b)=>a.date.localeCompare(b.date));
+  const done=T.filter(t=>t.status==='completed').sort((a,b)=>b.date.localeCompare(a.date));
+  const nx=up[0];let h='';
+  if(nx){const c=gCr(nx.cid);const d=dU(nx.date);const en=nx.reg.includes(CUR);const myTm=nx.teams.find(tm=>tm.p.includes(CUR));
+    h+=`<div class="hero-card" style="padding:0;overflow:hidden">
+      ${nx.img?`<div style="width:100%;height:180px;overflow:hidden;position:relative"><img src="${nx.img}" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(27,42,74,0.1) 0%,rgba(27,42,74,0.85) 100%)"></div></div>`:''}
+      <div style="padding:24px 28px 24px;position:relative;z-index:1;${nx.img?'margin-top:-60px':''}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><span class="badge badge-orange">Neste turnering</span>${d>0?`<span class="badge" style="background:rgba(37,99,235,.12);color:#93c5fd">om ${d} dager</span>`:''}</div>
+      <div style="font-size:24px;font-weight:700;margin-bottom:4px;letter-spacing:-.3px">${nx.name}</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:20px">${fD(nx.date)} kl. ${nx.time}</div>
+      <div style="display:flex;gap:28px;margin-bottom:24px;flex-wrap:wrap">
+        <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.4);margin-bottom:2px">Bane</div><div style="font-size:14px;font-weight:600">${c.name}</div></div>
+        <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.4);margin-bottom:2px">Format</div><div style="font-size:14px;font-weight:600">Scramble (lag)</div></div>
+        <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.4);margin-bottom:2px">Påmeldt</div><div style="font-size:14px;font-weight:600">${nx.reg.length} spillere</div></div>
+        <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.4);margin-bottom:2px">Frist</div><div style="font-size:14px;font-weight:600">${fS(nx.dl)}</div></div>
+      </div>
+      ${myTm?`<div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:14px 16px;margin-bottom:16px">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.4);margin-bottom:6px">Ditt lag</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px">${myTm.p.map(pid=>av(gP(pid),28)).join('')}<span style="font-weight:600">${myTm.name}</span></div>
+          <button onclick="vScore(${nx.id},${myTm.id})" style="padding:8px 16px;border-radius:6px;background:var(--tb-orange);color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">📝 Registrer score</button>
+        </div></div>`:''}
+      ${!en?`<button onclick="openReg(${nx.id})" style="padding:12px 32px;border-radius:8px;background:var(--tb-orange);color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;width:100%">Meld deg på</button>`
+        :en&&!myTm?`<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 32px;border-radius:8px;background:rgba(27,158,75,.15);color:#2ecc71;font-size:14px;font-weight:600">✓ Du er påmeldt</div>`:''}
+    </div></div>`;}
+  const rest=up.slice(1);
+  if(rest.length){h+=`<div class="section-title">Kommende turneringer</div><div class="card">${rest.map(tI).join('')}</div>`;}
+  if(done.length){h+=`<div class="section-title">Spilte turneringer</div><div class="card">${done.map(tI).join('')}</div>`;}
+  el.innerHTML=h;
+}
+function tI(t){const c=gCr(t.cid);const dt=new Date(t.date+'T00:00:00');const d=t.status==='completed';
+  return `<div class="t-item" onclick="vDet(${t.id})"><div class="t-date-box" style="background:${d?'#F1F3F5':'var(--tb-orange-bg)'};color:${d?'var(--text-dim)':'var(--tb-orange)'}"><div style="font-size:16px;font-weight:800;line-height:1">${dt.getDate()}</div><div style="font-size:10px;font-weight:600;text-transform:uppercase">${MO[dt.getMonth()]}</div></div><div style="flex:1"><div style="font-size:14px;font-weight:600;color:var(--navy)">${t.name}</div><div style="font-size:12px;color:var(--text-dim)">${c.name} · ${t.reg.length} påmeldt${t.teams.length?' · '+t.teams.length+' lag':''}</div></div>${d?'<span class="badge badge-green">✓ Ferdig</span>':''}<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--text-dim)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div>`;}
+
+// ═══ DETAIL ═══
+function vDet(id){const t=T.find(x=>x.id===id);if(!t)return;const c=gCr(t.cid);const d=t.status==='completed';const en=t.reg.includes(CUR);const par=c.pars.reduce((a,b)=>a+b,0);
+  gTab='_det';document.querySelectorAll('#gTabs .tab').forEach(x=>x.classList.remove('active'));
+  let h=`<button class="detail-back" onclick="sG('kalender')">← Tilbake</button>
+  <div style="font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:2px">${t.name}</div>
+  <div style="font-size:14px;color:var(--text-dim);margin-bottom:20px">${fD(t.date)} kl. ${t.time}</div>
+  <div class="card"><div class="card-body"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+    <div><div class="form-label">Bane</div><div style="font-weight:600">${c.name}</div><div style="font-size:12px;color:var(--text-dim)">${c.loc} · ${c.holes} hull · Par ${par}</div></div>
+    <div><div class="form-label">Format</div><div style="font-weight:600">Scramble</div><div style="font-size:12px;color:var(--text-dim)">Lag på 2</div></div>
+    <div><div class="form-label">Status</div>${d?'<span class="badge badge-green">Ferdig</span>':en?'<span class="badge badge-blue">Du er påmeldt</span>':'<span class="badge badge-yellow">Åpen</span>'}</div>
+  </div></div></div>`;
+  if(d&&t.res.length){const sorted=[...t.res].sort((a,b)=>a.tot-b.tot);h+=`<div class="section-title">Resultater</div>`;
+    sorted.forEach((r,i)=>{const tm=t.teams.find(x=>x.id===r.tid);if(!tm)return;const df=r.tot-par;const ds=df===0?'E':df>0?'+'+df:''+df;
+      h+=`<div class="team-card" ${i===0?'style="border-color:var(--tb-orange);border-width:2px"':''}>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:10px"><div class="rank-badge ${rb(i+1)}">${i+1}</div><div style="font-size:15px;font-weight:700;color:var(--navy)">${tm.name}</div></div>
+          <div style="text-align:right"><div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--navy)">${r.tot}</div><div style="font-size:12px;color:${df<=0?'var(--green-text)':'var(--red-text)'};font-weight:600">${ds}</div></div>
+        </div>
+        <div class="team-players">${tm.p.map(pid=>{const p=gP(pid);return `<div class="team-player">${av(p,28)}<div><div style="font-size:13px;font-weight:600">${p.name}</div><div style="font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:4px"><span class="company-dot" style="background:${gc(p.co).color}"></span>${gc(p.co).short}</div></div></div>`;}).join('')}</div>
+      </div>`;});}
+  if(!d){h+=`<div class="section-title">Påmeldte (${t.reg.length})</div><div class="card">`;
+    if(!t.reg.length)h+=`<div style="text-align:center;padding:32px;color:var(--text-dim)"><p style="font-weight:600">Ingen påmeldte ennå</p></div>`;
+    else t.reg.forEach(pid=>{const p=gP(pid);h+=`<div class="row">${av(p)}<div style="flex:1"><div style="font-weight:600;font-size:14px">${p.name}</div><div style="font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:4px"><span class="company-dot" style="background:${gc(p.co).color}"></span>${gc(p.co).name}</div></div><span class="badge badge-gray">${xpL[p.xp]}</span>${p.eq==='need'?'<span class="badge badge-yellow">Låneutstyr</span>':''}</div>`;});
+    h+=`</div>`;
+    if(t.teams.length){h+=`<div class="section-title">Lag</div>`;t.teams.forEach(tm=>{h+=`<div class="team-card"><div style="font-weight:700;margin-bottom:8px">${tm.name}</div><div class="team-players">${tm.p.map(pid=>{const p=gP(pid);return `<div class="team-player">${av(p,28)}<div style="font-size:13px;font-weight:600">${p.name}</div></div>`;}).join('')}</div></div>`;});}
+    h+=`<div style="margin-top:16px">${en?`<button class="btn btn-outline btn-block" onclick="unreg(${t.id})">Meld av</button>`:`<button class="btn btn-primary btn-block" onclick="openReg(${t.id})">Meld deg på</button>`}</div>`;}
+  $('gC').innerHTML=h;}
+function unreg(id){const t=T.find(x=>x.id===id);if(t){t.reg=t.reg.filter(p=>p!==CUR);vDet(id);}}
+
+// ═══ REGISTRATION ═══
+let regTid=null,regXp=null,regEq=null;
+function openReg(tid){regTid=tid;const t=T.find(x=>x.id===tid);const p=gP(CUR);regXp=null;regEq=null;
+  $('rmTitle').textContent='Meld deg på: '+t.name;$('rmSub').textContent=fD(t.date)+' · '+gCr(t.cid).name;
+  $('rmBody').innerHTML=`
+    <div class="form-group"><div class="form-label">Erfaring</div><div class="opt-group" id="rXp">
+      <div class="opt-card" onclick="sOpt('rXp',this,'none')"><div class="opt-icon">🌱</div><div class="opt-label">Helt ny</div><div class="opt-desc">Aldri spilt golf</div></div>
+      <div class="opt-card" onclick="sOpt('rXp',this,'some')"><div class="opt-icon">⛳</div><div class="opt-label">Har spilt litt</div><div class="opt-desc">Vært på banen noen ganger</div></div>
+      <div class="opt-card" onclick="sOpt('rXp',this,'regular')"><div class="opt-icon">🏆</div><div class="opt-label">Spiller jevnlig</div><div class="opt-desc">Aktiv golfspiller</div></div>
+    </div></div>
+    <div class="form-group" id="rHG" style="display:none"><div class="form-label">Handicap <span style="text-transform:none;font-weight:400;color:var(--text-dim)">(valgfritt)</span></div><input class="form-input" id="rHcp" type="number" placeholder="F.eks. 18" value="" style="max-width:160px"></div>
+    <div class="form-group"><div class="form-label">Utstyr</div><div class="opt-group" id="rEq">
+      <div class="opt-card" onclick="sOpt('rEq',this,'own')"><div class="opt-icon">🎒</div><div class="opt-label">Har eget</div><div class="opt-desc">Egne køller</div></div>
+      <div class="opt-card" onclick="sOpt('rEq',this,'need')"><div class="opt-icon">🤝</div><div class="opt-label">Trenger lån</div><div class="opt-desc">Ordnes av arrangør</div></div>
+    </div></div>
+    <div class="form-group"><div class="form-label">Lagønske <span style="text-transform:none;font-weight:400;color:var(--text-dim)">(valgfritt)</span></div><select class="form-input" id="rPart"><option value="">Ingen preferanse, par meg med noen</option>${PL.filter(x=>x.id!==CUR).map(x=>`<option value="${x.id}">${x.name} (${gc(x.co).short})</option>`).join('')}</select></div>
+    <div class="info-box orange" style="margin-top:8px"><strong>Scramble-format:</strong> Alle spiller i lag på to. Begge slår, velg beste ballen, begge slår derfra. Nybegynnere pares med erfarne spillere. Admin setter opp lagene etter fristen.</div>
+    <button class="btn btn-primary btn-block" style="margin-top:16px;padding:14px" onclick="subReg()">Bekreft påmelding</button>`;
+  $('regModal').style.display='flex';}
+function closeReg(){$('regModal').style.display='none';regTid=null;}
+function sOpt(g,el,v){document.querySelectorAll('#'+g+' .opt-card').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');if(g==='rXp'){regXp=v;$('rHG').style.display=v==='regular'?'':'none';}if(g==='rEq')regEq=v;}
+function subReg(){if(!regXp){alert('Velg erfaringsnivå');return;}if(!regEq){alert('Velg utstyr');return;}const t=T.find(x=>x.id===regTid);if(!t)return;const p=gP(CUR);p.xp=regXp;p.eq=regEq;const hv=$('rHcp').value;p.hcp=hv?parseInt(hv):null;if(!t.reg.includes(CUR))t.reg.push(CUR);closeReg();vDet(t.id);}
+
+// ═══ RANKING ═══
+function teamRank(){
+  const teams=[];
+  T.filter(t=>t.status==='completed').forEach(t=>{
+    const sorted=[...t.res].sort((a,b)=>a.tot-b.tot);
+    sorted.forEach((r,i)=>{const pts=SPTS[i]||1;const tm=t.teams.find(x=>x.id===r.tid);if(!tm)return;
+      teams.push({name:tm.name,p:tm.p,pts,pos:i+1,tName:t.name,tDate:t.date,tot:r.tot});});});
+  return teams.sort((a,b)=>b.pts-a.pts);
+}
+function rRank(el){const comp=T.filter(t=>t.status==='completed').length;const tot=T.length;
+  let h=`<div class="card"><div class="card-body"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:13px;font-weight:600;color:var(--text-dim)">Sesongfremgang</span><span style="font-size:13px;font-weight:700">${comp} av ${tot} turneringer spilt</span></div><div class="season-bar"><div class="season-fill" style="width:${Math.round(comp/tot*100)}%"></div></div></div></div>
+  <div class="subtabs"><button class="subtab active" id="rti" onclick="sRT('i')">Lag</button><button class="subtab" id="rtc" onclick="sRT('c')">Selskap</button></div>
+  <div id="rI"></div><div id="rC" style="display:none"></div>`;el.innerHTML=h;rRI();}
+function sRT(t){$('rti').className='subtab'+(t==='i'?' active':'');$('rtc').className='subtab'+(t==='c'?' active':'');$('rI').style.display=t==='i'?'':'none';$('rC').style.display=t==='c'?'':'none';if(t==='c')rRC();}
+function rRI(){const r=teamRank();let h='';
+  // Podium top 3 teams
+  if(r.length>=3){const o=[r[1],r[0],r[2]];const hs=[75,100,60];const cs=['linear-gradient(180deg,#bdc3c7,#95a5a6)','linear-gradient(180deg,#f1c40f,#e67e22)','linear-gradient(180deg,#e67e22,#d35400)'];const positions=[2,1,3];
+    h+='<div class="podium">';o.forEach((x,i)=>{
+      h+=`<div class="podium-col">
+        <div style="display:flex;gap:-4px;margin-bottom:4px">${x.p.map(pid=>av(gP(pid),positions[i]===1?32:26)).join('')}</div>
+        <div style="font-size:10px;font-weight:600;margin-bottom:4px;text-align:center;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.name.replace('Team ','')}</div>
+        <div class="podium-bar" style="height:${hs[i]}px;background:${cs[i]}"><div style="font-size:22px;font-weight:800">${positions[i]}</div><div style="font-size:11px;font-weight:600;opacity:.9">${x.pts} p</div></div></div>`;
+    });h+='</div>';}
+  // Full list
+  h+='<div class="card">';
+  r.forEach((x,i)=>{
+    h+=`<div class="row">
+      <div class="rank-badge ${rb(i+1)}">${i+1}</div>
+      <div style="display:flex;gap:4px">${x.p.map(pid=>av(gP(pid),28)).join('')}</div>
+      <div style="flex:1"><div style="font-weight:600;font-size:14px">${x.name}</div>
+        <div style="font-size:12px;color:var(--text-dim)">${x.tName} · ${fS(x.tDate)} · ${x.tot} slag</div></div>
+      <div style="text-align:right"><div style="font-weight:700;font-size:16px;font-family:'JetBrains Mono',monospace">${x.pts}</div><div style="font-size:11px;color:var(--text-dim)">poeng</div></div>
+    </div>`;});
+  h+='</div>';
+  h+=`<div class="info-box orange" style="margin-top:8px"><strong>Poenggivning:</strong> 1. plass = 10p, 2. = 8p, 3. = 6p, 4. = 5p, 5. = 4p, 6. = 3p, 7. = 2p, 8.+ = 1p.</div>`;
+  $('rI').innerHTML=h;}
+function rRC(){const r=cRank();let h='';r.forEach((c,i)=>{h+=`<div class="card"><div class="card-body"><div style="display:flex;align-items:center;gap:12px;margin-bottom:14px"><div class="rank-badge ${rb(i+1)}">${i+1}</div><span class="company-dot" style="background:${c.color}"></span><div style="font-weight:700;font-size:16px">${c.name}</div></div><div style="display:flex;gap:12px"><div style="flex:1;background:#F9F7F4;border-radius:8px;padding:10px 14px;text-align:center"><div style="font-size:20px;font-weight:800;color:var(--navy);font-family:'JetBrains Mono',monospace">${c.total}</div><div style="font-size:11px;color:var(--text-dim)">Totalpoeng</div></div><div style="flex:1;background:#F9F7F4;border-radius:8px;padding:10px 14px;text-align:center"><div style="font-size:20px;font-weight:800;color:var(--navy);font-family:'JetBrains Mono',monospace">${c.avg}</div><div style="font-size:11px;color:var(--text-dim)">Snitt/spiller</div></div><div style="flex:1;background:#F9F7F4;border-radius:8px;padding:10px 14px;text-align:center"><div style="font-size:20px;font-weight:800;color:var(--navy);font-family:'JetBrains Mono',monospace">${c.cnt}</div><div style="font-size:11px;color:var(--text-dim)">Spillere</div></div></div></div></div>`;});$('rC').innerHTML=h;}
+
+// ═══ LAG & RESULTATER ═══
+function rLag(el){const done=T.filter(t=>t.status==='completed').sort((a,b)=>b.date.localeCompare(a.date));let h='';
+  // My upcoming teams
+  const myUp=T.filter(t=>t.status==='upcoming'&&t.teams.some(tm=>tm.p.includes(CUR)));
+  if(myUp.length){h+=`<div class="section-title">Ditt lag</div>`;myUp.forEach(t=>{const tm=t.teams.find(x=>x.p.includes(CUR));const c=gCr(t.cid);
+    h+=`<div class="team-card" style="border-color:var(--tb-orange);border-width:2px">
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">${t.name} · ${fS(t.date)}</div>
+      <div style="font-weight:700;margin-bottom:8px">${tm.name}</div>
+      <div class="team-players" style="margin-bottom:12px">${tm.p.map(pid=>{const p=gP(pid);return `<div class="team-player">${av(p,28)}<div><div style="font-size:13px;font-weight:600">${p.name}</div><div style="font-size:11px;color:var(--text-dim)">${gc(p.co).short} · ${xpL[p.xp]}</div></div></div>`;}).join('')}</div>
+      <button class="btn btn-primary btn-sm" onclick="vScore(${t.id},${tm.id})">📝 Registrer score</button>
+    </div>`;});}
+  if(done.length){h+=`<div class="section-title">Turneringsresultater</div>`;done.forEach(t=>{const c=gCr(t.cid);const par=c.pars.reduce((a,b)=>a+b,0);const sorted=[...t.res].sort((a,b)=>a.tot-b.tot);
+    h+=`<div class="card"><div class="card-header"><div><div class="card-title">${t.name}</div><div class="card-subtitle">${fS(t.date)} · ${c.name} · Par ${par}</div></div></div>`;
+    sorted.forEach((r,i)=>{const tm=t.teams.find(x=>x.id===r.tid);if(!tm)return;const df=r.tot-par;const ds=df===0?'E':df>0?'+'+df:''+df;
+      h+=`<div class="row"><div class="rank-badge ${rb(i+1)}">${i+1}</div><div style="display:flex;gap:4px">${tm.p.map(pid=>av(gP(pid),28)).join('')}</div><div style="flex:1;font-weight:600;font-size:13px">${tm.name}</div><div style="text-align:right;font-family:'JetBrains Mono',monospace"><span style="font-weight:700;font-size:16px">${r.tot}</span> <span style="font-size:12px;color:${df<=0?'var(--green-text)':'var(--red-text)'}">(${ds})</span></div></div>`;});
+    h+=`</div>`;});}
+  if(!h)h=`<div style="text-align:center;padding:48px;color:var(--text-dim)"><p style="font-weight:600;font-size:15px">Ingen lag ennå</p><p style="font-size:13px">Lag settes opp av admin etter påmeldingsfristen</p></div>`;
+  el.innerHTML=h;}
+
+// ═══ SCORECARD ═══
+function vScore(tid,tmid){const t=T.find(x=>x.id===tid);if(!t)return;const c=gCr(t.cid);const tm=t.teams.find(x=>x.id===tmid);const par=c.pars.reduce((a,b)=>a+b,0);
+  gTab='_sc';document.querySelectorAll('#gTabs .tab').forEach(x=>x.classList.remove('active'));
+  let h=`<button class="detail-back" onclick="sG('lag')">← Tilbake</button>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div style="font-size:20px;font-weight:700;letter-spacing:-.3px">Scorecard</div><span class="badge badge-blue">${t.name}</span></div>
+  <div style="font-size:13px;color:var(--text-dim);margin-bottom:8px">${tm.name} · ${c.name} · Par ${par}</div>
+  <div class="team-players" style="margin-bottom:20px">${tm.p.map(pid=>{const p=gP(pid);return `<div class="team-player">${av(p,28)}<div style="font-size:13px;font-weight:600">${p.name}</div></div>`;}).join('')}</div>
+  <div class="card" style="overflow:visible"><div class="sc-grid">
+    <div class="sc-header">Hull</div><div class="sc-header">Par</div><div class="sc-header">Slag</div><div class="sc-header">+/−</div>`;
+  c.pars.forEach((p,i)=>{h+=`<div class="sc-cell" style="font-weight:700;color:var(--navy)">${i+1}</div><div class="sc-cell sc-par">${p}</div><div class="sc-cell"><input class="sc-input" id="h${i}" type="number" min="1" max="15" oninput="cSc(${tid},${tmid})"></div><div class="sc-cell" id="d${i}">—</div>`;});
+  h+=`<div class="sc-cell sc-total" style="font-weight:700">Σ</div><div class="sc-cell sc-total sc-par" style="font-weight:700">${par}</div><div class="sc-cell sc-total" style="font-weight:800;font-size:18px;font-family:'JetBrains Mono',monospace" id="scT">—</div><div class="sc-cell sc-total" id="scD">—</div>
+  </div></div>
+  <button class="btn btn-primary btn-block" style="margin-top:16px;padding:14px" onclick="subSc(${tid},${tmid})">Lever scorecard</button>
+  <div style="font-size:12px;color:var(--text-dim);text-align:center;margin-top:8px">Admin verifiserer resultatene etter runden</div>`;
+  $('gC').innerHTML=h;}
+function cSc(tid,tmid){const t=T.find(x=>x.id===tid);const c=gCr(t.cid);let tot=0,n=0;
+  c.pars.forEach((p,i)=>{const v=parseInt($('h'+i).value);const de=$('d'+i);if(v){const d=v-p;de.textContent=d===0?'E':d>0?'+'+d:''+d;de.className='sc-cell sc-diff '+(d<0?'under':d>0?'over':'even');tot+=v;n++;}else{de.textContent='—';de.className='sc-cell';}});
+  $('scT').textContent=n?tot:'—';const par=c.pars.reduce((a,b)=>a+b,0);if(n===c.holes){const d=tot-par;const ds=d===0?'E':d>0?'+'+d:''+d;$('scD').innerHTML=`<span class="sc-diff ${d<0?'under':d>0?'over':'even'}">${ds}</span>`;}else $('scD').textContent='—';}
+function subSc(tid,tmid){const t=T.find(x=>x.id===tid);const c=gCr(t.cid);const sc=[];let ok=true;c.pars.forEach((_,i)=>{const v=parseInt($('h'+i).value);if(!v)ok=false;else sc.push(v);});if(!ok){alert('Fyll inn slag for alle hull');return;}const tot=sc.reduce((a,b)=>a+b,0);const ei=t.res.findIndex(r=>r.tid===tmid);if(ei>=0)t.res[ei]={tid:tmid,sc,tot};else t.res.push({tid:tmid,sc,tot});alert('Scorecard levert! Total: '+tot+' slag.');sG('lag');}
+
+// ═══ ADMIN ═══
+function rAdmin(el){
+  let h=`<div class="subtabs"><button class="subtab ${aTab==='turneringer'?'active':''}" onclick="aTab='turneringer';rAdmin($('gC'))">Turneringer</button><button class="subtab ${aTab==='lag'?'active':''}" onclick="aTab='lag';rAdmin($('gC'))">Lag & paring</button><button class="subtab ${aTab==='spillere'?'active':''}" onclick="aTab='spillere';rAdmin($('gC'))">Påmeldte</button><button class="subtab ${aTab==='resultat'?'active':''}" onclick="aTab='resultat';rAdmin($('gC'))">Godkjenn</button></div><div id="aC"></div>`;
+  el.innerHTML=h;const ae=$('aC');
+  if(aTab==='turneringer')rAT(ae);else if(aTab==='lag')rAL(ae);else if(aTab==='spillere')rAP(ae);else if(aTab==='resultat')rAR(ae);}
+
+function rAT(el){let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="section-title" style="margin:0">Alle turneringer</div><button class="btn btn-primary btn-sm" onclick="sTF()">+ Ny turnering</button></div><div id="tFB" style="display:none"></div>`;
+  T.sort((a,b)=>a.date.localeCompare(b.date)).forEach(t=>{const c=gCr(t.cid);const d=t.status==='completed';
+    h+=`<div class="card"><div style="padding:14px 20px;display:flex;align-items:center;gap:12px"><div style="flex:1"><div style="font-weight:600;font-size:14px">${t.name}</div><div style="font-size:12px;color:var(--text-dim)">${fS(t.date)} · ${c.name} · ${t.reg.length} påmeldt · ${t.teams.length} lag</div></div><span class="badge ${d?'badge-green':'badge-blue'}">${d?'Ferdig':'Kommende'}</span><button class="btn btn-outline btn-sm" onclick="eT(${t.id})">✏️</button>${!d?`<button class="btn btn-danger btn-sm" onclick="dT(${t.id})">🗑️</button>`:''}</div></div>`;});
+  el.innerHTML=h;}
+function sTF(t){const b=$('tFB');b.style.display='';const e=!!t;
+  b.innerHTML=`<div class="card" style="border:2px solid var(--tb-orange);margin-bottom:16px"><div class="card-body"><div style="font-size:16px;font-weight:700;margin-bottom:16px">${e?'Rediger':'Ny'} turnering</div>
+  <div class="form-group"><label class="form-label">Navn</label><input class="form-input" id="fn" value="${e?t.name:''}" placeholder="F.eks. Høstfinalen"></div>
+  <div class="form-row form-row-2"><div class="form-group"><label class="form-label">Dato</label><input class="form-input" type="date" id="fd" value="${e?t.date:''}"></div><div class="form-group"><label class="form-label">Tid</label><input class="form-input" type="time" id="ft" value="${e?t.time:'11:00'}"></div></div>
+  <div class="form-group"><label class="form-label">Bane</label><select class="form-input" id="fc" onchange="var c=COURSES.find(x=>x.id===this.value);if(c)$('fh').value=c.holes">${COURSES.map(c=>`<option value="${c.id}" ${e&&t.cid===c.id?'selected':''}>${c.name}, ${c.loc}</option>`).join('')}</select></div>
+  <div class="form-row form-row-2">
+    <div class="form-group"><label class="form-label">Antall hull</label><select class="form-input" id="fh"><option value="9" ${e?gCr(t.cid).holes===9?'selected':'':COURSES[0].holes===9?'selected':''}>9 hull</option><option value="18" ${e?gCr(t.cid).holes===18?'selected':'':COURSES[0].holes===18?'selected':''}>18 hull</option></select></div>
+    <div class="form-group"><label class="form-label">Maks lag</label><input class="form-input" type="number" id="fm" value="${e?t.maxT:20}"></div>
+  </div>
+  <div class="form-row form-row-2">
+    <div class="form-group"><label class="form-label">Påmeldingsfrist</label><input class="form-input" type="date" id="fdl" value="${e?t.dl:''}"></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:8px"><button class="btn btn-primary" style="flex:1" onclick="svT(${e?t.id:'null'})">Lagre</button><button class="btn btn-outline" style="flex:1" onclick="$('tFB').style.display='none'">Avbryt</button></div></div></div>`;}
+function eT(id){sTF(T.find(x=>x.id===id));}
+function dT(id){T=T.filter(t=>t.id!==id);rAdmin($('gC'));}
+function svT(eid){const n=$('fn').value,d=$('fd').value,ti=$('ft').value,ci=$('fc').value,m=parseInt($('fm').value)||20,dl=$('fdl').value;if(!n||!d)return;
+  if(eid){const t=T.find(x=>x.id===eid);Object.assign(t,{name:n,date:d,time:ti,cid:ci,maxT:m,dl});}
+  else T.push({id:Date.now(),name:n,date:d,time:ti,cid:ci,maxT:m,dl,status:'upcoming',reg:[],teams:[],res:[]});
+  $('tFB').style.display='none';rAdmin($('gC'));}
+
+function rAL(el){const up=T.filter(t=>t.status==='upcoming'&&t.reg.length>=2);
+  if(!up.length){el.innerHTML='<div style="text-align:center;padding:48px;color:var(--text-dim)"><p style="font-weight:600">Ingen turneringer klare</p><p style="font-size:13px">Trenger minst 2 påmeldte</p></div>';return;}
+  let h='';up.forEach(t=>{const c=gCr(t.cid);
+    h+=`<div class="card"><div class="card-header"><div><div class="card-title">${t.name}</div><div class="card-subtitle">${fS(t.date)} · ${t.reg.length} påmeldte</div></div><button class="btn btn-primary btn-sm" onclick="autoT(${t.id})">🎲 Generer lag</button></div><div class="card-body">`;
+    if(t.teams.length){t.teams.forEach(tm=>{h+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light)"><div style="flex:1;font-weight:600;font-size:13px">${tm.name}</div>${tm.p.map(pid=>{const p=gP(pid);return `<div style="display:flex;align-items:center;gap:4px">${av(p,24)}<span style="font-size:12px">${p.name.split(' ')[0]}</span></div>`;}).join(' + ')}</div>`;});
+      const unp=t.reg.filter(pid=>!t.teams.some(tm=>tm.p.includes(pid)));if(unp.length)h+=`<div style="margin-top:10px;font-size:12px;color:var(--yellow-text)">⚠ ${unp.length} uten lag</div>`;
+    }else h+=`<div style="color:var(--text-dim);font-size:13px">Trykk "Generer lag" for å pare spillere (erfaren + nybegynner, på tvers av selskap).</div>`;
+    h+=`</div></div>`;});el.innerHTML=h;}
+function autoT(tid){const t=T.find(x=>x.id===tid);if(!t)return;const regs=[...t.reg].map(gP);
+  const exp=regs.filter(p=>p.xp==='regular').sort(()=>Math.random()-.5);const mid=regs.filter(p=>p.xp==='some').sort(()=>Math.random()-.5);const nov=regs.filter(p=>p.xp==='none').sort(()=>Math.random()-.5);
+  const pool=[...exp,...nov,...mid];const teams=[];let id=Date.now();
+  while(pool.length>=2){const a=pool.shift();let bi=0,bs=-1;for(let i=0;i<pool.length;i++){let s=0;if(pool[i].co!==a.co)s+=2;if(pool[i].xp!==a.xp)s+=1;if(s>bs){bs=s;bi=i;}}
+    const b=pool.splice(bi,1)[0];teams.push({id:id++,p:[a.id,b.id],name:'Team '+a.name.split(' ')[1]+'/'+b.name.split(' ')[1]});}
+  t.teams=teams;rAdmin($('gC'));}
+
+function rAP(el){const all=new Set(T.flatMap(t=>t.reg));let h=`<div class="section-title">Alle påmeldte</div><div class="card">`;
+  [...all].forEach(pid=>{const p=gP(pid);const c=gc(p.co);const n=T.filter(t=>t.reg.includes(pid)).length;
+    h+=`<div class="row">${av(p)}<div style="flex:1"><div style="font-weight:600;font-size:14px">${p.name}</div><div style="font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:4px"><span class="company-dot" style="background:${c.color}"></span>${c.name}</div></div><span class="badge badge-gray">${xpL[p.xp]}</span>${p.hcp?`<span style="font-size:12px;color:var(--text-dim)">HCP ${p.hcp}</span>`:''}${p.eq==='need'?'<span class="badge badge-yellow">Lån</span>':''}<span style="font-size:12px;color:var(--text-dim)">${n} t.</span></div>`;});
+  h+='</div>';const ne=[...all].filter(pid=>gP(pid).eq==='need');
+  if(ne.length)h+=`<div class="info-box orange" style="margin-top:16px"><strong>Låneutstyr:</strong> ${ne.length} spiller${ne.length>1?'e':''} trenger lån: ${ne.map(pid=>gP(pid).name).join(', ')}. Kontakt banen for reservasjon.</div>`;
+  el.innerHTML=h;}
+
+function rAR(el){const pending=T.filter(t=>t.status==='upcoming'&&t.res.length>0);let h='';
+  if(pending.length){h+=`<div class="section-title">Innsendte scorecards</div>`;pending.forEach(t=>{const c=gCr(t.cid);const par=c.pars.reduce((a,b)=>a+b,0);
+    h+=`<div class="card"><div class="card-header"><div><div class="card-title">${t.name}</div><div class="card-subtitle">${t.res.length} av ${t.teams.length} lag har levert</div></div>${t.res.length===t.teams.length?`<button class="btn btn-primary btn-sm" onclick="fin(${t.id})">✓ Godkjenn og avslutt</button>`:''}</div>`;
+    t.res.sort((a,b)=>a.tot-b.tot).forEach(r=>{const tm=t.teams.find(x=>x.id===r.tid);if(!tm)return;const df=r.tot-par;const ds=df===0?'E':df>0?'+'+df:''+df;
+      h+=`<div class="row"><div style="flex:1;font-weight:600;font-size:13px">${tm.name}</div><span style="font-family:'JetBrains Mono',monospace;font-weight:700">${r.tot}</span><span style="font-size:12px;color:${df<=0?'var(--green-text)':'var(--red-text)'}">(${ds})</span></div>`;});
+    h+=`</div>`;});}
+  if(!h)h=`<div style="text-align:center;padding:48px;color:var(--text-dim)"><p style="font-weight:600">Ingen resultater å behandle</p><p style="font-size:13px">Venter på innleverte scorecards</p></div>`;
+  el.innerHTML=h;}
+function fin(tid){const t=T.find(x=>x.id===tid);if(t){t.status='completed';rAdmin($('gC'));}}
+</script>
+</body>
+</html>
