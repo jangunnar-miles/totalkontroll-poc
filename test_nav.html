@@ -3,38 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test – TOTALKontroll PoC</title>
+<title>TOTALKontroll – Test</title>
 <script src="tk-nav.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  body {
-    font-family: 'DM Sans', sans-serif;
-    padding: 32px;
-    background: #f5f6f8;
-    color: #1a2744;
-  }
-  .card {
-    background: #fff;
-    border-radius: 10px;
-    padding: 32px;
-    max-width: 600px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-  h1 { font-size: 22px; margin-bottom: 12px; }
-  p { color: #555; line-height: 1.6; }
-  code {
-    background: #f0f1f3;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 13px;
-  }
+  body { font-family: 'DM Sans', sans-serif; background: #F4F5F7; color: #1B2A4A; min-height: 100vh; }
+  .topbar { background: #fff; border-bottom: 1px solid #E2E6EC; padding: 0 32px; height: 52px; display: flex; align-items: center; position: sticky; top: 0; z-index: 50; }
+  .topbar-breadcrumb { font-size: 13px; color: #9BA5B5; font-weight: 500; }
+  .topbar-breadcrumb .current { color: #1B2A4A; font-weight: 600; }
+  .content { padding: 28px 32px; max-width: 800px; }
+  .card { background: #fff; border: 1px solid #E2E6EC; border-radius: 12px; padding: 28px; box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06); }
+  h1 { font-size: 20px; margin-bottom: 12px; }
+  p { color: #5A6578; line-height: 1.7; margin-bottom: 12px; }
+  code { background: #F1F3F5; padding: 2px 8px; border-radius: 4px; font-size: 13px; color: #E87722; }
 </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Test-side for tk-nav.js</h1>
-    <p>Denne siden inkluderer kun <code>&lt;script src="tk-nav.js"&gt;&lt;/script&gt;</code> i head.</p>
-    <p>Sidebaren injiseres automatisk, og innholdet dyttes til høyre. Ingen ekstra oppsett nødvendig.</p>
-    <p>Denne filen er ikke i menyen ennå, men sidebaren vises likevel, slik at du kan navigere tilbake.</p>
+  <div class="topbar">
+    <div class="topbar-breadcrumb">TOTALKontroll / <span class="current">Test</span></div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <h1>tk-nav.js fungerer</h1>
+      <p>Denne siden inkluderer kun <code>&lt;script src="tk-nav.js"&gt;&lt;/script&gt;</code> i head.</p>
+      <p>Sidebar, auth-gate og margin injiseres automatisk. Sidebaren er identisk med den i de eksisterende PoC-ene.</p>
+      <p>Denne filen er ikke i menyen ennå, men sidebaren vises likevel slik at du kan navigere til andre moduler.</p>
+    </div>
   </div>
 </body>
 </html>

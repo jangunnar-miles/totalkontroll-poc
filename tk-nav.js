@@ -1,38 +1,77 @@
 /*
  * tk-nav.js – TOTALKontroll PoC felles navigasjon
+ *
+ * Bruk:  <script src="tk-nav.js"></script> i <head> eller før </body>
  * 
- * Bruk: Legg til <script src="tk-nav.js"></script> i <head> eller før </body>.
- *       Scriptet injiserer sidebar, auth og styling automatisk.
+ * Scriptet injiserer sidebar, auth-gate og nødvendig styling.
+ * Oppdater kun MENU-arrayet når nye moduler legges til.
  *
- * Oppdatering: Kun dette scriptet oppdateres når nye moduler legges til.
- *              PoC-filene trenger ikke endres.
- *
- * Versjon: 0.1
+ * Versjon: 0.2
  */
-(function() {
+(function () {
   'use strict';
 
   // ══════════════════════════════════════════════════════
   //  MENYKONFIGURASJON – Oppdater kun denne ved nye PoC-er
+  //
+  //  Typer:
+  //    { label, file, icon }     – vanlig menypunkt
+  //    { label, icon, sub: [] }  – gruppe med undermenyer
+  //
+  //  icon: SVG path(s) inni 24x24 viewBox, stroke-basert
   // ══════════════════════════════════════════════════════
   const MENU = [
-    { section: 'Salg' },
-    { icon: '📊', label: 'Pipeline',       file: 'salg_work17.html' },
-    { icon: '💡', label: 'Muligheter',     file: 'mul_work3.html' },
-    { icon: '📈', label: 'Markedsanalyse', file: 'markedsanalyse.html' },
-
-    { section: 'Prosjekt' },
-    { icon: '🎯', label: 'KPI Dashboard',   file: 'prosjekt_poc_light.html' },
-    { icon: '📅', label: 'Fremdriftsplan',  file: 'TOTALKontroll_Fremdriftsplan.html' },
-
+    {
+      label: 'Min side',
+      file: 'minside.html',
+      icon: '<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'
+    },
+    {
+      label: 'Salg',
+      file: 'salg_work17.html',
+      icon: '<path d="M18 20V10M12 20V4M6 20v-6"/>',
+      sub: [
+        {
+          label: 'Muligheter',
+          file: 'mul_work3.html',
+          icon: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>'
+        },
+        {
+          label: 'Markedsanalyse',
+          file: 'markedsanalyse.html',
+          icon: '<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>'
+        }
+      ]
+    },
+    {
+      label: 'Prosjekt',
+      file: 'prosjekt_poc_light.html',
+      icon: '<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+      sub: [
+        {
+          label: 'Fremdriftsplan',
+          file: 'TOTALKontroll_Fremdriftsplan.html',
+          icon: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'
+        }
+      ]
+    },
+    {
+      label: 'Håndbok',
+      file: 'handbok.html',
+      icon: '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>'
+    },
     // ── Legg til nye moduler her ──
-    // { icon: '🔍', label: 'Prosjektgjennomgang', file: 'prosjektgjennomgang_v1.html' },
+    // {
+    //   label: 'Arrangement',
+    //   file: 'TOTALKontroll_Arrangement.html',
+    //   icon: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>'
+    // },
   ];
 
   // ══════════════════════════════════════════════════════
   //  AUTH
   // ══════════════════════════════════════════════════════
-  const HASH = 2562494657; // DF2026
+  const HASH = 2562494657;
   const AUTH_KEY = 'tk_auth';
 
   function djb2(str) {
@@ -48,174 +87,123 @@
   }
 
   // ══════════════════════════════════════════════════════
-  //  STYLING
+  //  SVG
   // ══════════════════════════════════════════════════════
-  const CSS = `
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+  const TB_LOGO = '<svg viewBox="0 0 100 90"><rect x="8" y="0" width="84" height="24" rx="2" fill="#E87722"/><rect x="8" y="30" width="36" height="56" rx="2" fill="#E87722"/><rect x="56" y="30" width="36" height="56" rx="2" fill="#E87722"/></svg>';
 
-    :root {
-      --tk-navy: #1a2744;
-      --tk-navy-light: #243352;
-      --tk-navy-hover: #2d3f63;
-      --tk-orange: #e67e22;
-      --tk-orange-hover: #d35400;
-      --tk-sidebar-w: 220px;
-    }
-
-    /* Auth overlay */
-    .tk-auth-overlay {
-      position: fixed; inset: 0; z-index: 10000;
-      background: var(--tk-navy);
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 24px;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .tk-auth-overlay.tk-hidden { display: none; }
-
-    .tk-auth-logo {
-      display: flex; align-items: center; gap: 12px;
-      color: #fff; font-size: 22px; font-weight: 700;
-    }
-    .tk-auth-logo-icon {
-      width: 40px; height: 40px; background: var(--tk-orange);
-      border-radius: 6px; display: flex; align-items: center;
-      justify-content: center; font-weight: 700; font-size: 18px; color: #fff;
-    }
-    .tk-auth-box {
-      display: flex; border-radius: 8px; overflow: hidden;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-    }
-    .tk-auth-box input {
-      padding: 12px 16px; font-size: 15px; font-family: 'DM Sans', sans-serif;
-      border: none; outline: none; width: 220px;
-      background: #fff; color: var(--tk-navy);
-    }
-    .tk-auth-box input::placeholder { color: #8a92a0; }
-    .tk-auth-box button {
-      padding: 12px 20px; font-size: 14px; font-weight: 600;
-      font-family: 'DM Sans', sans-serif; border: none; cursor: pointer;
-      background: var(--tk-orange); color: #fff; transition: background 0.15s;
-    }
-    .tk-auth-box button:hover { background: var(--tk-orange-hover); }
-    .tk-auth-error { color: #e74c3c; font-size: 13px; min-height: 18px; }
-
-    /* Sidebar */
-    .tk-sidebar {
-      position: fixed; left: 0; top: 0; bottom: 0;
-      width: var(--tk-sidebar-w); background: var(--tk-navy);
-      color: #fff; font-family: 'DM Sans', sans-serif;
-      display: flex; flex-direction: column;
-      z-index: 9000; user-select: none;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.15);
-    }
-    .tk-sidebar.tk-hidden { display: none; }
-
-    .tk-sidebar-header {
-      padding: 20px 16px 16px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .tk-sidebar-brand {
-      display: flex; align-items: center; gap: 10px;
-      font-size: 16px; font-weight: 700;
-    }
-    .tk-sidebar-brand-icon {
-      width: 32px; height: 32px; background: var(--tk-orange);
-      border-radius: 5px; display: flex; align-items: center;
-      justify-content: center; font-weight: 700; font-size: 14px;
-    }
-    .tk-sidebar-sub {
-      font-size: 11px; color: #8a92a0; margin-top: 4px;
-      padding-left: 42px; text-transform: uppercase; letter-spacing: 0.5px;
-    }
-
-    .tk-sidebar-nav {
-      flex: 1; padding: 12px 8px; overflow-y: auto;
-      display: flex; flex-direction: column; gap: 2px;
-    }
-
-    .tk-nav-section {
-      font-size: 10px; font-weight: 600; color: #8a92a0;
-      text-transform: uppercase; letter-spacing: 0.8px;
-      padding: 14px 12px 6px;
-    }
-
-    .tk-nav-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 9px 12px; border-radius: 6px;
-      font-size: 13.5px; font-weight: 500;
-      color: rgba(255,255,255,0.7); cursor: pointer;
-      transition: all 0.12s; text-decoration: none;
-    }
-    .tk-nav-item:hover {
-      background: var(--tk-navy-hover); color: #fff;
-    }
-    .tk-nav-item.tk-active {
-      background: var(--tk-navy-light); color: #fff; font-weight: 600;
-    }
-    .tk-nav-item.tk-active::before {
-      content: ''; width: 3px; height: 18px;
-      background: var(--tk-orange); border-radius: 2px;
-      margin-left: -4px; margin-right: 2px; flex-shrink: 0;
-    }
-    .tk-nav-icon {
-      width: 18px; text-align: center; font-size: 14px;
-      flex-shrink: 0; opacity: 0.85;
-    }
-
-    .tk-sidebar-footer {
-      padding: 12px 16px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      font-size: 11px; color: #8a92a0;
-    }
-
-    /* Push page content right */
-    body.tk-has-sidebar {
-      margin-left: var(--tk-sidebar-w) !important;
-    }
-
-    /* Mobile */
-    @media (max-width: 768px) {
-      :root { --tk-sidebar-w: 52px; }
-      .tk-sidebar-brand span,
-      .tk-sidebar-sub,
-      .tk-nav-section,
-      .tk-nav-item span:not(.tk-nav-icon) { display: none; }
-      .tk-sidebar-header { padding: 14px 10px; }
-      .tk-nav-item { justify-content: center; padding: 10px; }
-      .tk-nav-item.tk-active::before { display: none; }
-      .tk-nav-icon { margin: 0; font-size: 16px; }
-    }
-  `;
-
-  // ══════════════════════════════════════════════════════
-  //  BUILD DOM
-  // ══════════════════════════════════════════════════════
-
-  function injectStyle() {
-    const style = document.createElement('style');
-    style.textContent = CSS;
-    document.head.appendChild(style);
+  function navSvg(paths) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
   }
 
-  function buildAuthOverlay() {
+  // ══════════════════════════════════════════════════════
+  //  STYLING – pikselkopi av eksisterende PoC-sidebar
+  // ══════════════════════════════════════════════════════
+  const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+.tk-gate{position:fixed;inset:0;background:#1B2A4A;display:flex;align-items:center;justify-content:center;z-index:9999;font-family:'DM Sans',sans-serif}
+.tk-gate.tk-hidden{display:none}
+.tk-gate-box{text-align:center;color:#fff}
+.tk-gate-logo{width:60px;height:54px;margin:0 auto}
+.tk-gate-logo svg{width:100%;height:100%}
+.tk-gate-box h2{font-size:22px;margin:16px 0 4px}
+.tk-gate-box h2 em{font-style:normal;color:#E87722}
+.tk-gate-box p{font-size:13px;color:#9BA5B5;margin-bottom:24px}
+.tk-gate-box input{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:12px 20px;color:#fff;font-size:14px;width:240px;text-align:center;outline:none;font-family:inherit}
+.tk-gate-box input:focus{border-color:#E87722}
+.tk-gate-error{color:#DC2626;font-size:12px;margin-top:8px;min-height:18px}
+
+.tk-sidebar{position:fixed;left:0;top:0;bottom:0;width:228px;background:#1B2A4A;display:flex;flex-direction:column;z-index:100;font-family:'DM Sans',sans-serif}
+.tk-sidebar.tk-hidden{display:none}
+
+.tk-sidebar-logo{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px}
+.tk-sidebar-logo svg{width:30px;height:30px;flex-shrink:0}
+.tk-sidebar-logo .tk-logo-text{display:flex;flex-direction:column;line-height:1.15}
+.tk-sidebar-logo .tk-brand{font-weight:700;font-size:13px;color:#fff}
+.tk-sidebar-logo .tk-brand em{font-style:normal;color:#E87722}
+.tk-sidebar-logo .tk-sub{font-size:9.5px;color:#5A6A82;font-weight:500;letter-spacing:0.8px;text-transform:uppercase;margin-top:1px}
+
+.tk-sidebar-nav{padding:14px 0;flex:1;overflow-y:auto}
+
+.tk-nav-item{display:flex;align-items:center;gap:11px;padding:9px 18px;color:#8B99B0;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;border-left:3px solid transparent;text-decoration:none}
+.tk-nav-item:hover{color:#E8ECF2;background:rgba(255,255,255,0.04)}
+.tk-nav-item.tk-active{color:#E87722;border-left-color:#E87722;background:rgba(232,119,34,0.08)}
+.tk-nav-item svg{width:17px;height:17px;flex-shrink:0}
+
+.tk-nav-sub{padding-left:18px}
+.tk-nav-sub .tk-nav-item{padding:6px 18px 6px 32px;font-size:12px}
+.tk-nav-sub .tk-nav-item svg{width:14px;height:14px}
+
+.tk-sidebar-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:#8B99B0;font-weight:500}
+
+body.tk-has-sidebar{margin-left:228px !important}
+
+@media(max-width:768px){
+  .tk-sidebar{display:none}
+  body.tk-has-sidebar{margin-left:0 !important}
+}
+`;
+
+  // ══════════════════════════════════════════════════════
+  //  BUILD
+  // ══════════════════════════════════════════════════════
+  function injectStyle() {
+    const s = document.createElement('style');
+    s.textContent = CSS;
+    document.head.appendChild(s);
+  }
+
+  function currentFile() {
+    return location.pathname.split('/').pop() || '';
+  }
+
+  function buildNavItems(items) {
+    const cur = currentFile();
+    let html = '';
+    for (const item of items) {
+      const active = (item.file === cur) ? ' tk-active' : '';
+      html += '<a class="tk-nav-item' + active + '" href="' + item.file + '">' + navSvg(item.icon) + ' ' + item.label + '</a>';
+      if (item.sub && item.sub.length) {
+        html += '<div class="tk-nav-sub">';
+        html += buildNavItems(item.sub);
+        html += '</div>';
+      }
+    }
+    return html;
+  }
+
+  function buildSidebar() {
+    const nav = document.createElement('nav');
+    nav.className = 'tk-sidebar tk-hidden';
+    nav.id = 'tkSidebar';
+    nav.innerHTML =
+      '<div class="tk-sidebar-logo">' + TB_LOGO +
+        '<div class="tk-logo-text">' +
+          '<span class="tk-brand"><em>TOTAL</em>Kontroll</span>' +
+          '<span class="tk-sub">Ledelsessystem</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="tk-sidebar-nav">' + buildNavItems(MENU) + '</div>' +
+      '<div class="tk-sidebar-footer">Konseptvisning, kun demo data</div>';
+    document.body.appendChild(nav);
+  }
+
+  function buildGate() {
     const div = document.createElement('div');
-    div.className = 'tk-auth-overlay';
-    div.id = 'tkAuth';
-    div.innerHTML = `
-      <div class="tk-auth-logo">
-        <div class="tk-auth-logo-icon">TK</div>
-        TOTALKontroll
-      </div>
-      <div class="tk-auth-box">
-        <input type="password" id="tkAuthInput" placeholder="Passord" autofocus>
-        <button id="tkAuthBtn">Logg inn</button>
-      </div>
-      <div class="tk-auth-error" id="tkAuthError"></div>
-    `;
+    div.className = 'tk-gate';
+    div.id = 'tkGate';
+    div.innerHTML =
+      '<div class="tk-gate-box">' +
+        '<div class="tk-gate-logo">' + TB_LOGO + '</div>' +
+        '<h2><em>TOTAL</em>Kontroll</h2>' +
+        '<p>PoC \u2013 Prototyper</p>' +
+        '<input type="password" id="tkPw" placeholder="Passord" autocomplete="off">' +
+        '<div class="tk-gate-error" id="tkPwErr"></div>' +
+      '</div>';
     document.body.appendChild(div);
 
-    const input = document.getElementById('tkAuthInput');
-    const error = document.getElementById('tkAuthError');
+    var input = document.getElementById('tkPw');
+    var err = document.getElementById('tkPwErr');
 
     function doAuth() {
       if (djb2(input.value) === HASH) {
@@ -223,54 +211,20 @@
         div.classList.add('tk-hidden');
         showSidebar();
       } else {
-        error.textContent = 'Feil passord';
+        err.textContent = 'Feil passord';
         input.value = '';
         input.focus();
       }
     }
 
-    document.getElementById('tkAuthBtn').addEventListener('click', doAuth);
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') doAuth(); });
-  }
-
-  function buildSidebar() {
-    const currentFile = location.pathname.split('/').pop() || 'index.html';
-
-    let navHTML = '';
-    for (const item of MENU) {
-      if (item.section) {
-        navHTML += `<div class="tk-nav-section">${item.section}</div>`;
-      } else {
-        const active = (item.file === currentFile) ? ' tk-active' : '';
-        navHTML += `
-          <a class="tk-nav-item${active}" href="${item.file}">
-            <span class="tk-nav-icon">${item.icon}</span>
-            <span>${item.label}</span>
-          </a>`;
-      }
-    }
-
-    const sidebar = document.createElement('nav');
-    sidebar.className = 'tk-sidebar tk-hidden';
-    sidebar.id = 'tkSidebar';
-    sidebar.innerHTML = `
-      <div class="tk-sidebar-header">
-        <div class="tk-sidebar-brand">
-          <div class="tk-sidebar-brand-icon">TK</div>
-          <span>TOTALKontroll</span>
-        </div>
-        <div class="tk-sidebar-sub">PoC – Prototyper</div>
-      </div>
-      <div class="tk-sidebar-nav">${navHTML}</div>
-      <div class="tk-sidebar-footer">PoC v0.1 – Kun demo</div>
-    `;
-    document.body.appendChild(sidebar);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') doAuth(); });
+    setTimeout(function () { input.focus(); }, 50);
   }
 
   function showSidebar() {
-    const sidebar = document.getElementById('tkSidebar');
-    if (sidebar) {
-      sidebar.classList.remove('tk-hidden');
+    var sb = document.getElementById('tkSidebar');
+    if (sb) {
+      sb.classList.remove('tk-hidden');
       document.body.classList.add('tk-has-sidebar');
     }
   }
@@ -285,11 +239,10 @@
     if (isAuthed()) {
       showSidebar();
     } else {
-      buildAuthOverlay();
+      buildGate();
     }
   }
 
-  // Run when DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
