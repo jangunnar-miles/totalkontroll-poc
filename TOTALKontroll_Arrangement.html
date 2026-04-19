@@ -4,13 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TOTALKontroll — Arrangement</title>
-<script src="tk-nav.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--tb-orange:#E87722;--tb-orange-bg:rgba(232,119,34,0.06);--navy:#1B2A4A;--bg-page:#F4F5F7;--bg-white:#FFFFFF;--bg-card:#FFFFFF;--border:#E2E6EC;--border-light:#EEF0F4;--text-primary:#1B2A4A;--text-secondary:#5A6578;--text-dim:#9BA5B5;--green:#1B9E4B;--green-bg:rgba(27,158,75,0.08);--green-text:#15803D;--yellow:#CA8A04;--yellow-bg:rgba(202,138,4,0.08);--yellow-text:#A16207;--red:#DC2626;--red-bg:rgba(220,38,38,0.07);--red-text:#B91C1C;--blue:#2563EB;--blue-bg:rgba(37,99,235,0.06);--radius:12px;--radius-sm:8px;--shadow-sm:0 1px 2px rgba(0,0,0,0.04),0 1px 3px rgba(0,0,0,0.06);--shadow-md:0 4px 12px rgba(0,0,0,0.08)}
+:root{--tb-orange:#E87722;--tb-orange-bg:rgba(232,119,34,0.06);--navy:#1B2A4A;--bg-page:#F4F5F7;--bg-white:#FFFFFF;--bg-sidebar:#1B2A4A;--bg-card:#FFFFFF;--border:#E2E6EC;--border-light:#EEF0F4;--text-primary:#1B2A4A;--text-secondary:#5A6578;--text-dim:#9BA5B5;--text-inverse-muted:#8B99B0;--text-inverse-dim:#5A6A82;--green:#1B9E4B;--green-bg:rgba(27,158,75,0.08);--green-text:#15803D;--yellow:#CA8A04;--yellow-bg:rgba(202,138,4,0.08);--yellow-text:#A16207;--red:#DC2626;--red-bg:rgba(220,38,38,0.07);--red-text:#B91C1C;--blue:#2563EB;--blue-bg:rgba(37,99,235,0.06);--radius:12px;--radius-sm:8px;--shadow-sm:0 1px 2px rgba(0,0,0,0.04),0 1px 3px rgba(0,0,0,0.06);--shadow-md:0 4px 12px rgba(0,0,0,0.08)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--text-primary);min-height:100vh;overflow-x:hidden}
-.main{min-height:100vh}
+.password-gate{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:9999}
+.password-box{text-align:center;color:#fff}
+.password-box h2{font-size:22px;margin:16px 0 4px}.password-box h2 em{font-style:normal;color:var(--tb-orange)}
+.password-box p{font-size:13px;color:var(--text-dim);margin-bottom:24px}
+.password-box input{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:12px 20px;color:#fff;font-size:14px;width:240px;text-align:center;outline:none;font-family:inherit}
+.password-box input:focus{border-color:var(--tb-orange)}
+.password-box .error{color:var(--red);font-size:12px;margin-top:8px;display:none}
+.logo-gate svg{width:60px;height:54px}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:228px;background:var(--bg-sidebar);display:flex;flex-direction:column;z-index:100}
+.sidebar-logo{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px}
+.sidebar-logo .logo-svg{width:30px;height:30px;flex-shrink:0}
+.sidebar-logo .logo-text{display:flex;flex-direction:column;line-height:1.15}
+.sidebar-logo .logo-text .brand{font-weight:700;font-size:13px;color:#fff}
+.sidebar-logo .logo-text .brand em{font-style:normal;color:var(--tb-orange)}
+.sidebar-logo .logo-text .sub{font-size:9.5px;color:var(--text-inverse-dim);font-weight:500;letter-spacing:0.8px;text-transform:uppercase;margin-top:1px}
+.sidebar-nav{padding:14px 0;flex:1}
+.nav-item{display:flex;align-items:center;gap:11px;padding:9px 18px;color:var(--text-inverse-muted);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;border-left:3px solid transparent;text-decoration:none}
+.nav-item:hover{color:#E8ECF2;background:rgba(255,255,255,0.04)}
+.nav-item.active{color:var(--tb-orange);border-left-color:var(--tb-orange);background:rgba(232,119,34,0.08)}
+.nav-item svg{width:17px;height:17px;flex-shrink:0}
+.nav-sub{padding-left:18px}.nav-sub .nav-item{padding:6px 18px 6px 32px;font-size:12px}.nav-sub .nav-item svg{width:14px;height:14px}
+.sidebar-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:var(--text-inverse-muted);font-weight:500}
+.main{margin-left:228px;min-height:100vh}
 .topbar{background:var(--bg-white);border-bottom:1px solid var(--border);padding:0 32px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .topbar-breadcrumb{font-size:13px;color:var(--text-dim);font-weight:500}.topbar-breadcrumb .current{color:var(--text-primary);font-weight:600}
 .content{padding:28px 32px;max-width:1200px}
@@ -86,14 +107,32 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--text
 @media(min-width:1800px){body{zoom:1.5}}
 @media(min-width:1400px) and (max-width:1799px){body{zoom:1.25}}
 @media(min-width:1100px) and (max-width:1399px){body{zoom:1.1}}
-@media(max-width:768px){.content{padding:20px 16px}.opt-group{flex-direction:column}.sc-grid{grid-template-columns:44px 1fr 50px 70px}.podium{max-width:100%}.form-row-2{grid-template-columns:1fr}}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0}.content{padding:20px 16px}.opt-group{flex-direction:column}.sc-grid{grid-template-columns:44px 1fr 50px 70px}.podium{max-width:100%}.form-row-2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
+<svg style="display:none"><symbol id="tb-logo" viewBox="0 0 100 90"><rect x="8" y="0" width="84" height="24" rx="2" fill="#E87722"/><rect x="8" y="30" width="36" height="56" rx="2" fill="#E87722"/><rect x="56" y="30" width="36" height="56" rx="2" fill="#E87722"/></symbol></svg>
+<div class="password-gate" id="gate"><div class="password-box"><div class="logo-gate"><svg viewBox="0 0 100 90"><use href="#tb-logo"/></svg></div><h2><em>TOTAL</em>Kontroll</h2><p>Arrangement — PoC</p><input type="password" id="pw" placeholder="Passord" autocomplete="off"><div class="error" id="pwError">Feil passord</div></div></div>
+
+<div id="app" style="display:none">
+<nav class="sidebar">
+  <div class="sidebar-logo"><svg class="logo-svg" viewBox="0 0 100 90"><use href="#tb-logo"/></svg><div class="logo-text"><span class="brand"><em>TOTAL</em>Kontroll</span><span class="sub">Ledelsessystem</span></div></div>
+  <div class="sidebar-nav">
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Min side</div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> Salg</div>
+    <div class="nav-sub"><div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Muligheter</div><div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Markedsanalyse</div></div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Prosjekt</div>
+    <div class="nav-sub"><div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Fremdriftsplan</div><div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/></svg> Bærekraft</div></div>
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Håndbok</div>
+    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg> Arrangement</div>
+  </div>
+  <div class="sidebar-footer">Konseptvisning, kun demo data</div>
+</nav>
 <main class="main">
 <div class="topbar"><div class="topbar-breadcrumb">TOTALKontroll / <span class="current" id="bc">Arrangement</span></div></div>
 <div class="content" id="root"></div>
 </main>
+</div>
 <div class="modal-overlay" id="regModal" style="display:none" onclick="if(event.target===this)closeReg()"><div class="modal-content"><div class="modal-header"><div><div style="font-size:16px;font-weight:700" id="rmTitle"></div><div style="font-size:13px;color:var(--text-dim)" id="rmSub"></div></div><button class="modal-close" onclick="closeReg()">&times;</button></div><div class="modal-body" id="rmBody"></div></div></div>
 
 <script>
@@ -130,8 +169,9 @@ const rb=p=>p===1?'gold':p===2?'silver':p===3?'bronze':'other';
 function sRank(){const m={};PL.forEach(p=>m[p.id]={pid:p.id,pts:0,rnd:0,wins:0});T.filter(t=>t.status==='completed').forEach(t=>{const s=[...t.res].sort((a,b)=>a.tot-b.tot);s.forEach((r,i)=>{const pts=SPTS[i]||1;const tm=t.teams.find(x=>x.id===r.tid);if(!tm)return;tm.p.forEach(pid=>{m[pid].pts+=pts;m[pid].rnd++;if(i===0)m[pid].wins++;});});});return Object.values(m).filter(p=>p.rnd>0).sort((a,b)=>b.pts-a.pts);}
 function cRank(){const r=sRank();return CO.map(c=>{const ps=r.filter(x=>gP(x.pid)?.co===c.id);const t=ps.reduce((s,p)=>s+p.pts,0);return{...c,total:t,avg:ps.length?Math.round(t/ps.length):0,cnt:ps.length};}).sort((a,b)=>b.total-a.total);}
 
-// Init
-vLanding();
+// Auth
+document.getElementById('pw').addEventListener('keydown',function(e){if(e.key==='Enter'){if(this.value==='DF2026'){document.getElementById('gate').style.display='none';document.getElementById('app').style.display='';sessionStorage.setItem('tk_auth','1');vLanding();}else{document.getElementById('pwError').style.display='block';this.value='';}}});
+if(sessionStorage.getItem('tk_auth')==='1'){document.getElementById('gate').style.display='none';document.getElementById('app').style.display='';vLanding();}
 
 // ═══ VIEWS ═══
 let gTab='kalender',aTab='turneringer';
@@ -152,7 +192,18 @@ function vLanding(){
         <div style="width:1px;height:32px;background:var(--border)"></div>
         <span class="badge badge-green" style="font-size:12px;padding:5px 14px">Sesong aktiv</span>
       </div>
-    </div></div>`;
+    </div></div>
+
+  <div style="border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);max-width:900px;margin-top:20px;opacity:0.85">
+    <div style="position:relative;width:100%;height:0;padding-bottom:25%;overflow:hidden;background:#1B2A4A"><img src="tb_padel.png" alt="Totalbetong Padel" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
+    <div style="background:var(--bg-white);padding:18px 24px;display:flex;align-items:center;gap:16px;border-top:3px solid var(--blue)">
+      <div style="flex:1">
+        <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:2px">Totalbetong Padel</div>
+        <div style="font-size:13px;color:var(--text-dim)">Padelturneringen er under planlegging. Mer informasjon kommer snart!</div>
+      </div>
+      <span class="badge badge-blue" style="font-size:12px;padding:5px 14px;flex-shrink:0">Kommer snart</span>
+    </div>
+  </div>`;
 }
 
 function vGolf(){$('bc').textContent='Arrangement / GolfCup 2026';gTab='kalender';rShell();}

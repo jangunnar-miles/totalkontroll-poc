@@ -6,20 +6,20 @@
 <title>TOTALKontroll — Prosjekt</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{
-  --tb-orange:#E87722;
+:root {
+  --tb-orange: #E87722;
   --tb-orange-bg: rgba(232,119,34,0.06);
   --bg-page: #F4F5F7;
   --bg-white: #FFFFFF;
-  --bg-sidebar:#1B2A4A;
+  --bg-sidebar: #1B2A4A;
   --border: #E2E6EC;
   --border-light: #EEF0F4;
   --text-primary: #1B2A4A;
   --text-secondary: #5A6578;
   --text-dim: #9BA5B5;
   --text-inverse: #E8ECF2;
-  --text-inverse-muted:#8B99B0;
-  --text-inverse-dim:#5A6A82;
+  --text-inverse-muted: #8B99B0;
+  --text-inverse-dim: #5A6A82;
   --green: #1B9E4B; --green-bg: rgba(27,158,75,0.08); --green-text: #15803D;
   --yellow: #CA8A04; --yellow-bg: rgba(202,138,4,0.08); --yellow-text: #A16207;
   --red: #DC2626; --red-bg: rgba(220,38,38,0.07); --red-text: #B91C1C;
@@ -43,7 +43,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .sidebar-logo .logo-text .sub { font-size:9.5px; color:var(--text-inverse-dim); font-weight:500; letter-spacing:0.8px; text-transform:uppercase; margin-top:1px; }
 .sidebar-nav { padding:14px 0; flex:1; }
 .nav-item { display:flex; align-items:center; gap:11px; padding:9px 18px; color:var(--text-inverse-muted); font-size:13px; font-weight:500; cursor:pointer; transition:all 0.15s; border-left:3px solid transparent; }
-.nav-item:hover { color:#E8ECF2; background:rgba(255,255,255,0.04); }
+.nav-item:hover { color:var(--text-inverse); background:rgba(255,255,255,0.04); }
 .nav-item.active { color:var(--tb-orange); border-left-color:var(--tb-orange); background:rgba(232,119,34,0.08); }
 .nav-item svg { width:17px; height:17px; flex-shrink:0; }
 .nav-label { padding:18px 18px 7px; font-size:9.5px; font-weight:600; letter-spacing:1.2px; text-transform:uppercase; color:var(--text-inverse-dim); }
@@ -52,7 +52,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .nav-sub .nav-item svg { width:14px; height:14px; }
 .sidebar-footer { padding:14px 18px; border-top:1px solid rgba(255,255,255,0.06); font-size:10px; color:var(--text-inverse-dim); line-height:1.5; }
 
-.main { margin-left:228px; min-height:100vh; }
+.main { min-height:100vh; }
 .topbar { height:54px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 32px; background:var(--bg-white); }
 /* Tab-based context hiding: focus mode for review and log tabs */
 .detail-page.tab-review .detail-header .project-meta,
@@ -82,15 +82,17 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .filter-btn:hover { border-color:var(--text-dim); color:var(--text-primary); }
 .filter-btn.active { border-color:var(--tb-orange); color:var(--tb-orange); background:var(--tb-orange-bg); }
 
-.summary-health { background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); padding:14px 20px; box-shadow:var(--shadow-sm); margin-bottom:12px; display:flex; align-items:center; gap:20px; }
-.summary-health .sh-score { font-size:36px; font-weight:700; font-family:'JetBrains Mono',monospace; }
-.summary-health .sh-score.green { color:var(--green); }
-.summary-health .sh-score.yellow { color:var(--yellow); }
-.summary-health .sh-score.red { color:var(--red); }
-.summary-health .sh-label { font-size:13px; font-weight:600; color:var(--text-primary); }
-.summary-health .sh-meta { font-size:11px; color:var(--text-dim); margin-top:2px; }
-.summary-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
-.summary-card { background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow-sm); }
+.summary-row { display:flex; gap:0; margin-bottom:24px; align-items:stretch; background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius); box-shadow:var(--shadow-sm); overflow:hidden; }
+.summary-score-box { background:var(--bg-sidebar); padding:18px 24px; display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:140px; border-right:1px solid var(--border-light); }
+.summary-score-box .sh-label { font-size:11px; font-weight:600; color:var(--text-inverse); margin-top:7px; text-align:center; }
+.summary-score-box .sh-meta { font-size:10px; color:var(--text-inverse-muted); margin-top:2px; text-align:center; }
+.portfolio-ring { width:80px; height:80px; }
+.portfolio-ring .ring-bg { stroke:var(--text-inverse-dim); }
+.portfolio-ring .score-text { font-size:24px; }
+.summary-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:0; flex:1; }
+.summary-strip .summary-card { border-right:1px solid var(--border-light); padding:16px 18px; }
+.summary-strip .summary-card:last-child { border-right:none; }
+.summary-card { padding:16px 18px; }
 .summary-card .label { font-size:11px; color:var(--text-dim); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
 .summary-card .value { font-size:26px; font-weight:700; font-family:'JetBrains Mono',monospace; }
 .summary-card .meta { font-size:11px; color:var(--text-dim); margin-top:4px; }
@@ -174,6 +176,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 
 /* Economy card */
 .econ-card { background:var(--bg-white); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:18px 22px; margin-bottom:20px; box-shadow:var(--shadow-sm); }
+.econ-card > .collapse-toggle { margin:-18px -22px 14px; border-radius:var(--radius-lg) var(--radius-lg) 0 0; border:none; border-bottom:1px solid var(--border-light); }
+.econ-card > .collapse-toggle:not(.expanded) { margin-bottom:-18px; border-radius:var(--radius-lg); border-bottom:none; }
 .econ-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid var(--border-light); }
 .econ-card-title { font-size:13px; font-weight:700; color:var(--navy); display:flex; align-items:center; gap:6px; }
 .econ-card-sub { font-size:11px; color:var(--text-dim); font-weight:500; }
@@ -203,16 +207,6 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .econ-kalkyle-footer { margin-top:16px; padding-top:12px; border-top:1px dashed var(--border-light); font-size:11px; color:var(--text-dim); display:flex; align-items:center; gap:8px; }
 .econ-kalkyle-footer strong { color:var(--text-secondary); font-family:'JetBrains Mono',monospace; font-weight:600; }
 .econ-kalkyle-sep { color:var(--border); }
-.prognose-traff-section { margin-top:16px; padding-top:16px; border-top:1px dashed var(--border-light); }
-.prognose-traff-empty { background:var(--bg-page); padding:14px; border-radius:var(--radius-sm); font-size:11px; color:var(--text-secondary); line-height:1.5; font-style:italic; }
-.prognose-traff-table { border:1px solid var(--border-light); border-radius:var(--radius-sm); overflow:hidden; margin-top:4px; }
-.ptt-head { display:grid; grid-template-columns:1fr 1fr 1.2fr 1.3fr 0.8fr; background:var(--bg-page); padding:8px 12px; font-size:10px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.4px; border-bottom:1px solid var(--border-light); }
-.ptt-row { display:grid; grid-template-columns:1fr 1fr 1.2fr 1.3fr 0.8fr; padding:10px 12px; font-size:12px; color:var(--text-primary); border-bottom:1px solid var(--border-light); align-items:center; }
-.ptt-row:last-child { border-bottom:none; }
-.ptt-mono { font-family:'JetBrains Mono',monospace; font-weight:500; font-size:12px; }
-.ptt-mono.green { color:var(--green); }
-.ptt-mono.yellow { color:var(--yellow-text); }
-.ptt-mono.red { color:var(--red); }
 .trend-card { background:var(--bg-card); border:1px solid var(--border-light); border-radius:var(--radius); padding:18px 20px 14px; margin-bottom:20px; }
 .trend-card-header { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px; flex-wrap:wrap; gap:6px; }
 .trend-card-title { font-size:13px; font-weight:600; color:var(--text-primary); display:flex; align-items:center; gap:6px; }
@@ -221,6 +215,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .tl-item { display:inline-flex; align-items:center; gap:6px; }
 .tl-line { display:inline-block; width:18px; height:2px; border-radius:1px; }
 .tl-bar { display:inline-block; width:10px; height:10px; border-radius:1px; }
+.tl-diamond { display:inline-block; width:10px; height:10px; background:#6E4393; transform:rotate(45deg); border-radius:1px; }
 .trend-svg-wrap { width:100%; overflow:hidden; margin-top:4px; }
 .trend-empty { padding:32px 12px; text-align:center; font-size:12px; color:var(--text-dim); background:var(--bg-page); border-radius:var(--radius-sm); }
 .kpi-section-header { margin:4px 0 14px; padding-bottom:10px; border-bottom:2px solid var(--border-light); }
@@ -277,6 +272,36 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .ai-mod-inprogress-body { font-size:12px; color:var(--text-secondary); line-height:1.5; }
 .ai-mod-empty { background:var(--bg-page); padding:12px; border-radius:var(--radius-sm); font-size:12px; color:var(--text-dim); font-style:italic; }
 .ai-mod-disclaimer { margin-top:14px; padding:9px 13px; background:var(--bg-page); border-radius:var(--radius-sm); font-size:11px; color:var(--text-dim); font-style:italic; text-align:center; }
+/* AI modal tabs */
+.ai-tab-bar { display:flex; gap:0; margin-top:12px; border-bottom:2px solid var(--border-light); }
+.ai-tab { padding:8px 16px; font-size:12px; font-weight:600; color:var(--text-dim); background:none; border:none; cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; margin-bottom:-2px; transition:all 0.12s; }
+.ai-tab:hover { color:var(--text-secondary); }
+.ai-tab.active { color:#6E4393; border-bottom-color:#6E4393; }
+.ai-tab-content.hidden { display:none; }
+.ai-mod-sub-section { margin-top:18px; padding-top:14px; border-top:1px dashed var(--border-light); }
+.ai-mod-sub-title { font-size:12px; font-weight:700; color:var(--text-primary); margin-bottom:8px; }
+/* Chat interface */
+.ai-chat-wrap { display:flex; flex-direction:column; height:100%; min-height:340px; }
+.ai-chat-messages { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:12px; padding:4px 0 12px; min-height:260px; max-height:50vh; }
+.ai-chat-msg { display:flex; gap:8px; align-items:flex-start; }
+.ai-chat-msg.user { justify-content:flex-end; }
+.ai-chat-avatar { flex-shrink:0; margin-top:2px; }
+.ai-chat-bubble { max-width:80%; padding:10px 14px; border-radius:12px; font-size:13px; line-height:1.55; }
+.ai-chat-bubble.ai { background:#F6F1FA; color:var(--text-primary); border-top-left-radius:4px; }
+.ai-chat-bubble.user { background:var(--tb-orange); color:#FFFFFF; border-top-right-radius:4px; }
+.ai-chat-input-wrap { display:flex; gap:8px; margin-top:8px; padding-top:12px; border-top:1px solid var(--border-light); }
+.ai-chat-input { flex:1; padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13px; font-family:inherit; background:#FFFFFF; color:var(--text-primary); }
+.ai-chat-input:focus { outline:none; border-color:#6E4393; }
+.ai-chat-input::placeholder { color:var(--text-dim); }
+.ai-chat-send { width:40px; height:40px; border-radius:var(--radius-sm); background:#6E4393; color:#FFFFFF; border:none; font-size:16px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:inherit; transition:background 0.15s; }
+.ai-chat-send:hover { background:#593579; }
+.ai-chat-proto-note { text-align:center; font-size:10px; color:var(--text-dim); margin-top:8px; font-style:italic; }
+/* Typing dots animation */
+.ai-typing-dots { display:inline-flex; gap:3px; padding:0 4px; }
+.ai-typing-dots span { width:6px; height:6px; background:#6E4393; border-radius:50%; display:inline-block; animation:typingDot 1.2s infinite; }
+.ai-typing-dots span:nth-child(2) { animation-delay:0.2s; }
+.ai-typing-dots span:nth-child(3) { animation-delay:0.4s; }
+@keyframes typingDot { 0%,60%,100% { opacity:0.3; transform:translateY(0); } 30% { opacity:1; transform:translateY(-4px); } }
 .review-open-banner { display:flex; gap:14px; padding:14px 18px; background:#FEF3E2; border:1px solid #F4C27A; border-radius:var(--radius); margin-bottom:16px; align-items:center; }
 .rob-icon { font-size:22px; }
 .rob-title { font-size:13px; font-weight:700; color:#8C5A18; }
@@ -325,8 +350,15 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .wt-data-cell { background:var(--bg-page); padding:10px 14px; }
 .wt-data-k { font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; font-weight:600; margin-bottom:4px; }
 .wt-data-v { font-family:'JetBrains Mono',monospace; font-weight:600; color:var(--text-primary); font-size:13px; }
+.wt-data-prev { font-size:10px; color:var(--text-dim); margin-top:4px; font-style:italic; }
+.wt-notes-label { font-size:11px; font-weight:700; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; margin-top:4px; }
+.wt-required { color:var(--red); font-weight:700; }
 .wt-notes { width:100%; min-height:70px; padding:10px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-family:inherit; font-size:12px; color:var(--text-primary); resize:vertical; background:#FFFFFF; }
 .wt-notes:focus { outline:none; border-color:var(--tb-orange); }
+.wt-notes.wt-error { border-color:var(--red); background:#FEF2F2; }
+.wt-notes.wt-error:focus { border-color:var(--red); }
+.wt-field-label { font-size:10px; font-weight:600; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; margin-top:6px; }
+.wt-meeting { border-left:3px solid #6E4393; }
 .wizard-cf-item { background:var(--bg-page); padding:10px 14px; border-radius:var(--radius-sm); margin-bottom:8px; border-left:3px solid var(--yellow); transition:border-color 0.15s; }
 .wizard-cf-item.cf-fullført { border-left-color:var(--green); opacity:0.75; }
 .wizard-cf-item.cf-droppet { border-left-color:var(--text-dim); opacity:0.55; }
@@ -335,7 +367,12 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .wcf-actions { display:flex; gap:6px; margin-top:8px; }
 .wcf-btn { padding:4px 10px; font-size:11px; border:1px solid var(--border); background:var(--bg-card); border-radius:4px; cursor:pointer; color:var(--text-secondary); font-family:inherit; }
 .wcf-btn:hover { background:var(--bg-page); color:var(--text-primary); }
+.wcf-btn.active { background:var(--text-primary); color:#FFFFFF; border-color:var(--text-primary); }
+.wcf-btn.danger.active { background:var(--red); color:#FFFFFF; border-color:var(--red); }
 .wcf-btn.danger:hover { color:var(--red); border-color:var(--red); }
+.wcf-comment-wrap { margin-top:8px; }
+.wcf-comment { width:100%; padding:7px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:12px; font-family:inherit; color:var(--text-primary); background:#FFFFFF; }
+.wcf-comment:focus { outline:none; border-color:var(--tb-orange); }
 .wd-row { display:grid; grid-template-columns:1fr 140px 140px 32px; gap:8px; margin-bottom:8px; }
 .wd-row input, .wd-row select { padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:12px; font-family:inherit; background:#FFFFFF; color:var(--text-primary); }
 .wd-row input:focus, .wd-row select:focus { outline:none; border-color:var(--tb-orange); }
@@ -348,9 +385,22 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .btn.btn-secondary { background:#FFFFFF; color:var(--text-primary); border:1px solid var(--border); }
 .btn.btn-secondary:hover { background:var(--bg-page); border-color:var(--text-secondary); }
 /* Review CTA grid (2 types) */
-.review-cta-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+.review-cta-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; align-items:start; }
+.review-cta-col { display:flex; flex-direction:column; }
 .review-cta-card { background:#FFFFFF; border:1px solid var(--border-light); border-radius:var(--radius); padding:18px; display:flex; flex-direction:column; }
 .review-cta-card.has-draft { background:#FEF9EF; border-color:#F4C27A; }
+/* Review history table */
+.review-history { margin-top:10px; }
+.rh-title { font-size:10px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; padding-left:2px; }
+.rh-table { width:100%; border-collapse:collapse; font-size:11px; }
+.rh-table thead th { font-size:9px; font-weight:600; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.4px; text-align:left; padding:4px 8px; border-bottom:1px solid var(--border-light); }
+.rh-row { cursor:pointer; transition:background 0.1s; }
+.rh-row:hover { background:var(--bg-page); }
+.rh-row td { padding:7px 8px; border-bottom:1px solid var(--border-light); color:var(--text-secondary); }
+.rh-date { font-weight:600; color:var(--text-primary); white-space:nowrap; }
+.rh-period { color:var(--text-dim); }
+.rh-open { color:var(--tb-orange); font-weight:600; }
+.rh-who { color:var(--text-dim); }
 .rcc-head { display:flex; gap:12px; align-items:flex-start; margin-bottom:10px; }
 .rcc-icon { font-size:22px; }
 .rcc-title { font-size:13px; font-weight:700; color:var(--text-primary); }
@@ -621,16 +671,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .kalkyle-cell .kc-value { font-size:16px; font-weight:600; font-family:'JetBrains Mono',monospace; }
 .kalkyle-cell .kc-sub { font-size:10px; color:var(--text-dim); margin-top:2px; }
 
-.password-gate { position:fixed; inset:0; background:var(--bg-page); display:flex; align-items:center; justify-content:center; z-index:9999; }
-.password-gate.hidden { display:none; }
-.password-box { text-align:center; }
-.password-box .logo-gate svg { width:56px; height:56px; margin-bottom:20px; }
-.password-box h2 { font-size:18px; font-weight:700; margin-bottom:2px; }
-.password-box h2 em { font-style:normal; color:var(--tb-orange); }
-.password-box p { font-size:13px; color:var(--text-secondary); margin-bottom:20px; }
-.password-box input { width:240px; padding:10px 16px; background:var(--bg-white); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text-primary); font-size:14px; font-family:inherit; text-align:center; outline:none; box-shadow:var(--shadow-sm); }
-.password-box input:focus { border-color:var(--tb-orange); }
-.password-box .error { color:var(--red); font-size:12px; margin-top:8px; display:none; }
+
 
 @media (max-width:1100px) {
   .kpi-grid { grid-template-columns:repeat(2,1fr); }
@@ -772,39 +813,17 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 <body>
 <svg style="display:none"><symbol id="tb-logo" viewBox="0 0 100 90"><rect x="8" y="4" width="84" height="18" rx="2" fill="#E87722"/><rect x="8" y="30" width="36" height="56" rx="2" fill="#E87722"/><rect x="56" y="30" width="36" height="56" rx="2" fill="#E87722"/></symbol></svg>
 
-<div class="password-gate" id="gate"><div class="password-box"><div class="logo-gate"><svg viewBox="0 0 100 90"><use href="#tb-logo"/></svg></div><h2><em>TOTAL</em>Kontroll</h2><p>Ledelsessystem — DEMO</p><input type="password" id="pw" placeholder="Passord" autocomplete="off"><div class="error" id="pwError">Feil passord</div></div></div>
+<script src="tk-nav.js"></script>
+<div id="app">
 
-<div id="app" style="display:none;">
-<nav class="sidebar">
-  <div class="sidebar-logo"><svg class="logo-svg" viewBox="0 0 100 90"><use href="#tb-logo"/></svg><div class="logo-text"><span class="brand"><em>TOTAL</em>Kontroll</span><span class="sub">Ledelsessystem</span></div></div>
-  <div class="sidebar-nav">
-    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Min side</div>
-    <div class="nav-item" onclick="window.open('TOTALKontroll_Salg_PoC.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> Salg</div>
-    <div class="nav-sub">
-      <div class="nav-item" onclick="window.open('TOTALKontroll_Muligheter.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Muligheter</div>
-      <div class="nav-item" onclick="window.open('TOTALKontroll_Markedsanalyse.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> Markedsanalyse</div>
-    </div>
-    <div class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Prosjekt</div>
-    <div class="nav-sub">
-      <div class="nav-item" onclick="window.open('TOTALKontroll_Fremdriftsplan.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Fremdriftsplan</div>
-      <div class="nav-item" onclick="window.open('TOTALKontroll_Baerekraft_PoC.html','_self')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/></svg> Bærekraft</div>
-    </div>
-    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Håndbok</div>
-  </div>
-  <div class="sidebar-footer" style="color:var(--text-inverse-muted);font-size:11px;font-weight:500;position:relative;">
-    <div onclick="baneEasterEgg()" style="position:absolute;top:-18px;left:0;right:0;height:18px;cursor:default;" title=""></div>
-    Konseptvisning, kun demo data
-  </div>
-</nav>
-
-<main class="main">
+<main class="main" style="position:relative;">
+  <div onclick="baneEasterEgg()" style="position:absolute;top:0;left:0;width:28px;height:28px;cursor:default;z-index:50;" title=""></div>
   <div class="overview-page" id="overviewPage">
     <div class="topbar"><div class="topbar-breadcrumb">TOTALKontroll <span style="color:var(--text-dim)">/</span> <span class="current">Prosjektoversikt</span></div><div class="topbar-right"><div id="overviewPeriod"></div></div></div>
     <div class="content">
       <div id="overviewBanner"></div>
       <div class="page-header"><div><div class="page-title">Prosjektoversikt</div><div class="page-subtitle" id="overviewSubtitle"></div></div><div class="filter-bar" id="filterBar"></div></div>
-      <div class="summary-health" id="summaryHealth"></div>
-      <div class="summary-strip" id="summaryStrip"></div>
+      <div class="summary-row" id="summaryRow"></div>
       <div id="economyPortfolio"></div>
       <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
         <button class="update-kpi-btn" onclick="showReportPage()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Oppdater KPI-data</button>
@@ -943,9 +962,6 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 </div>
 
 <script>
-if(sessionStorage.getItem('tk_auth')==='1'){document.getElementById('gate').classList.add('hidden');document.getElementById('app').style.display='';}
-document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter'){if(e.target.value==='DF2026'){sessionStorage.setItem('tk_auth','1');document.getElementById('gate').classList.add('hidden');document.getElementById('app').style.display='';}else{document.getElementById('pwError').style.display='block';e.target.value='';}}});
-
 const projects=[
   {id:'p1',name:'Forus Kontorpark Bygg D',pnr:'P-2024-018',type:'TE Næring',cat:'te-naering',leader:'Lars Vestbø',phase:'Produksjon',customer:'Vestpark Utvikling AS',contractValue:'145 MNOK',plannedEnd:'Nov 2026',
    fremdrift:{pct:78,weeksOff:-4,label:'4 uker bak plan'},likviditet:{pct:12.3,inntekt:'112 MNOK',utgift:'98 MNOK'},hms:{open:5,highRisk:1,trend:'↑',sjaStatus:'92%',lastRound:'2. apr'},faktura:{total:8,overdue:3,avgDays:11,byRole:[{role:'Prosjektleder',count:3},{role:'Anleggsleder',count:3},{role:'Økonomi',count:2}]},indeks:{value:1.04,forecast:'150.8 MNOK',contractVsPrognose:'+3.8%'},kalkyle:{kalkulert:'138.2 MNOK',prognose:'142.5 MNOK',sistPrognose:'140.1 MNOK',type:'Totalentreprise + betong'},targets:{fremdriftUker:2,likviditetPct:15,bidragMinPct:10,hmsMax:3,fakturaMax:5}},
@@ -1097,60 +1113,64 @@ function renderEconomyPortfolio(projectList, month) {
 
   el.innerHTML = `
     <div class="econ-card" style="margin-top:4px;margin-bottom:24px">
-      <div class="econ-card-header">
-        <div class="econ-card-title"><span style="font-size:14px">💰</span> Økonomi — aggregert portefølje</div>
-        <div class="econ-card-sub">Kilde: Byggoffice · ${rows.length} prosjekter med registrert økonomi</div>
+      <div class="collapse-toggle" onclick="toggleCollapse(this)">
+        <span class="chev">▶</span>
+        <span class="ct-label"><span style="font-size:14px">💰</span> Økonomi — aggregert portefølje</span>
+        <span class="ct-hint">Bidrag ${bidragPct}% · Risiko ${risikoPct}% · Endringer ${sumEndrUnderValue} MNOK under behandling</span>
       </div>
-      <div class="econ-section-label">Status</div>
-      <div class="econ-grid" style="grid-template-columns:repeat(5,1fr)">
-        <div class="econ-cell">
-          <div class="econ-label">Kontraktsverdi</div>
-          <div><span class="econ-value">${totalKontrakt}</span><span class="econ-unit">MNOK</span></div>
-          <div class="econ-meta">Samlet portefølje</div>
+      <div class="collapsed-content">
+        <div class="econ-card-sub" style="margin:-4px 0 12px; font-size:11px; color:var(--text-dim)">Kilde: Byggoffice · ${rows.length} prosjekter med registrert økonomi</div>
+        <div class="econ-section-label">Status</div>
+        <div class="econ-grid" style="grid-template-columns:repeat(5,1fr)">
+          <div class="econ-cell">
+            <div class="econ-label">Kontraktsverdi</div>
+            <div><span class="econ-value">${totalKontrakt}</span><span class="econ-unit">MNOK</span></div>
+            <div class="econ-meta">Samlet portefølje</div>
+          </div>
+          <div class="econ-cell">
+            <div class="econ-label">Inntekt</div>
+            <div><span class="econ-value">${sumInntekt}</span><span class="econ-unit">MNOK</span></div>
+            <div class="econ-meta">Påløpt på tvers</div>
+          </div>
+          <div class="econ-cell">
+            <div class="econ-label">Kost</div>
+            <div><span class="econ-value">${sumKost}</span><span class="econ-unit">MNOK</span></div>
+            <div class="econ-meta">Påløpt på tvers</div>
+          </div>
+          <div class="econ-cell">
+            <div class="econ-label">Bidrag</div>
+            <div><span class="econ-value ${bidragColor}">${sumBidrag}</span><span class="econ-unit">MNOK</span></div>
+            <div class="econ-meta">${bidragPct}% bidragsprosent</div>
+          </div>
+          <div class="econ-cell">
+            <div class="econ-label">Risiko / buffer</div>
+            <div><span class="econ-value ${riskColor}">${sumRisiko}</span><span class="econ-unit">MNOK</span></div>
+            <div class="econ-meta">${risikoPct}% av inntekt${atRisk>0?` · ${atRisk} under terskel`:''}</div>
+          </div>
         </div>
-        <div class="econ-cell">
-          <div class="econ-label">Inntekt</div>
-          <div><span class="econ-value">${sumInntekt}</span><span class="econ-unit">MNOK</span></div>
-          <div class="econ-meta">Påløpt på tvers</div>
-        </div>
-        <div class="econ-cell">
-          <div class="econ-label">Kost</div>
-          <div><span class="econ-value">${sumKost}</span><span class="econ-unit">MNOK</span></div>
-          <div class="econ-meta">Påløpt på tvers</div>
-        </div>
-        <div class="econ-cell">
-          <div class="econ-label">Bidrag</div>
-          <div><span class="econ-value ${bidragColor}">${sumBidrag}</span><span class="econ-unit">MNOK</span></div>
-          <div class="econ-meta">${bidragPct}% bidragsprosent</div>
-        </div>
-        <div class="econ-cell">
-          <div class="econ-label">Risiko / buffer</div>
-          <div><span class="econ-value ${riskColor}">${sumRisiko}</span><span class="econ-unit">MNOK</span></div>
-          <div class="econ-meta">${risikoPct}% av inntekt${atRisk>0?` · ${atRisk} under terskel`:''}</div>
-        </div>
-      </div>
-      <div class="econ-divider"></div>
-      <div class="econ-section-label">Endringer fra byggherre</div>
-      <div class="econ-grid" style="grid-template-columns:repeat(4,1fr)">
-        <div class="econ-cell">
-          <div class="econ-label">Registrerte endringer</div>
-          <div><span class="econ-value">${sumEndrValue}</span><span class="econ-unit">MNOK</span></div>
-          <div class="econ-meta">${sumEndrTotal} stk i ${projWithEndr} prosjekter</div>
-        </div>
-        <div class="econ-cell">
-          <div class="econ-label">Godkjent</div>
-          <div><span class="econ-value ${endrColor}">${sumEndrGodkjentValue}</span><span class="econ-unit">MNOK</span></div>
-          <div class="econ-meta">${sumEndrGodkjent} stk · ${godkjRateValue}% av verdi</div>
-        </div>
-        <div class="econ-cell">
-          <div class="econ-label">Under behandling</div>
-          <div><span class="econ-value ${sumEndrUnder>0?'yellow':''}">${sumEndrUnderValue}</span><span class="econ-unit">MNOK</span></div>
-          <div class="econ-meta">${sumEndrUnder} stk venter på svar</div>
-        </div>
-        <div class="econ-cell">
-          <div class="econ-label">Godkjenningsgrad</div>
-          <div><span class="econ-value ${endrColor}">${godkjRateValue}</span><span class="econ-unit">%</span></div>
-          <div class="econ-progress" style="margin-top:6px"><div class="econ-progress-fill ${endrColor}" style="width:${godkjRateValue}%"></div></div>
+        <div class="econ-divider"></div>
+        <div class="econ-section-label">Endringer fra byggherre</div>
+        <div class="econ-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="econ-cell">
+            <div class="econ-label">Registrerte endringer</div>
+            <div><span class="econ-value">${sumEndrValue}</span><span class="econ-unit">MNOK</span></div>
+            <div class="econ-meta">${sumEndrTotal} stk i ${projWithEndr} prosjekter</div>
+          </div>
+          <div class="econ-cell">
+            <div class="econ-label">Godkjent</div>
+            <div><span class="econ-value ${endrColor}">${sumEndrGodkjentValue}</span><span class="econ-unit">MNOK</span></div>
+            <div class="econ-meta">${sumEndrGodkjent} stk · ${godkjRateValue}% av verdi</div>
+          </div>
+          <div class="econ-cell">
+            <div class="econ-label">Under behandling</div>
+            <div><span class="econ-value ${sumEndrUnder>0?'yellow':''}">${sumEndrUnderValue}</span><span class="econ-unit">MNOK</span></div>
+            <div class="econ-meta">${sumEndrUnder} stk venter på svar</div>
+          </div>
+          <div class="econ-cell">
+            <div class="econ-label">Godkjenningsgrad</div>
+            <div><span class="econ-value ${endrColor}">${godkjRateValue}</span><span class="econ-unit">%</span></div>
+            <div class="econ-progress" style="margin-top:6px"><div class="econ-progress-fill ${endrColor}" style="width:${godkjRateValue}%"></div></div>
+          </div>
         </div>
       </div>
     </div>`;
@@ -1186,14 +1206,24 @@ function renderOverview(){
   const avgBidrag = totInn > 0 ? +((totBid/totInn)*100).toFixed(1) : 0;
   const bidColor = avgBidrag>=10?'green':avgBidrag>=5?'yellow':'red';
 
-  document.getElementById('summaryHealth').innerHTML=`
-    <div class="sh-score ${ar}">${avg}</div>
-    <div><div class="sh-label">Porteføljehelse</div><div class="sh-meta">Snitt ${filtered.length} prosjekter, beregnet fra 4 KPI-er under</div></div>`;
-  document.getElementById('summaryStrip').innerHTML=`
-    <div class="summary-card"><div class="label">HMS — åpne avvik</div><div class="value ${totalHms>15?'red':totalHms>8?'yellow':'green'}">${totalHms}</div><div class="meta">Totalt på tvers</div></div>
-    <div class="summary-card"><div class="label">Fremdrift</div><div class="value ${behindPlan>filtered.length/2?'red':behindPlan>0?'yellow':'green'}">${behindPlan} av ${filtered.length}</div><div class="meta">Prosjekter bak plan</div></div>
-    <div class="summary-card"><div class="label">Bidrag</div><div class="value ${bidColor}">${avgBidrag}%</div><div class="meta">Vektet snitt portefølje</div></div>
-    <div class="summary-card"><div class="label">Fakturaflyt</div><div class="value ${totalFaktura>30?'red':totalFaktura>15?'yellow':'green'}">${totalFaktura}</div><div class="meta">Ubehandlede totalt</div></div>`;
+  const scoreCirc = 2 * Math.PI * 38;
+  const scoreOff = scoreCirc * (1 - avg/100);
+  const scoreColor = ar==='green'?'var(--green)':ar==='yellow'?'var(--yellow)':'var(--red)';
+  document.getElementById('summaryRow').innerHTML=`
+    <div class="summary-score-box">
+      <div class="health-score-ring portfolio-ring">
+        <svg viewBox="0 0 84 84"><circle class="ring-bg" cx="42" cy="42" r="38"/><circle class="ring-fg" cx="42" cy="42" r="38" style="stroke:${scoreColor};stroke-dasharray:${scoreCirc};stroke-dashoffset:${scoreOff}"/></svg>
+        <div class="score-text" style="color:${scoreColor}">${avg}</div>
+      </div>
+      <div class="sh-label">Porteføljehelse</div>
+      <div class="sh-meta">Snitt ${filtered.length} prosjekter</div>
+    </div>
+    <div class="summary-strip">
+      <div class="summary-card"><div class="label">HMS — åpne avvik</div><div class="value ${totalHms>15?'red':totalHms>8?'yellow':'green'}">${totalHms}</div><div class="meta">Totalt på tvers</div></div>
+      <div class="summary-card"><div class="label">Fremdrift</div><div class="value ${behindPlan>filtered.length/2?'red':behindPlan>0?'yellow':'green'}">${behindPlan} av ${filtered.length}</div><div class="meta">Prosjekter bak plan</div></div>
+      <div class="summary-card"><div class="label">Bidrag</div><div class="value ${bidColor}">${avgBidrag}%</div><div class="meta">Vektet snitt portefølje</div></div>
+      <div class="summary-card"><div class="label">Fakturaflyt</div><div class="value ${totalFaktura>30?'red':totalFaktura>15?'yellow':'green'}">${totalFaktura}</div><div class="meta">Ubehandlede totalt</div></div>
+    </div>`;
   // Economy portfolio aggregate
   renderEconomyPortfolio(filtered, '2026-04');
   document.getElementById('projectTableBody').innerHTML=sorted.map(p=>{
@@ -1351,6 +1381,36 @@ function renderTrendCard(p) {
     return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="8" height="${bh.toFixed(1)}" fill="#B89BD9" opacity="0.75" rx="1"><title>${MONTH_LABELS[h.month]}: +${h.endrGodkjentValue} MNOK endringer godkjent</title></rect>`;
   }).join('');
 
+  // Locked prognose markers from godkjent economy reviews
+  const lockedProgReviews = (projectReviews[p.id] || []).filter(r => r.type === 'economy' && r.status === 'godkjent' && r.prognoseLock);
+  const lockedMarkers = lockedProgReviews.map(r => {
+    const monthIdx = allMonths.indexOf(r.prognoseLock.period);
+    if (monthIdx < 0) return '';
+    const lockedVal = r.prognoseLock.value;
+    const x = xAt(monthIdx);
+    const y = yAt(lockedVal);
+    // Compare to actual prognose for that same period in punchStore
+    const actualProg = store[r.prognoseLock.period]?.kalPrognose;
+    let markerColor = '#6E4393'; // default lilla
+    let treffLabel = '';
+    if (actualProg != null) {
+      const diffPct = Math.abs((actualProg - lockedVal) / lockedVal * 100);
+      markerColor = diffPct <= 2 ? 'var(--green)' : diffPct <= 5 ? 'var(--yellow)' : 'var(--red)';
+      treffLabel = diffPct <= 2 ? '✓' : diffPct <= 5 ? '~' : '✗';
+    }
+    // Diamond shape (rotated square)
+    const s = 6;
+    return `
+      <g>
+        <polygon points="${x},${y-s} ${x+s},${y} ${x},${y+s} ${x-s},${y}" fill="${markerColor}" stroke="#fff" stroke-width="1.5"/>
+        <text x="${x}" y="${y-s-5}" text-anchor="middle" font-size="9" font-weight="700" fill="${markerColor}" font-family="JetBrains Mono, monospace">${lockedVal}</text>
+        <rect x="${x-xStep/2}" y="${y-s-8}" width="${xStep}" height="${2*s+16}" fill="transparent">
+          <title>Låst prognose ${monthLabel(r.prognoseLock.period)}: ${lockedVal} MNOK\nLåst av ${r.prognoseLock.lockedBy}${actualProg != null ? `\nFaktisk prognose: ${actualProg} MNOK\nAvvik: ${Math.abs(+(actualProg-lockedVal).toFixed(1))} MNOK` : ''}</title>
+        </rect>
+      </g>`;
+  }).join('');
+  const hasLockedMarkers = lockedProgReviews.length > 0;
+
   // Data point circles with tooltips
   const points = history.map((h, i) => `
     <g class="trend-pt">
@@ -1387,6 +1447,7 @@ function renderTrendCard(p) {
         <span class="tl-item"><span class="tl-line" style="background:var(--tb-orange)"></span>Prognose</span>
         <span class="tl-item"><span class="tl-line" style="background:var(--tb-orange);height:2px;background-image:repeating-linear-gradient(90deg,var(--tb-orange) 0 4px,transparent 4px 8px);"></span>Projeksjon</span>
         <span class="tl-item"><span class="tl-bar" style="background:#B89BD9"></span>Endringer godkjent</span>
+        ${hasLockedMarkers ? '<span class="tl-item"><span class="tl-diamond"></span>Låst prognose</span>' : ''}
       </div>
       <div class="trend-svg-wrap">
         <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" width="100%" style="display:block">
@@ -1399,82 +1460,12 @@ function renderTrendCard(p) {
           <path d="${prognosePath}" fill="none" stroke="var(--tb-orange)" stroke-width="2"/>
           <path d="${prognoseFuture}" fill="none" stroke="var(--tb-orange)" stroke-width="2" stroke-dasharray="5 4"/>
           ${points}
+          ${lockedMarkers}
           ${xLabels}
           <text x="${PAD_L-30}" y="${(PAD_T+PH/2).toFixed(1)}" text-anchor="middle" font-size="9" fill="var(--text-dim)" font-family="DM Sans" transform="rotate(-90 ${PAD_L-30} ${(PAD_T+PH/2).toFixed(1)})">MNOK</text>
         </svg>
       </div>
     </div>
-    </div>`;
-}
-
-function renderPrognoseTraff(p) {
-  // Pull all locked prognoses from godkjente economy reviews, chronological
-  const reviews = (projectReviews[p.id] || []).filter(r => r.type === 'economy' && r.status === 'godkjent' && r.prognoseLock);
-  if (reviews.length === 0) {
-    return `
-      <div class="prognose-traff-section">
-        <div class="collapse-toggle" onclick="toggleCollapse(this)">
-          <span class="chev">▶</span>
-          <span class="ct-label">🎯 Prognosetreff historisk</span>
-          <span class="ct-hint">Ingen låste prognoser ennå</span>
-        </div>
-        <div class="collapsed-content">
-          <div class="prognose-traff-empty">Prognoser som låses i økonomigjennomgangen sammenlignes med faktiske tall neste måned. Over tid bygger dette en treffrate som hjelper å identifisere systematiske prognoseavvik.</div>
-        </div>
-      </div>`;
-  }
-  // Sort by period ascending
-  const sorted = [...reviews].sort((a,b) => a.period.localeCompare(b.period));
-  // For each locked prognose, find the "actual" — use the prognose recorded in the *next* period as proxy
-  // (in production would compare to realized inntekt+remaining budget)
-  const rows = sorted.map((r, i) => {
-    const locked = r.prognoseLock.value;
-    // Find next period's prognose in punchStore
-    const nextPer = addMonthStr(r.period);
-    const nextPs = punchStore[p.id]?.[nextPer];
-    const actual = nextPs?.kalPrognose;
-    let diff = null, pct = null, status = null;
-    if (actual != null) {
-      diff = +(actual - locked).toFixed(1);
-      pct = +((diff / locked) * 100).toFixed(1);
-      const absPct = Math.abs(pct);
-      status = absPct <= 2 ? 'green' : absPct <= 5 ? 'yellow' : 'red';
-    }
-    return { period: r.period, locked, actual, diff, pct, status, lockedBy: r.prognoseLock.lockedBy };
-  });
-  // Aggregate treffrate
-  const evaluated = rows.filter(r => r.status);
-  const greens = evaluated.filter(r => r.status === 'green').length;
-  const treffrate = evaluated.length > 0 ? Math.round((greens/evaluated.length)*100) : null;
-
-  const hint = treffrate != null ? `${greens} av ${evaluated.length} innenfor ±2% · treffrate ${treffrate}%` : 'Bygges opp over tid';
-
-  return `
-    <div class="prognose-traff-section">
-      <div class="collapse-toggle" onclick="toggleCollapse(this)">
-        <span class="chev">▶</span>
-        <span class="ct-label">🎯 Prognosetreff historisk</span>
-        <span class="ct-hint">${hint}</span>
-      </div>
-      <div class="collapsed-content">
-        <div class="prognose-traff-table">
-          <div class="ptt-head">
-            <div>Periode</div>
-            <div>Låst prognose</div>
-            <div>Faktisk (neste periode)</div>
-            <div>Avvik</div>
-            <div>Treff</div>
-          </div>
-          ${rows.map(r => `
-            <div class="ptt-row">
-              <div>${monthLabel(r.period)}</div>
-              <div class="ptt-mono">${r.locked} MNOK</div>
-              <div class="ptt-mono">${r.actual != null ? r.actual + ' MNOK' : '—'}</div>
-              <div class="ptt-mono ${r.status || ''}">${r.diff != null ? (r.diff>=0?'+':'') + r.diff + ' MNOK (' + (r.pct>=0?'+':'') + r.pct + '%)' : 'Venter'}</div>
-              <div>${r.status ? (r.status==='green'?'✓ Godt':(r.status==='yellow'?'⚠ Delvis':'✗ Bommet')) : '—'}</div>
-            </div>`).join('')}
-        </div>
-      </div>
     </div>`;
 }
 
@@ -1602,7 +1593,6 @@ function renderDetailKpis(p){
             </div>
           </div>
         </div>
-        ${renderPrognoseTraff(p)}
         <div class="econ-kalkyle-footer">
           <span>Opprinnelig kalkyle: <strong>${p.kalkyle.kalkulert}</strong></span>
           <span class="econ-kalkyle-sep">·</span>
@@ -1818,6 +1808,7 @@ function exitReviewReadonly() {
   renderBreadcrumb();
 }
 
+
 // ── Seen state (per session, simulates persistent read-status) ──
 const seenLogCounts = {};
 
@@ -1980,18 +1971,24 @@ projectReviews['p1'] = [
     carryForward: [],
     themes: [
       { id: 't1', title: 'Prognose og bidrag', question: 'Er prognosen realistisk, og har vi nok risiko/buffer igjen?',
-        notes: 'Prognose oppjustert med 2,4 MNOK pga. forsinket støpeplan. Bidrag på 9,8% — under mål på 10%. Risiko tynn.', tags: ['prognose','economy'] },
+        notes: 'Prognose oppjustert med 2,4 MNOK pga. forsinket støpeplan. Bidrag på 9,8% — under mål på 10%. Risiko tynn.',
+        meetingNotes: 'Kurt kommenterte at bidragsmarginen er for lav. Enighet om at Roar må stramme inn kost-prognosen og gjøre ny vurdering innen 1. april. Silje tar kontakt med byggherre om utestående endringer.',
+        tags: ['prognose','economy'] },
       { id: 't2', title: 'Endringer fra byggherre', question: 'Status på godkjenning, påvirkning på likviditet?',
-        notes: 'To endringer ubesvart i 6+ uker (1,8 MNOK). Byggherre har bedt om møte 24. april.', tags: ['endringer','byggherre'] },
+        notes: 'To endringer ubesvart i 6+ uker (1,8 MNOK). Byggherre har bedt om møte 24. april.',
+        meetingNotes: 'Besluttet å eskalere til byggherre-ledelsen hvis ikke avklart innen 25. april. Silje dokumenterer likviditetskonsekvens som forhandlingsgrunnlag.',
+        tags: ['endringer','byggherre'] },
       { id: 't3', title: 'Faktura- og likviditetsstatus', question: 'Er det noen uregelmessigheter i kontantstrøm?',
-        notes: 'Ubehandlede fakturaer 8 totalt, 3 over frist. Må følges opp av Roar.', tags: ['economy'] }
+        notes: 'Ubehandlede fakturaer 8 totalt, 3 over frist. Må følges opp av Roar.',
+        meetingNotes: 'Roar tar ansvar for å rydde opp i de 3 forfallne fakturaene denne uken. Ny rutine: ukentlig gjennomgang av fakturastatus.',
+        tags: ['economy'] }
     ],
     decisions: [
       { id: 'd1', text: 'Avtale møte med byggherre om 2 utestående endringer før 25. april', owner: 'Roar Mæland', dueDate: '2026-04-24', status: 'pågående', tags: ['byggherre','endringer'] },
       { id: 'd2', text: 'Silje sjekker likviditetskonsekvens av sen godkjenning', owner: 'Silje Tvedt', dueDate: '2026-04-01', status: 'fullført', tags: ['economy','byggherre'] }
     ],
-    prognoseLock: { value: 142.5, period: '2026-03', lockedBy: 'Silje Tvedt', lockedAt: '2026-03-26 16:00' },
-    summary: 'Økonomisk status under press pga utestående endringer og forsinket støpeplan. Prognose låst 142,5 MNOK.'
+    prognoseLock: { value: 139.0, period: '2026-03', lockedBy: 'Silje Tvedt', lockedAt: '2026-03-26 16:00' },
+    summary: 'Økonomisk status under press pga utestående endringer og forsinket støpeplan. Prognose låst 139,0 MNOK.'
   },
   {
     id: 'rev-p1-2026-03-project', type: 'project', status: 'godkjent', period: '2026-03',
@@ -2001,19 +1998,99 @@ projectReviews['p1'] = [
     carryForward: [],
     themes: [
       { id: 't1', title: 'HMS og sikkerhet', question: 'Er det trender i avvik eller SJA-status som krever tiltak?',
-        notes: 'HMS-avvik stabilt på 5. Én sak om fallsikring i etasje 3 — SJA er oppdatert og gjennomgått med lag.', tags: ['hms','sja'] },
+        notes: 'HMS-avvik stabilt på 5. Én sak om fallsikring i etasje 3 — SJA er oppdatert og gjennomgått med lag.',
+        meetingNotes: 'Ørjan bekreftet at SJA er gjennomgått med hele laget. Fallsikring i etasje 3 lukkes formelt etter neste vernerunde.',
+        tags: ['hms','sja'] },
       { id: 't2', title: 'Fremdrift og aktiviteter', question: 'Kommer vi i mål som planlagt, og hva er kritisk neste 2 uker?',
-        notes: 'Ligger 3 uker bak plan grunnet forsinket leveranse av prefab-elementer fra Contiga. Kritisk støpeplan i uke 15.', tags: ['fremdrift','leverandor'] },
+        notes: 'Ligger 3 uker bak plan grunnet forsinket leveranse av prefab-elementer fra Contiga. Kritisk støpeplan i uke 15.',
+        meetingNotes: 'Contiga har bekreftet ny leveringsdato torsdag uke 14. Hvis de ikke leverer, bestiller Roar nattskift fra mandag uke 16. Daniel følger opp skriftlig.',
+        tags: ['fremdrift','leverandor'] },
       { id: 't3', title: 'Bemanning og logistikk', question: 'Har vi riktig bemanning og riktig utstyr til neste fase?',
-        notes: 'Vurderer nattskift uke 16-17. Tårnkran deles med nabotomt, logistikk-møte satt opp.', tags: ['bemanning','logistikk','kranbehov'] },
+        notes: 'Vurderer nattskift uke 16-17. Tårnkran deles med nabotomt, logistikk-møte satt opp.',
+        meetingNotes: 'Avventer Contiga-avklaring før nattskift-beslutning. Kran-deling fungerer foreløpig, men Roar eskalerer til Oddgeir om det blir tidspress.',
+        tags: ['bemanning','logistikk','kranbehov'] },
       { id: 't4', title: 'Kvalitet og sjekklister', question: 'Er kvalitetssjekkene oppdatert og fulgt opp?',
-        notes: 'Sjekklister i Dalux oppdatert. Ingen åpne kvalitetsavvik siste periode.', tags: ['kvalitet'] }
+        notes: 'Sjekklister i Dalux oppdatert. Ingen åpne kvalitetsavvik siste periode.',
+        meetingNotes: 'Ingen diskusjon nødvendig. Fortsett som nå.',
+        tags: ['kvalitet'] }
     ],
     decisions: [
       { id: 'd1', text: 'Vurdere bestilling av nattskift uke 16-17 for å hente inn 2 uker', owner: 'Roar Mæland', dueDate: '2026-04-05', status: 'pågående', tags: ['fremdrift','bemanning'] },
       { id: 'd2', text: 'Følge opp Contiga på prefab-leveranse, eskalere om ikke løst denne uka', owner: 'Roar Mæland', dueDate: '2026-03-25', status: 'fullført', tags: ['leverandor'] }
     ],
     summary: 'Fremdrift er kritisk pga forsinket prefab. Nattskift vurderes. HMS og kvalitet under kontroll.'
+  },
+  // February 2026 — Economy
+  {
+    id: 'rev-p1-2026-02-economy', type: 'economy', status: 'godkjent', period: '2026-02',
+    date: '2026-02-25', participants: 'Lars Vestbø (PL), Silje Tvedt, Kurt Andreassen',
+    createdBy: 'Lars Vestbø', publishedBy: 'Lars Vestbø', publishedAt: '2026-02-23 14:00',
+    godkjentAv: 'Silje Tvedt', godkjentAt: '2026-02-25 15:30',
+    carryForward: [],
+    themes: [
+      { id: 't1', title: 'Prognose og bidrag', question: 'Er prognosen realistisk?',
+        notes: 'Bidrag på 10,2% — marginalt over mål. Prognose stabil, ingen vesentlige endringer.',
+        meetingNotes: 'Silje fornøyd med nivået. Enighet om å holde kursen.', tags: ['prognose','economy'] },
+      { id: 't2', title: 'Endringer fra byggherre', question: 'Status godkjenning?',
+        notes: '4 endringer registrert totalt, 2 godkjent. Ingen kritiske utestående.',
+        meetingNotes: 'Kurt kommenterte at to utestående bør purres innen uke 10.', tags: ['endringer','byggherre'] },
+      { id: 't3', title: 'Faktura og likviditet', question: 'Kontantstrøm?',
+        notes: '5 ubehandlede fakturaer, 1 over frist. Likviditet tilfredsstillende.',
+        meetingNotes: 'Ingen kommentarer. Rutiner fungerer.', tags: ['economy'] }
+    ],
+    decisions: [
+      { id: 'd1', text: 'Purre byggherre på 2 utestående endringer innen uke 10', owner: 'Lars Vestbø', dueDate: '2026-03-07', status: 'fullført', tags: ['endringer'] }
+    ],
+    prognoseLock: { value: 140.5, period: '2026-02', lockedBy: 'Silje Tvedt', lockedAt: '2026-02-25 15:30' },
+    summary: 'Økonomi stabil. Bidrag marginalt over mål. To utestående endringer purres.'
+  },
+  // February 2026 — Project
+  {
+    id: 'rev-p1-2026-02-project', type: 'project', status: 'godkjent', period: '2026-02',
+    date: '2026-02-18', participants: 'Lars Vestbø (PL), Ørjan Todnem, Daniel Shortt',
+    createdBy: 'Lars Vestbø', publishedBy: 'Lars Vestbø', publishedAt: '2026-02-16 10:00',
+    godkjentAv: 'Lars Vestbø', godkjentAt: '2026-02-18 16:00',
+    carryForward: [],
+    themes: [
+      { id: 't1', title: 'HMS og sikkerhet', question: 'Trender i avvik?',
+        notes: 'HMS-avvik på 4, ned fra 6 forrige måned. Ingen høyrisiko-saker.',
+        meetingNotes: 'Positivt. Vernerunde gjennomført uten funn.', tags: ['hms'] },
+      { id: 't2', title: 'Fremdrift', question: 'Ligger vi i plan?',
+        notes: '2 uker bak plan. Prefab-leveranse fra Contiga forsinket med 1 uke.',
+        meetingNotes: 'Første tegn på forsinkelse. Roar tar kontakt med Contiga for avklaring.', tags: ['fremdrift','leverandor'] },
+      { id: 't3', title: 'Bemanning', question: 'Riktig ressurser?',
+        notes: 'Fullt bemannet. Nytt lag starter betongarbeider i uke 9.',
+        meetingNotes: 'Ingen diskusjon nødvendig.', tags: ['bemanning'] }
+    ],
+    decisions: [
+      { id: 'd1', text: 'Kontakte Contiga om leveringsstatus prefab', owner: 'Lars Vestbø', dueDate: '2026-02-25', status: 'fullført', tags: ['leverandor'] },
+      { id: 'd2', text: 'Oppdatere fremdriftsplan med justert leveringsdato', owner: 'Lars Vestbø', dueDate: '2026-03-01', status: 'fullført', tags: ['fremdrift'] }
+    ],
+    summary: 'HMS positiv utvikling. Prefab-forsinkelse 1 uke, Contiga kontaktes.'
+  },
+  // January 2026 — Project
+  {
+    id: 'rev-p1-2026-01-project', type: 'project', status: 'godkjent', period: '2026-01',
+    date: '2026-01-21', participants: 'Lars Vestbø (PL), Ørjan Todnem',
+    createdBy: 'Lars Vestbø', publishedBy: 'Lars Vestbø', publishedAt: '2026-01-19 09:00',
+    godkjentAv: 'Lars Vestbø', godkjentAt: '2026-01-21 15:00',
+    carryForward: [],
+    themes: [
+      { id: 't1', title: 'HMS og sikkerhet', question: 'Trender i avvik?',
+        notes: 'HMS-avvik på 6. To saker om orden og ryddighet, resten mindre.',
+        meetingNotes: 'Ørjan tar ansvar for kampanje om orden på byggeplass uke 5.', tags: ['hms'] },
+      { id: 't2', title: 'Fremdrift', question: 'Ligger vi i plan?',
+        notes: 'I rute. Grunnarbeid ferdigstilt, forskaling i gang.',
+        meetingNotes: 'Fremdrift god. Ingen bekymringer på dette tidspunktet.', tags: ['fremdrift'] },
+      { id: 't3', title: 'Kvalitet', question: 'Sjekklister oppdatert?',
+        notes: 'Dalux sjekklister opprettet for alle fag. Første egenkontroll gjennomført.',
+        meetingNotes: 'Daniel kommenterte at sjekkliste-malen bør standardiseres på tvers av prosjekter.', tags: ['kvalitet'] }
+    ],
+    decisions: [
+      { id: 'd1', text: 'Gjennomføre kampanje om orden og ryddighet uke 5', owner: 'Ørjan Todnem', dueDate: '2026-02-01', status: 'fullført', tags: ['hms'] },
+      { id: 'd2', text: 'Standardisere Dalux sjekkliste-mal med Daniel', owner: 'Lars Vestbø', dueDate: '2026-02-15', status: 'fullført', tags: ['kvalitet'] }
+    ],
+    summary: 'Prosjekt i rute. HMS krever fokus på orden. Dalux sjekklister etablert.'
   }
 ];
 
@@ -2058,11 +2135,17 @@ function monthLabel(period) {
 
 function buildNewReviewDraft(p, type) {
   const ec = punchStore[p.id]?.['2026-04'] || {};
+  const ecPrev = punchStore[p.id]?.['2026-03'] || {};
   const bidragPct = ec.inntekt > 0 ? +((ec.bidrag/ec.inntekt)*100).toFixed(1) : null;
   const risikoPct = ec.inntekt > 0 ? +((ec.risiko/ec.inntekt)*100).toFixed(1) : null;
   const endrUnder = (ec.endrTotal||0) - (ec.endrGodkjent||0);
   const endrUnderVal = +((ec.endrValue||0) - (ec.endrGodkjentValue||0)).toFixed(1);
   const progDelta = ec.kalPrognose && ec.kalSist ? +(ec.kalPrognose - ec.kalSist).toFixed(1) : 0;
+  // Previous period values
+  const prevBidragPct = ecPrev.inntekt > 0 ? +((ecPrev.bidrag/ecPrev.inntekt)*100).toFixed(1) : null;
+  const prevRisikoPct = ecPrev.inntekt > 0 ? +((ecPrev.risiko/ecPrev.inntekt)*100).toFixed(1) : null;
+  const prevEndrUnder = (ecPrev.endrTotal||0) - (ecPrev.endrGodkjent||0);
+  const prevEndrUnderVal = +((ecPrev.endrValue||0) - (ecPrev.endrGodkjentValue||0)).toFixed(1);
 
   const base = {
     id: 'rev-draft-' + type + '-' + Date.now(),
@@ -2085,12 +2168,21 @@ function buildNewReviewDraft(p, type) {
           'Prognose endring': (progDelta>=0?'+':'') + progDelta + ' MNOK',
           'Mål bidrag': p.targets.bidragMinPct ? '≥' + p.targets.bidragMinPct + '%' : 'Ikke satt'
         },
+        prev: {
+          'Bidragsmargin': prevBidragPct != null ? prevBidragPct + '%' : '—',
+          'Risiko/buffer': prevRisikoPct != null ? prevRisikoPct + '% av inntekt' : '—'
+        },
         notes: '', tags: ['prognose','economy'] },
       { id: 't2', title: 'Endringer fra byggherre', question: 'Status på godkjenning og påvirkning på prognose?',
         data: {
           'Registrert': (ec.endrTotal||0) + ' stk · ' + (ec.endrValue||0) + ' MNOK',
           'Godkjent': (ec.endrGodkjent||0) + ' stk · ' + (ec.endrGodkjentValue||0) + ' MNOK',
           'Under behandling': endrUnder + ' stk · ' + endrUnderVal + ' MNOK'
+        },
+        prev: {
+          'Registrert': (ecPrev.endrTotal||0) + ' stk · ' + (ecPrev.endrValue||0) + ' MNOK',
+          'Godkjent': (ecPrev.endrGodkjent||0) + ' stk · ' + (ecPrev.endrGodkjentValue||0) + ' MNOK',
+          'Under behandling': prevEndrUnder + ' stk · ' + prevEndrUnderVal + ' MNOK'
         },
         notes: '', tags: ['endringer','byggherre'] },
       { id: 't3', title: 'Faktura og likviditet', question: 'Er det noen uregelmessigheter i kontantstrøm?',
@@ -2099,9 +2191,12 @@ function buildNewReviewDraft(p, type) {
           'Snitt behandlingstid': p.faktura.avgDays + ' dager',
           'Likviditet': p.likviditet.pct + '%'
         },
+        prev: {
+          'Ubehandlede fakturaer': ecPrev.fakturaSnapshot != null ? ecPrev.fakturaSnapshot + '' : '—',
+          'Likviditet': ecPrev.likviditetPct != null ? ecPrev.likviditetPct + '%' : '—'
+        },
         notes: '', tags: ['economy'] }
     ];
-    // Prepare prognose lock (not locked yet)
     base.prognoseLock = null;
     base.prognoseProposed = ec.kalPrognose;
   } else {
@@ -2114,6 +2209,9 @@ function buildNewReviewDraft(p, type) {
           'SJA-status': p.hms.sjaStatus,
           'Siste vernerunde': p.hms.lastRound
         },
+        prev: {
+          'Åpne HMS-avvik': ecPrev.hmsSnapshot != null ? ecPrev.hmsSnapshot + '' : '—'
+        },
         notes: '', tags: ['hms','sja'] },
       { id: 't2', title: 'Fremdrift og aktiviteter', question: 'Kommer vi i mål som planlagt, og hva er kritisk neste 2 uker?',
         data: {
@@ -2121,12 +2219,17 @@ function buildNewReviewDraft(p, type) {
           'Avvik': p.fremdrift.label,
           'Planlagt ferdig': p.plannedEnd
         },
+        prev: {
+          'Fremdrift': ecPrev.fremdriftPct != null ? ecPrev.fremdriftPct + '%' : '—'
+        },
         notes: '', tags: ['fremdrift'] },
       { id: 't3', title: 'Bemanning og logistikk', question: 'Har vi riktig bemanning og riktig utstyr til neste fase?',
         data: {},
+        prev: {},
         notes: '', tags: ['bemanning','logistikk'] },
       { id: 't4', title: 'Kvalitet og sjekklister', question: 'Er kvalitetssjekkene oppdatert og fulgt opp?',
         data: {},
+        prev: {},
         notes: '', tags: ['kvalitet'] }
     ];
   }
@@ -2183,14 +2286,20 @@ function renderReviewTimeline(el, p) {
       </div>
       <button class="ai-assessment-btn" onclick="openAiAssessmentModal()">
         <span class="ai-pill-small">AI</span>
-        <span>AI-vurdering</span>
+        <span>AI-assistanse</span>
         <span class="ai-sparkles">✦</span>
       </button>
     </div>
     ${openBanner}
     <div class="review-cta-grid">
-      ${projectCard}
-      ${economyCard}
+      <div class="review-cta-col">
+        ${projectCard}
+        ${renderReviewHistory(p, 'project')}
+      </div>
+      <div class="review-cta-col">
+        ${economyCard}
+        ${renderReviewHistory(p, 'economy')}
+      </div>
     </div>`;
 }
 
@@ -2204,6 +2313,31 @@ function getActiveReview(pid, type) {
 function getLastGodkjent(pid, type) {
   const reviews = projectReviews[pid] || [];
   return reviews.find(r => r.type === type && r.status === 'godkjent') || null;
+}
+
+function renderReviewHistory(p, type) {
+  const reviews = (projectReviews[p.id] || []).filter(r => r.type === type && r.status === 'godkjent');
+  if (reviews.length === 0) return '';
+  const typeCfg = REVIEW_TYPE[type];
+  const rows = reviews.map(r => {
+    const openCount = r.decisions.filter(d => d.status === 'pågående').length;
+    const totalCount = r.decisions.length;
+    return `
+      <tr class="rh-row" onclick="openReadonly('${r.id}')">
+        <td class="rh-date">${formatDateNO(r.date)}</td>
+        <td class="rh-period">${monthLabel(r.period)}</td>
+        <td class="rh-actions">${totalCount} aksjon${totalCount !== 1 ? 'er' : ''}${openCount > 0 ? ` · <span class="rh-open">${openCount} åpne</span>` : ''}</td>
+        <td class="rh-who">${r.godkjentAv || '—'}</td>
+      </tr>`;
+  }).join('');
+  return `
+    <div class="review-history">
+      <div class="rh-title">Tidligere ${typeCfg.label.toLowerCase()}er</div>
+      <table class="rh-table">
+        <thead><tr><th>Godkjent</th><th>Periode</th><th>Beslutninger</th><th>Godkjent av</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
 }
 
 function renderLivingCard(p, type) {
@@ -2325,48 +2459,72 @@ function openReadonly(reviewId) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// AI chat state
+let aiChatMessages = [];
+let aiCurrentTab = 0;
+
+const AI_CANNED_RESPONSES = [
+  'Basert på bidragsmarginen og trenden fra lignende prosjekter, anbefaler jeg å fokusere på endringshåndteringen. I Jåttunparken så vi at utestående endringer over 4 uker var den sterkeste indikatoren på at bidraget ville falle ytterligere 1-2% i siste kvartal.',
+  'Fremdriftsavviket er innenfor det vi har sett i sammenlignbare prosjekter på dette stadiet. Det kritiske er å sikre at prefab-leveransene holder tidsplanen de neste 3 ukene. Kontiga-situasjonen fra Jåttunparken ligner, og der hjalp det å etablere daglige statusoppdateringer direkte med fabrikken.',
+  'HMS-tallene ser stabile ut, men erfaringen fra Biskop Hognestadgate viser at antall høyrisiko-saker typisk øker når man går inn i sluttfasen med tidspress. SJA-oppdateringer bør gjøres ukentlig i den perioden, ikke bare ved endringer.',
+  'Risikobufferen er på et nivå som krever oppmerksomhet. I prosjekter av denne størrelsen med totalentreprise anbefaler vi minimum 5% av inntekt som buffer. Under 3% er erfaringsmessig et varseltegn. Vurder om det er poster i prognosen som kan strammes inn.',
+  'Godkjenningsgraden på endringer fra byggherre er et viktig styringsparameter. I porteføljen ser vi at prosjekter med godkjenningsgrad under 60% har signifikant høyere risiko for tvister ved sluttoppgjør. Dokumentasjon av krav og avtalegrunnlag bør prioriteres nå.'
+];
+let aiResponseIdx = 0;
+
 function openAiAssessmentModal() {
   const p = projects.find(x => x.id === currentProjectId);
   if (!p) return;
+  aiChatMessages = [];
+  aiCurrentTab = 0;
+  aiResponseIdx = 0;
+
+  // Welcome message
+  aiChatMessages.push({
+    role: 'ai',
+    text: `Jeg har kontekst på ${p.name}, inkludert økonomidata, fremdrift, HMS-historikk og pågående gjennomganger. Jeg har også tilgang til erfaringsbanken som inneholder prosjektgjennomganger og tall fra historiske og pågående prosjekter. Hva vil du vite?`
+  });
+
+  renderAiModal(p);
+}
+
+function renderAiModal(p) {
   const reviews = projectReviews[p.id] || [];
-  // Check for publiserte/aktive gjennomganger to comment on
   const inProgress = reviews.filter(r => r.status === 'published' || r.status === 'active');
 
-  // Section 3: analysis of in-progress reviews (only if any exist)
-  const inProgressHtml = inProgress.length > 0 ? inProgress.map(r => {
-    const typeCfg = REVIEW_TYPE[r.type];
-    const notedThemes = r.themes.filter(t => t.notes && t.notes.length > 20);
-    const themesComment = notedThemes.length > 0
-      ? `Diskusjonsnotatene fremhever ${notedThemes.length === 1 ? 'temaet' : notedThemes.length + ' temaer'} hvor AI-en ser paralleller til tidligere prosjekter. Spesielt verdt å merke seg:`
-      : 'Gjennomgangen er klargjort men har lite notater enda. Når dere fyller inn mer kontekst i møtet, kan AI-en gi mer presise innspill.';
-    const themeExamples = notedThemes.slice(0,2).map(t => `"${t.title}" — diskusjonen her minner om mønsteret fra sammenlignbare prosjekter der tidlig eskalering ga bedre utfall enn å vente.`).join(' ');
-    return `
-      <div class="ai-mod-inprogress-item">
-        <div class="ai-mod-inprogress-head">
-          <span style="color:${typeCfg.color}">${typeCfg.icon}</span>
-          <strong>${typeCfg.label} — ${monthLabel(r.period)}</strong>
-          <span class="ai-mod-inprogress-status">${r.status === 'active' ? 'I gang' : 'Klargjort'}</span>
-        </div>
-        <div class="ai-mod-inprogress-body">${themesComment} ${themeExamples}</div>
-      </div>`;
-  }).join('') : '<div class="ai-mod-empty">Ingen publiserte eller pågående gjennomganger å analysere. Klargjør en gjennomgang og kom tilbake hit for kontekstuelle innspill.</div>';
-
-  // Section 2: project analysis based on actual metrics
+  // Tab 1: Analyse content
   const ec = punchStore[p.id]?.['2026-04'] || {};
   const bidragPct = ec.inntekt > 0 ? +((ec.bidrag/ec.inntekt)*100).toFixed(1) : null;
   const bidragComment = bidragPct != null && p.targets.bidragMinPct
     ? (bidragPct < p.targets.bidragMinPct
-       ? `Bidragsmargin ligger på ${bidragPct}% — under mål på ${p.targets.bidragMinPct}%. Dette mønsteret (bidrag som faller i siste halvdel av byggefasen) gikk igjen i både Jåttunparken og Forus Kontorpark. I begge tilfeller var årsaken sene endringer som ikke ble fakturert i tide.`
-       : `Bidragsmargin på ${bidragPct}% ligger over mål — positivt tegn, men følg nøye med når siste fase nærmer seg ettersom sene kostnader ofte dukker opp her.`)
+       ? `Bidragsmargin ligger på ${bidragPct}% — under mål på ${p.targets.bidragMinPct}%. Dette mønsteret gikk igjen i både Jåttunparken og Forus Kontorpark. I begge tilfeller var årsaken sene endringer som ikke ble fakturert i tide.`
+       : `Bidragsmargin på ${bidragPct}% ligger over mål — positivt tegn, men følg nøye med i siste fase ettersom sene kostnader ofte dukker opp her.`)
     : 'For lite økonomidata til å vurdere bidragstrend ennå.';
   const fremdriftComment = p.fremdrift.pct < 30
-    ? `Prosjektet er i tidlig fase (${p.fremdrift.pct}% fremdrift). Dette er det mest verdifulle tidspunktet for en grundig første gjennomgang — fordi beslutninger tatt nå har størst påvirkning på sluttresultat.`
+    ? `Prosjektet er i tidlig fase (${p.fremdrift.pct}%). Beslutninger tatt nå har størst påvirkning på sluttresultat.`
     : p.fremdrift.pct > 80
-      ? `Prosjektet er i sluttfase (${p.fremdrift.pct}% fremdrift). Fokus bør være på overlevering, sluttoppgjør med byggherre, og systematisk læring som kan overføres til neste prosjekt.`
-      : `Prosjektet er i midtfase (${p.fremdrift.pct}% fremdrift). Erfaring fra sammenlignbare prosjekter tilsier at dette er den kritiske perioden for prognosetreff — små avvik nå er store avvik senere.`;
+      ? `Prosjektet er i sluttfase (${p.fremdrift.pct}%). Fokus bør være på overlevering, sluttoppgjør og systematisk læring.`
+      : `Prosjektet er i midtfase (${p.fremdrift.pct}%). Erfaringsmessig er dette den kritiske perioden for prognosetreff.`;
   const hmsComment = p.hms.highRisk > 0
-    ? `HMS-bildet har ${p.hms.highRisk} sak${p.hms.highRisk === 1 ? '' : 'er'} med høy risiko. I sammenlignbare prosjekter var tidlig eskalering og systematisk SJA-gjennomgang det som ga størst effekt.`
-    : 'HMS-bildet er stabilt. Fortsett jevnlige vernerunder og SJA-oppdateringer.';
+    ? `${p.hms.highRisk} sak${p.hms.highRisk===1?'':'er'} med høy risiko. Tidlig eskalering og systematisk SJA-gjennomgang ga størst effekt i lignende prosjekter.`
+    : 'HMS-bildet er stabilt. Fortsett jevnlige vernerunder.';
+
+  const inProgressHtml = inProgress.length > 0 ? `
+    <div class="ai-mod-sub-section">
+      <div class="ai-mod-sub-title">Kommentar til pågående gjennomganger</div>
+      ${inProgress.map(r => {
+        const tc = REVIEW_TYPE[r.type];
+        return `<div class="ai-mod-inprogress-item">
+          <div class="ai-mod-inprogress-head"><span style="color:${tc.color}">${tc.icon}</span> <strong>${tc.label} — ${monthLabel(r.period)}</strong> <span class="ai-mod-inprogress-status">${r.status==='active'?'I gang':'Klargjort'}</span></div>
+          <div class="ai-mod-inprogress-body">${r.themes.filter(t=>t.notes).length > 0 ? 'Diskusjonsnotatene viser paralleller til historiske prosjekter. Tidlig eskalering ga bedre utfall enn å vente.' : 'Gjennomgangen har lite notater enda. Mer kontekst gir mer presise innspill.'}</div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+  // Tab 2: Erfaringsbank anbefalinger
+  // Tab 3: Chat (rendered dynamically)
+
+  const tabs = ['Analyse av ' + p.name, 'Erfaringsbank anbefalinger', 'Chat'];
 
   const modal = document.getElementById('aiAssessmentModal');
   modal.innerHTML = `
@@ -2374,41 +2532,51 @@ function openAiAssessmentModal() {
       <div class="ai-mod-modal">
         <button class="ai-mod-close-x" onclick="closeAiAssessmentModal()" title="Lukk" aria-label="Lukk">×</button>
         <div class="ai-mod-head">
-          <div class="modal-title"><span class="ai-pill-small">AI</span> AI-vurdering av prosjektet</div>
-          <div class="modal-sub">Basert på historikk fra sammenlignbare prosjekter, nåværende nøkkeltall, og pågående gjennomganger</div>
+          <div class="modal-title"><span class="ai-pill-small">AI</span> AI-assistanse · ${p.name}</div>
+          <div class="ai-tab-bar">
+            ${tabs.map((t,i) => `<button class="ai-tab ${i===aiCurrentTab?'active':''}" onclick="setAiTab(${i})">${i===2?'💬 ':''}${t}</button>`).join('')}
+          </div>
         </div>
         <div class="ai-mod-body">
-          <div class="ai-mod-similar">
-            <span class="ai-mod-sim-label">Mest sammenlignbare prosjekter i historikken</span>
-            <span class="ai-sim-chip">Jåttunparken BT1 (145 MNOK)</span>
-            <span class="ai-sim-chip">Biskop Hognestadgate (195 MNOK)</span>
-            <span class="ai-sim-chip">Forus Kontorpark Bygg D (112 MNOK)</span>
-          </div>
-
-          <div class="ai-mod-section">
-            <div class="ai-mod-section-title"><span class="ai-mod-num">1</span>Historiske innspill fra lignende prosjekter</div>
-            <div class="ai-mod-findings">
-              <div class="ai-mod-finding"><div class="ai-mod-f-title">Tidlig avklaring av grunnforhold</div><div class="ai-mod-f-body">To av tre sammenlignbare prosjekter hadde overraskelser som forskjøv støpeplan 2-4 uker. Anbefalt tidlig befaring og supplerende prøvetaking.</div></div>
-              <div class="ai-mod-finding"><div class="ai-mod-f-title">Byggherrens beslutningshastighet på endringer</div><div class="ai-mod-f-body">I Jåttunparken og Biskop Hognestadgate ble endringer liggende 4-6 uker. Anbefaling: etabler fast ukentlig statusmøte med byggherre fra start.</div></div>
-              <div class="ai-mod-finding"><div class="ai-mod-f-title">Leveransesikkerhet prefabrikkerte elementer</div><div class="ai-mod-f-body">Forsinkelser på prefab var kritisk faktor i 2 av 3 lignende prosjekter. Anbefaling: doble opp leverandør eller legg inn buffer i fremdriftsplan.</div></div>
-            </div>
-          </div>
-
-          <div class="ai-mod-section">
-            <div class="ai-mod-section-title"><span class="ai-mod-num">2</span>Analyse av ${p.name}</div>
+          <div class="ai-tab-content ${aiCurrentTab===0?'':'hidden'}" id="aiTab0">
             <div class="ai-mod-analysis">
               <div class="ai-mod-ana-item"><strong>Økonomi:</strong> ${bidragComment}</div>
               <div class="ai-mod-ana-item"><strong>Fremdrift:</strong> ${fremdriftComment}</div>
               <div class="ai-mod-ana-item"><strong>HMS:</strong> ${hmsComment}</div>
             </div>
-          </div>
-
-          <div class="ai-mod-section">
-            <div class="ai-mod-section-title"><span class="ai-mod-num">3</span>Kommentar til pågående gjennomganger</div>
             ${inProgressHtml}
+            <div class="ai-mod-disclaimer">Basert på nåværende prosjektdata og erfaringer fra porteføljen</div>
           </div>
-
-          <div class="ai-mod-disclaimer">AI-vurderingen er en assistent til ditt eget skjønn. Bruk innsiktene som innspill, ikke fasit.</div>
+          <div class="ai-tab-content ${aiCurrentTab===1?'':'hidden'}" id="aiTab1">
+            <div class="ai-mod-similar">
+              <span class="ai-mod-sim-label">Sammenlignbare prosjekter</span>
+              <span class="ai-sim-chip">Jåttunparken BT1 (145 MNOK)</span>
+              <span class="ai-sim-chip">Biskop Hognestadgate (195 MNOK)</span>
+              <span class="ai-sim-chip">Forus Kontorpark Bygg D (112 MNOK)</span>
+            </div>
+            <div class="ai-mod-findings">
+              <div class="ai-mod-finding"><div class="ai-mod-f-title">Tidlig avklaring av grunnforhold</div><div class="ai-mod-f-body">To av tre sammenlignbare prosjekter hadde overraskelser som forskjøv støpeplan 2-4 uker. Anbefalt tidlig befaring og supplerende prøvetaking.</div></div>
+              <div class="ai-mod-finding"><div class="ai-mod-f-title">Byggherrens beslutningshastighet på endringer</div><div class="ai-mod-f-body">I Jåttunparken og Biskop Hognestadgate ble endringer liggende 4-6 uker. Anbefaling: etabler fast ukentlig statusmøte med byggherre fra start.</div></div>
+              <div class="ai-mod-finding"><div class="ai-mod-f-title">Leveransesikkerhet prefabrikkerte elementer</div><div class="ai-mod-f-body">Forsinkelser på prefab var kritisk faktor i 2 av 3 lignende prosjekter. Anbefaling: doble opp leverandør eller legg inn buffer i fremdriftsplan.</div></div>
+            </div>
+            <div class="ai-mod-disclaimer">Erfaringer fra lignende prosjekter i porteføljen</div>
+          </div>
+          <div class="ai-tab-content ${aiCurrentTab===2?'':'hidden'}" id="aiTab2">
+            <div class="ai-chat-wrap">
+              <div class="ai-chat-messages" id="aiChatMessages">
+                ${aiChatMessages.map(m => `
+                  <div class="ai-chat-msg ${m.role}">
+                    ${m.role==='ai' ? '<span class="ai-chat-avatar"><span class="ai-pill-small">AI</span></span>' : ''}
+                    <div class="ai-chat-bubble ${m.role}">${m.text}</div>
+                  </div>`).join('')}
+              </div>
+              <div class="ai-chat-input-wrap">
+                <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Still et spørsmål om ${p.name}..." onkeydown="if(event.key==='Enter')sendAiChat()">
+                <button class="ai-chat-send" onclick="sendAiChat()">→</button>
+              </div>
+              <div class="ai-chat-proto-note">Kobles til Claude API i produksjon</div>
+            </div>
+          </div>
         </div>
         <div class="ai-mod-footer">
           <button class="btn btn-primary" onclick="closeAiAssessmentModal()">Lukk</button>
@@ -2416,9 +2584,65 @@ function openAiAssessmentModal() {
       </div>
     </div>`;
   modal.classList.remove('hidden');
-
-  // ESC to close
   document.addEventListener('keydown', aiModalEscHandler);
+
+  // Scroll chat to bottom if on chat tab
+  if (aiCurrentTab === 2) {
+    const chatEl = document.getElementById('aiChatMessages');
+    if (chatEl) chatEl.scrollTop = chatEl.scrollHeight;
+  }
+}
+
+function setAiTab(idx) {
+  aiCurrentTab = idx;
+  document.querySelectorAll('.ai-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  document.querySelectorAll('.ai-tab-content').forEach((c,i) => c.classList.toggle('hidden', i!==idx));
+  if (idx === 2) {
+    const chatEl = document.getElementById('aiChatMessages');
+    if (chatEl) chatEl.scrollTop = chatEl.scrollHeight;
+    setTimeout(() => document.getElementById('aiChatInput')?.focus(), 100);
+  }
+}
+
+function sendAiChat() {
+  const input = document.getElementById('aiChatInput');
+  const text = (input?.value || '').trim();
+  if (!text) return;
+  input.value = '';
+
+  // Add user message
+  aiChatMessages.push({ role: 'user', text });
+  renderChatMessages();
+
+  // Show typing indicator
+  const chatEl = document.getElementById('aiChatMessages');
+  const typingEl = document.createElement('div');
+  typingEl.className = 'ai-chat-msg ai';
+  typingEl.id = 'aiTyping';
+  typingEl.innerHTML = '<span class="ai-chat-avatar"><span class="ai-pill-small">AI</span></span><div class="ai-chat-bubble ai"><span class="ai-typing-dots"><span>.</span><span>.</span><span>.</span></span></div>';
+  chatEl.appendChild(typingEl);
+  chatEl.scrollTop = chatEl.scrollHeight;
+
+  // Simulate response
+  setTimeout(() => {
+    const resp = AI_CANNED_RESPONSES[aiResponseIdx % AI_CANNED_RESPONSES.length];
+    aiResponseIdx++;
+    aiChatMessages.push({ role: 'ai', text: resp });
+    const typing = document.getElementById('aiTyping');
+    if (typing) typing.remove();
+    renderChatMessages();
+  }, 1500);
+}
+
+function renderChatMessages() {
+  const chatEl = document.getElementById('aiChatMessages');
+  if (!chatEl) return;
+  chatEl.innerHTML = aiChatMessages.map(m => `
+    <div class="ai-chat-msg ${m.role}">
+      ${m.role==='ai' ? '<span class="ai-chat-avatar"><span class="ai-pill-small">AI</span></span>' : ''}
+      <div class="ai-chat-bubble ${m.role}">${m.text}</div>
+    </div>`).join('');
+  chatEl.scrollTop = chatEl.scrollHeight;
 }
 
 function aiModalEscHandler(e) {
@@ -2505,25 +2729,58 @@ function renderReviewWizard(el, p, draft, readonly = false) {
           <div class="wcf-text">${d.text}</div>
           <div class="wcf-meta">${d.owner} · frist ${d.dueDate}</div>
           ${ro ? '' : `<div class="wcf-actions">
-            <button class="wcf-btn" onclick="setCfStatus('${d.id}','fullført')">✓ Fullført</button>
-            <button class="wcf-btn" onclick="setCfStatus('${d.id}','pågående')">↻ Rull videre</button>
-            <button class="wcf-btn danger" onclick="setCfStatus('${d.id}','droppet')">✗ Droppes</button>
+            <button class="wcf-btn ${d.newStatus==='fullført'?'active':''}" onclick="setCfStatus('${d.id}','fullført')">✓ Fullført</button>
+            <button class="wcf-btn ${d.newStatus==='pågående'?'active':''}" onclick="setCfStatus('${d.id}','pågående')">↻ Rull videre</button>
+            <button class="wcf-btn danger ${d.newStatus==='droppet'?'active':''}" onclick="setCfStatus('${d.id}','droppet')">✗ Droppes</button>
+          </div>
+          <div class="wcf-comment-wrap" id="cfComment-${d.id}" style="display:${d.newStatus==='fullført'||d.newStatus==='droppet'?'block':'none'}">
+            <input type="text" class="wcf-comment" placeholder="${d.newStatus==='droppet'?'Begrunn hvorfor aksjonen droppes...':'Kort beskrivelse av hva som ble gjort...'}" value="${d.statusComment||''}" oninput="updateCfComment('${d.id}',this.value)">
           </div>`}
         </div>`).join('')}
     </div>` : '';
 
   const themeHtml = draft.themes.map((t, i) => {
     const dataEntries = Object.entries(t.data || {});
-    const dataRows = dataEntries.map(([k,v]) => `<div class="wt-data-cell"><div class="wt-data-k">${k}</div><div class="wt-data-v">${v}</div></div>`).join('');
-    const notesField = ro
-      ? (t.notes ? `<div class="ro-notes-view">${(t.notes).replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>` : `<div class="ro-notes-empty">Ingen notater fylt inn</div>`)
-      : `<textarea class="wt-notes" placeholder="Notater fra diskusjonen..." oninput="updateThemeNotes('${t.id}', this.value)">${t.notes||''}</textarea>`;
+    const prevData = t.prev || {};
+    const hasPrev = Object.keys(prevData).length > 0;
+    const dataRows = dataEntries.map(([k,v]) => {
+      const pv = prevData[k];
+      return `<div class="wt-data-cell">
+        <div class="wt-data-k">${k}</div>
+        <div class="wt-data-v">${v}</div>
+        ${hasPrev && pv != null ? `<div class="wt-data-prev">Forrige: ${pv}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    let fieldsHtml = '';
+    if (ro) {
+      // Read-only: show both redegjørelse and møtereferat if present
+      fieldsHtml = `
+        <div class="wt-field-label">Redegjørelse</div>
+        ${t.notes ? `<div class="ro-notes-view">${(t.notes).replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>` : `<div class="ro-notes-empty">Ingen redegjørelse</div>`}
+        ${t.meetingNotes ? `
+          <div class="wt-field-label" style="margin-top:14px">Møtereferat</div>
+          <div class="ro-notes-view" style="border-left-color:#6E4393">${(t.meetingNotes).replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>` : ''}`;
+    } else if (draft.status === 'active') {
+      // Active meeting: redegjørelse read-only + editable møtereferat
+      fieldsHtml = `
+        <div class="wt-field-label">Redegjørelse (klargjort)</div>
+        ${t.notes ? `<div class="ro-notes-view">${(t.notes).replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>` : `<div class="ro-notes-empty">Ingen redegjørelse ble fylt inn</div>`}
+        <div class="wt-notes-label" style="margin-top:14px">Møtereferat</div>
+        <textarea class="wt-notes wt-meeting" id="meeting-${t.id}" placeholder="Oppsummer diskusjonen, konklusjoner og eventuelle avklaringer..." oninput="updateMeetingNotes('${t.id}', this.value)">${t.meetingNotes||''}</textarea>`;
+    } else {
+      // Draft: editable redegjørelse, no meeting notes
+      fieldsHtml = `
+        <div class="wt-notes-label">Redegjørelse <span class="wt-required">*</span></div>
+        <textarea class="wt-notes wt-redegjor" id="redegjor-${t.id}" placeholder="Beskriv status og forklar eventuelle endringer siden forrige gjennomgang..." oninput="updateThemeNotes('${t.id}', this.value)">${t.notes||''}</textarea>`;
+    }
+
     return `
       <div class="wizard-section">
         <div class="wizard-section-title"><span class="ws-num">${i+1}</span>${t.title}</div>
         <div class="wt-question">${t.question}</div>
         ${dataRows ? `<div class="wt-data" style="grid-template-columns:repeat(${Math.min(dataEntries.length,4)},1fr)">${dataRows}</div>` : ''}
-        ${notesField}
+        ${fieldsHtml}
       </div>`;
   }).join('');
 
@@ -2666,6 +2923,17 @@ function updateThemeNotes(themeId, value) {
   const draft = reviewDraft[draftEntries[0]];
   const theme = draft.themes.find(t => t.id === themeId);
   if (theme) theme.notes = value;
+  const el = document.getElementById('redegjor-' + themeId);
+  if (el && value.trim()) el.classList.remove('wt-error');
+}
+
+function updateMeetingNotes(themeId, value) {
+  const p = projects.find(x => x.id === currentProjectId);
+  const draftEntries = Object.keys(reviewDraft).filter(k => k.startsWith(p.id + '-'));
+  if (draftEntries.length === 0) return;
+  const draft = reviewDraft[draftEntries[0]];
+  const theme = draft.themes.find(t => t.id === themeId);
+  if (theme) theme.meetingNotes = value;
 }
 
 function setCfStatus(cfId, status) {
@@ -2676,9 +2944,36 @@ function setCfStatus(cfId, status) {
   const item = draft.carryForward.find(c => c.id === cfId);
   if (item) {
     item.newStatus = status;
+    if (status === 'pågående') item.statusComment = '';
     const row = document.querySelector(`[data-cf-id="${cfId}"]`);
     if (row) { row.classList.remove('cf-fullført','cf-pågående','cf-droppet'); row.classList.add('cf-' + status); }
+    // Show/hide comment field
+    const commentWrap = document.getElementById('cfComment-' + cfId);
+    if (commentWrap) {
+      const needsComment = status === 'fullført' || status === 'droppet';
+      commentWrap.style.display = needsComment ? 'block' : 'none';
+      if (needsComment) {
+        const input = commentWrap.querySelector('.wcf-comment');
+        if (input) {
+          input.placeholder = status === 'droppet' ? 'Begrunn hvorfor aksjonen droppes...' : 'Kort beskrivelse av hva som ble gjort...';
+          setTimeout(() => input.focus(), 50);
+        }
+      }
+    }
+    // Update button active states
+    row?.querySelectorAll('.wcf-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = row?.querySelector(`.wcf-btn:nth-child(${status==='fullført'?1:status==='pågående'?2:3})`);
+    if (activeBtn) activeBtn.classList.add('active');
   }
+}
+
+function updateCfComment(cfId, value) {
+  const p = projects.find(x => x.id === currentProjectId);
+  const draftEntries = Object.keys(reviewDraft).filter(k => k.startsWith(p.id + '-'));
+  if (draftEntries.length === 0) return;
+  const draft = reviewDraft[draftEntries[0]];
+  const item = draft.carryForward.find(c => c.id === cfId);
+  if (item) item.statusComment = value;
 }
 
 function addDecision() {
@@ -2808,13 +3103,24 @@ function publishReview() {
   const draftEntries = Object.keys(reviewDraft).filter(k => k.startsWith(p.id + '-'));
   if (draftEntries.length === 0) return;
   const draft = reviewDraft[draftEntries[0]];
+  // Validate: all themes must have redegjørelse
+  const emptyThemes = draft.themes.filter(t => !(t.notes || '').trim());
+  if (emptyThemes.length > 0) {
+    // Highlight empty fields
+    emptyThemes.forEach(t => {
+      const el = document.getElementById('redegjor-' + t.id);
+      if (el) { el.classList.add('wt-error'); el.focus(); }
+    });
+    showToast(`${emptyThemes.length} redegjørelse${emptyThemes.length > 1 ? 'r' : ''} mangler — fyll ut alle før publisering`);
+    return;
+  }
   draft.status = 'published';
   draft.publishedBy = p.leader;
   draft.publishedAt = new Date().toISOString().slice(0,16).replace('T',' ');
   if (!projectReviews[p.id]) projectReviews[p.id] = [];
   projectReviews[p.id] = projectReviews[p.id].filter(r => r.id !== draft.id);
   projectReviews[p.id].unshift({...draft});
-  delete reviewDraft[draftEntries[0]]; // Close wizard after publish — back to card view
+  delete reviewDraft[draftEntries[0]];
   showToast('Gjennomgang publisert — klar for møte');
   renderReviewTab();
   renderReviewBadge(p);
@@ -3411,14 +3717,24 @@ function renderOverviewForPeriod() {
   const totBidH = ecSumH.reduce((s,x)=>s+x.bidrag,0);
   const avgBidragH = totInnH > 0 ? +((totBidH/totInnH)*100).toFixed(1) : 0;
   const bidColorH = avgBidragH>=10?'green':avgBidragH>=5?'yellow':'red';
-  document.getElementById('summaryHealth').innerHTML=`
-    <div class="sh-score ${ar}">${avg}</div>
-    <div><div class="sh-label">Porteføljehelse</div><div class="sh-meta">Snitt ${histFiltered.length} prosjekter, beregnet fra 4 KPI-er under</div></div>`;
-  document.getElementById('summaryStrip').innerHTML=`
-    <div class="summary-card"><div class="label">HMS — åpne avvik</div><div class="value ${totalHmsH>15?'red':totalHmsH>8?'yellow':'green'}">${totalHmsH}</div><div class="meta">Totalt på tvers</div></div>
-    <div class="summary-card"><div class="label">Fremdrift</div><div class="value ${behindPlanH>histFiltered.length/2?'red':behindPlanH>0?'yellow':'green'}">${behindPlanH} av ${histFiltered.length}</div><div class="meta">Prosjekter bak plan</div></div>
-    <div class="summary-card"><div class="label">Bidrag</div><div class="value ${bidColorH}">${avgBidragH}%</div><div class="meta">Vektet snitt portefølje</div></div>
-    <div class="summary-card"><div class="label">Fakturaflyt</div><div class="value ${totalFakturaH>30?'red':totalFakturaH>15?'yellow':'green'}">${totalFakturaH}</div><div class="meta">Ubehandlede totalt</div></div>`;
+  const scoreCircH = 2 * Math.PI * 38;
+  const scoreOffH = scoreCircH * (1 - avg/100);
+  const scoreColorH = ar==='green'?'var(--green)':ar==='yellow'?'var(--yellow)':'var(--red)';
+  document.getElementById('summaryRow').innerHTML=`
+    <div class="summary-score-box">
+      <div class="health-score-ring portfolio-ring">
+        <svg viewBox="0 0 84 84"><circle class="ring-bg" cx="42" cy="42" r="38"/><circle class="ring-fg" cx="42" cy="42" r="38" style="stroke:${scoreColorH};stroke-dasharray:${scoreCircH};stroke-dashoffset:${scoreOffH}"/></svg>
+        <div class="score-text" style="color:${scoreColorH}">${avg}</div>
+      </div>
+      <div class="sh-label">Porteføljehelse</div>
+      <div class="sh-meta">Snitt ${histFiltered.length} prosjekter</div>
+    </div>
+    <div class="summary-strip">
+      <div class="summary-card"><div class="label">HMS — åpne avvik</div><div class="value ${totalHmsH>15?'red':totalHmsH>8?'yellow':'green'}">${totalHmsH}</div><div class="meta">Totalt på tvers</div></div>
+      <div class="summary-card"><div class="label">Fremdrift</div><div class="value ${behindPlanH>histFiltered.length/2?'red':behindPlanH>0?'yellow':'green'}">${behindPlanH} av ${histFiltered.length}</div><div class="meta">Prosjekter bak plan</div></div>
+      <div class="summary-card"><div class="label">Bidrag</div><div class="value ${bidColorH}">${avgBidragH}%</div><div class="meta">Vektet snitt portefølje</div></div>
+      <div class="summary-card"><div class="label">Fakturaflyt</div><div class="value ${totalFakturaH>30?'red':totalFakturaH>15?'yellow':'green'}">${totalFakturaH}</div><div class="meta">Ubehandlede totalt</div></div>
+    </div>`;
   renderEconomyPortfolio(histFiltered, getViewMonth());
   document.getElementById('projectTableBody').innerHTML=sorted.map(p=>{
     const h=evaluateKpis(p, getViewMonth());
