@@ -158,7 +158,7 @@ function R(){return $('root');}
 let events=[
   {id:'e1',name:'Firmatur Palma 2026',type:'single',dateFrom:'2026-10-16',dateTo:'2026-10-18',
     loc:'Palma de Mallorca',desc:'Felles firmatur for alle ansatte i Totalbetong Gruppen. Charterfly fra Sola, hotell med basseng, sosiale aktiviteter, byvandring, bankett med fest og gode matopplevelser. Turen gjennomføres med følge.',
-    img:'firmatur_palma.jpg',contact:'Olav',maxPax:200,deadline:'2026-02-13',status:'upcoming',
+    img:'firmatur_palma.jpg',contact:'Emma',maxPax:200,mockReg:200,deadline:'2026-02-13',status:'upcoming',
     blocks:{diet:true,dietOpts:['Ingen','Vegetar','Vegan','Halal','Glutenfri','Laktosefri','Annet'],
       passport:true,room:false,companion:true,tshirt:false,
       egenandel:true,egenandel1:2000,egenandel2:2000,egenandelDesc:'Trekkes i lønn april–august. 1 person: 400 kr/mnd. 2 personer: 800 kr/mnd.',
@@ -220,7 +220,7 @@ function vLanding(){
       <div style="background:var(--bg-white);padding:20px 24px;display:flex;align-items:center;gap:16px;border-top:3px solid var(--green)">
         <div style="flex:1"><div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:2px">${ev.name}</div><div style="font-size:13px;color:var(--text-dim)">${ev.loc} · ${fS(ev.dateFrom)}${ev.dateTo&&ev.dateTo!==ev.dateFrom?' – '+fS(ev.dateTo):''}</div></div>
         <div style="display:flex;gap:12px;align-items:center;flex-shrink:0">
-          <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--navy);font-family:'JetBrains Mono',monospace">${ev.registered.length}</div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px">Påmeldt</div></div>
+          <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--navy);font-family:'JetBrains Mono',monospace">${ev.mockReg||ev.registered.length}</div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px">Påmeldt</div></div>
           ${canReg?`<span class="badge badge-green" style="font-size:12px;padding:5px 14px">Påmelding åpen</span>`:`<span class="badge badge-yellow" style="font-size:12px;padding:5px 14px">Frist utløpt</span>`}
         </div>
       </div></div>`;
@@ -404,7 +404,7 @@ function vEvent(eid){
   <div style="font-size:14px;color:var(--text-dim);margin-bottom:20px">${ev.loc} · ${fD(ev.dateFrom)}${ev.dateTo&&ev.dateTo!==ev.dateFrom?' – '+fD(ev.dateTo):''}</div>
   <div class="card"><div class="card-body">
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
-      <div><div class="form-label">Deltakere</div><div style="font-weight:700;font-size:20px;font-family:'JetBrains Mono',monospace">${ev.registered.length}<span style="font-size:14px;color:var(--text-dim);font-weight:400"> / ${ev.maxPax}</span></div></div>
+      <div><div class="form-label">Deltakere</div><div style="font-weight:700;font-size:20px;font-family:'JetBrains Mono',monospace">${ev.mockReg||ev.registered.length}<span style="font-size:14px;color:var(--text-dim);font-weight:400"> / ${ev.maxPax}</span></div></div>
       <div><div class="form-label">Påmeldingsfrist</div><div style="font-weight:600">${ev.deadline?fS(ev.deadline):'Ikke satt'}</div>${canReg?`<div style="font-size:12px;color:var(--green-text)">${days} dager igjen</div>`:''}</div>
       <div><div class="form-label">Kontaktperson</div><div style="font-weight:600">${ev.contact||'Ikke oppgitt'}</div></div>
     </div>
@@ -420,7 +420,7 @@ function vEvent(eid){
     h+=`</div></div>`;}
   if(ev.info.length){h+=`<div class="section-title">Praktisk informasjon</div>`;
     ev.info.forEach(inf=>{h+=`<div class="card"><div class="card-body"><div style="font-weight:700;font-size:14px;margin-bottom:6px">${inf.title}</div><div style="font-size:13px;color:var(--text-secondary);line-height:1.6">${inf.text}</div></div></div>`;});}
-  if(ev.registered.length){h+=`<div class="section-title">Påmeldte (${ev.registered.length})</div><div class="card">`;
+  if(ev.registered.length){h+=`<div class="section-title">Påmeldte (${ev.mockReg||ev.registered.length})</div><div class="card">`;
     ev.registered.forEach(r=>{const p=gP(r.pid);h+=`<div class="row">${av(p)}<div style="flex:1"><div style="font-weight:600;font-size:14px">${p.name}</div><div style="font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:4px"><span class="company-dot" style="background:${gc(p.co).color}"></span>${gc(p.co).name}</div></div>${r.diet&&r.diet!=='Ingen'?`<span class="badge badge-yellow">${r.diet}</span>`:''}${r.companion?`<span class="badge badge-blue">+1 ${r.companion}</span>`:''}${r.airport&&r.airport!==ev.blocks.airportDefault?`<span class="badge badge-gray">✈ ${r.airport}</span>`:''}</div>`;});
     h+=`</div>`;}
   h+=`</div>`;R().innerHTML=h;
