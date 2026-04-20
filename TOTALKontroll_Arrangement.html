@@ -147,18 +147,59 @@ const rb=p=>p===1?'gold':p===2?'silver':p===3?'bronze':'other';
 function sRank(){const m={};PL.forEach(p=>m[p.id]={pid:p.id,pts:0,rnd:0,wins:0});T.filter(t=>t.status==='completed').forEach(t=>{const s=[...t.res].sort((a,b)=>a.tot-b.tot);s.forEach((r,i)=>{const pts=SPTS[i]||1;const tm=t.teams.find(x=>x.id===r.tid);if(!tm)return;tm.p.forEach(pid=>{m[pid].pts+=pts;m[pid].rnd++;if(i===0)m[pid].wins++;});});});return Object.values(m).filter(p=>p.rnd>0).sort((a,b)=>b.pts-a.pts);}
 function cRank(){const r=sRank();return CO.map(c=>{const ps=r.filter(x=>gP(x.pid)?.co===c.id);const t=ps.reduce((s,p)=>s+p.pts,0);return{...c,total:t,avg:ps.length?Math.round(t/ps.length):0,cnt:ps.length};}).sort((a,b)=>b.total-a.total);}
 
-// Init
-vLanding();
+// Init - called at end of script
 
 // ═══ VIEWS ═══
 let gTab='kalender',aTab='turneringer';
 function $(id){return document.getElementById(id);}
 function R(){return $('root');}
 
+// ═══ GENERIC EVENTS ═══
+let events=[
+  {id:'e1',name:'Firmatur Palma 2026',type:'single',dateFrom:'2026-10-16',dateTo:'2026-10-18',
+    loc:'Palma de Mallorca',desc:'Felles firmatur for alle ansatte i Totalbetong Gruppen. Charterfly fra Sola, hotell med basseng, sosiale aktiviteter, byvandring, bankett med fest og gode matopplevelser. Turen gjennomføres med følge.',
+    img:'firmatur_palma.jpg',contact:'Olav',maxPax:160,deadline:'2026-02-13',status:'upcoming',
+    blocks:{diet:true,dietOpts:['Ingen','Vegetar','Vegan','Halal','Glutenfri','Laktosefri','Annet'],
+      passport:true,room:false,companion:true,tshirt:false,
+      egenandel:true,egenandel1:2000,egenandel2:2000,egenandelDesc:'Trekkes i lønn april–august. 1 person: 400 kr/mnd. 2 personer: 800 kr/mnd.',
+      airport:true,airportDefault:'Stavanger (Sola)',
+      freetext:true,freetextQ:'Er det noe annet vi bør vite? (helsehensyn, spesielle behov o.l.)'},
+    program:[
+      {time:'Fredag 16. okt, 06:00',title:'Oppmøte Sola flyplass',desc:'Felles innsjekk. Charterfly avgang kl 08:00.'},
+      {time:'Fredag 16. okt, 12:00',title:'Ankomst Palma',desc:'Busstransfer til hotellet. Innsjekk og fri tid ved bassenget.'},
+      {time:'Fredag 16. okt, 19:30',title:'Velkomstmiddag',desc:'Felles middag på hotellet.'},
+      {time:'Lørdag 17. okt, 10:00',title:'Byvandring Palma',desc:'Guidet tur i gamlebyen med katedralen, tapas og lokale perler.'},
+      {time:'Lørdag 17. okt, 15:00',title:'Fri tid / aktiviteter',desc:'Strand, basseng eller utforsk på egen hånd.'},
+      {time:'Lørdag 17. okt, 19:00',title:'Bankett og fest',desc:'Årets høydepunkt. Festmiddag med underholdning og dans.'},
+      {time:'Søndag 18. okt, 10:00',title:'Utsjekk',desc:'Sen frokost og fri tid frem til avreise.'},
+      {time:'Søndag 18. okt, 17:00',title:'Hjemreise',desc:'Charterfly fra Palma. Ankomst Sola ca 21:30.'}
+    ],
+    info:[
+      {title:'Hva er inkludert',text:'Charterfly tur/retur Sola, hotell med basseng (2 netter), frokost, velkomstmiddag, bankett, byvandring, busstransfer.'},
+      {title:'Egenandel',text:'Bindende påmelding. Egenandel kr 2 000 per reisende. Trekkes i lønn fra april til august. 2 personer: 800 kr/mnd. 1 person: 400 kr/mnd.'},
+      {title:'Reiser du fra et annet sted?',text:'Oppgi ønsket avreiseflyplass ved påmelding. Spesielt relevant for ansatte som reiser fra Polen.'},
+      {title:'Reisedokumenter',text:'Gyldig pass kreves. Sjekk at passet er gyldig minst 6 måneder etter reisedato.'}
+    ],
+    updates:[
+      {date:'2026-01-20',text:'Firmaturen er bekreftet! Destinasjon: Palma de Mallorca. Påmelding åpner snart.'},
+      {date:'2026-02-01',text:'Påmelding er nå åpen. Frist 13. februar. Husk å oppgi om du reiser med følge.'}
+    ],
+    registered:[]
+  }
+];
+
+let evRegRoom=null,evRegComp=null;
+
+// ═══ LANDING ═══
 function vLanding(){
   $('bc').textContent='Arrangement';
   const n=new Set(T.flatMap(t=>t.reg)).size;
-  R().innerHTML=`<div style="cursor:pointer;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-md);max-width:900px;transition:transform 0.2s" onclick="vGolf()" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;max-width:900px;margin-bottom:20px">
+    <div style="font-size:20px;font-weight:700;color:var(--navy)">Arrangement</div>
+    <button class="btn btn-primary btn-sm" onclick="vAdminHub()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68 1.65 1.65 0 0010 3.17V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> Administrer</button>
+  </div>`;
+  // Golf card
+  h+=`<div style="cursor:pointer;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-md);max-width:900px;transition:transform 0.2s" onclick="vGolf()" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
     <div style="position:relative;width:100%;height:0;padding-bottom:33%;overflow:hidden;background:#1B2A4A"><img src="golfcup_hero.jpg" alt="GolfCup 2026" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
     <div style="background:var(--bg-white);padding:20px 24px;display:flex;align-items:center;gap:16px;border-top:3px solid var(--tb-orange)">
       <div style="flex:1"><div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:2px">Totalbetong GolfCup 2026</div><div style="font-size:13px;color:var(--text-dim)">Scramble-turnering på lag, på tvers av hele konsernet</div></div>
@@ -169,18 +210,253 @@ function vLanding(){
         <div style="width:1px;height:32px;background:var(--border)"></div>
         <span class="badge badge-green" style="font-size:12px;padding:5px 14px">Sesong aktiv</span>
       </div>
-    </div></div>
-
-  <div style="border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);max-width:900px;margin-top:20px;opacity:0.85">
+    </div></div>`;
+  // Generic events
+  events.forEach(ev=>{
+    const days=ev.deadline?Math.ceil((new Date(ev.deadline+'T00:00:00')-new Date())/864e5):null;
+    const canReg=days!==null&&days>0;
+    h+=`<div style="cursor:pointer;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);max-width:900px;margin-top:20px;transition:transform 0.2s" onclick="vEvent('${ev.id}')" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+      ${ev.img?`<div style="position:relative;width:100%;height:0;padding-bottom:25%;overflow:hidden;background:#1B2A4A"><img src="${ev.img}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>`:''}
+      <div style="background:var(--bg-white);padding:20px 24px;display:flex;align-items:center;gap:16px;border-top:3px solid var(--green)">
+        <div style="flex:1"><div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:2px">${ev.name}</div><div style="font-size:13px;color:var(--text-dim)">${ev.loc} · ${fS(ev.dateFrom)}${ev.dateTo&&ev.dateTo!==ev.dateFrom?' – '+fS(ev.dateTo):''}</div></div>
+        <div style="display:flex;gap:12px;align-items:center;flex-shrink:0">
+          <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:var(--navy);font-family:'JetBrains Mono',monospace">${ev.registered.length}</div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px">Påmeldt</div></div>
+          ${canReg?`<span class="badge badge-green" style="font-size:12px;padding:5px 14px">Påmelding åpen</span>`:`<span class="badge badge-yellow" style="font-size:12px;padding:5px 14px">Frist utløpt</span>`}
+        </div>
+      </div></div>`;
+  });
+  // Padel
+  h+=`<div style="border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);max-width:900px;margin-top:20px;opacity:0.85">
     <div style="position:relative;width:100%;height:0;padding-bottom:25%;overflow:hidden;background:#1B2A4A"><img src="tb_padel.png" alt="Totalbetong Padel" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div>
     <div style="background:var(--bg-white);padding:18px 24px;display:flex;align-items:center;gap:16px;border-top:3px solid var(--blue)">
-      <div style="flex:1">
-        <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:2px">Totalbetong Padel</div>
-        <div style="font-size:13px;color:var(--text-dim)">Padelturneringen er under planlegging. Mer informasjon kommer snart!</div>
-      </div>
+      <div style="flex:1"><div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:2px">Totalbetong Padel</div><div style="font-size:13px;color:var(--text-dim)">Padelturneringen er under planlegging. Mer informasjon kommer snart!</div></div>
       <span class="badge badge-blue" style="font-size:12px;padding:5px 14px;flex-shrink:0">Kommer snart</span>
+    </div></div>`;
+  R().innerHTML=h;
+}
+
+// ═══ ADMIN HUB ═══
+function vAdminHub(){
+  $('bc').textContent='Arrangement / Administrer';
+  let h=`<div style="margin-bottom:4px"><button class="detail-back" onclick="vLanding()">← Arrangement</button></div>
+  <div style="font-size:20px;font-weight:700;color:var(--navy);margin-bottom:20px">Opprett nytt arrangement</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:900px;margin-bottom:32px">
+    <div class="card" style="cursor:pointer;transition:all 0.2s;padding:24px" onclick="vNewEvent('golf')" onmouseover="this.style.borderColor='var(--tb-orange)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='';this.style.transform=''">
+      <div style="font-size:28px;margin-bottom:8px">⛳</div>
+      <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px">Golfturnering</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.5">Sesongbasert turnering med lag, scorecard og ranking. Gjenbruk oppsett fra tidligere sesonger.</div>
+      <div style="margin-top:12px"><span class="badge badge-orange">Mal tilgjengelig</span></div>
+    </div>
+    <div class="card" style="cursor:pointer;transition:all 0.2s;padding:24px" onclick="vNewEvent('single')" onmouseover="this.style.borderColor='var(--green)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='';this.style.transform=''">
+      <div style="font-size:28px;margin-bottom:8px">🎉</div>
+      <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px">Engangsarrangement</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.5">Firmatur, julebord, sommeravslutning, fagdag. Konfigurerbar påmelding med valgfrie felt.</div>
+      <div style="margin-top:12px"><span class="badge badge-green">Fleksibel mal</span></div>
+    </div>
+    <div class="card" style="cursor:default;padding:24px;opacity:0.6">
+      <div style="font-size:28px;margin-bottom:8px">🛠️</div>
+      <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px">Bestill ny mal</div>
+      <div style="font-size:13px;color:var(--text-dim);line-height:1.5">Trenger du noe annet? Padelturnering, fiskekonkurranse, quiz? Kontakt produkteier for skreddersydd mal.</div>
+      <div style="margin-top:12px"><span class="badge badge-gray">Kontakt produkteier</span></div>
+    </div>
+  </div>
+  <div class="section-title">Eksisterende arrangementer</div>
+  <div class="card" style="max-width:900px"><div style="padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border-light)">
+    <div style="flex:1"><div style="font-weight:600;font-size:14px">Totalbetong GolfCup 2026</div><div style="font-size:12px;color:var(--text-dim)">Golfturnering · ${T.length} turneringer · Sesong aktiv</div></div>
+    <span class="badge badge-orange">Golf</span>
+    <button class="btn btn-outline btn-sm" onclick="vGolf()">Åpne</button>
+    <button class="btn btn-outline btn-sm" onclick="alert('Åpner redigering av GolfCup 2026 sesonginnstillinger. (Ikke implementert i prototypen.)')">✏️</button>
+  </div>`;
+  events.forEach(ev=>{
+    h+=`<div style="padding:14px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border-light)">
+      <div style="flex:1"><div style="font-weight:600;font-size:14px">${ev.name}</div><div style="font-size:12px;color:var(--text-dim)">Engangsarrangement · ${ev.loc} · ${fS(ev.dateFrom)}${ev.dateTo?' – '+fS(ev.dateTo):''}</div></div>
+      <span class="badge badge-green">Enkelt</span>
+      <button class="btn btn-outline btn-sm" onclick="vEvent('${ev.id}')">Åpne</button>
+      <button class="btn btn-outline btn-sm" onclick="alert('Åpner redigering av ${ev.name}. Samme skjema som opprettelse, forhåndsutfylt med eksisterende data. (Ikke implementert i prototypen.)')">✏️</button>
+    </div>`;
+  });
+  h+=`</div>`;
+  R().innerHTML=h;
+}
+
+// ═══ NEW EVENT FORM ═══
+function vNewEvent(type){
+  if(type==='golf'){alert('Kopierer oppsettet fra GolfCup 2026. (Ikke implementert i prototypen.)');return;}
+  $('bc').textContent='Arrangement / Nytt engangsarrangement';
+  let h=`<div style="margin-bottom:4px"><button class="detail-back" onclick="vAdminHub()">← Administrer</button></div>
+  <div style="font-size:20px;font-weight:700;color:var(--navy);margin-bottom:6px">Nytt engangsarrangement</div>
+  <div style="font-size:13px;color:var(--text-dim);margin-bottom:24px">Fyll inn grunninfo og velg hvilke felt deltakerne skal fylle ut ved påmelding.</div>
+  <div style="max-width:700px">
+  <div class="card"><div class="card-header"><div class="card-title">Grunninfo</div></div><div class="card-body">
+    <div class="form-group"><label class="form-label">Navn på arrangement</label><input class="form-input" id="ne-name" placeholder="F.eks. Firmatur Kreta 2026"></div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label class="form-label">Dato fra</label><input class="form-input" type="date" id="ne-from"></div>
+      <div class="form-group"><label class="form-label">Dato til <span style="text-transform:none;font-weight:400">(valgfritt, flerdagers)</span></label><input class="form-input" type="date" id="ne-to"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Sted / destinasjon</label><input class="form-input" id="ne-loc" placeholder="F.eks. Chania, Kreta"></div>
+    <div class="form-group"><label class="form-label">Beskrivelse</label><textarea class="form-input" id="ne-desc" rows="3" style="resize:vertical" placeholder="Kort beskrivelse som vises til deltakerne..."></textarea></div>
+    <div class="form-row form-row-2">
+      <div class="form-group"><label class="form-label">Maks deltakere</label><input class="form-input" type="number" id="ne-max" value="80"></div>
+      <div class="form-group"><label class="form-label">Påmeldingsfrist</label><input class="form-input" type="date" id="ne-dl"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Kontaktperson</label><input class="form-input" id="ne-contact" placeholder="Navn på den som svarer på spørsmål"></div>
+    <div class="form-group"><label class="form-label">Bannerbilde <span style="text-transform:none;font-weight:400">(valgfritt)</span></label>
+      <div id="ne-img-preview" style="display:none;margin-bottom:8px;border-radius:8px;overflow:hidden;max-height:160px"><img id="ne-img-tag" style="width:100%;object-fit:cover"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <label class="btn btn-outline btn-sm" style="cursor:pointer"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Velg bilde<input type="file" id="ne-img" accept="image/*" style="display:none" onchange="previewImg(this)"></label>
+        <span id="ne-img-name" style="font-size:12px;color:var(--text-dim)">Ingen fil valgt</span>
+      </div>
+    </div>
+  </div></div>
+  <div class="card"><div class="card-header"><div><div class="card-title">Påmeldingsspørsmål</div><div class="card-subtitle">Slå av/på hvilke felt deltakerne skal fylle ut</div></div></div><div class="card-body">
+    ${bTog('ne-diet','Matpreferanser','Vegetar, vegan, halal, glutenfri, laktosefri, annet','🍽️',true)}
+    ${bTog('ne-passport','Reisedokumenter','Passnummer og utløpsdato (for utenlandsreiser)','🛂',false)}
+    ${bTog('ne-room','Rompreferanse','Enkel/dobbel, hvem man vil dele med','🛏️',false)}
+    ${bTog('ne-companion','Ledsager','Kan man ta med partner? Navn og matpreferanse','👫',false)}
+    ${bTog('ne-tshirt','T-skjortestørrelse','XS til XXL, for profilklær eller utstyr','👕',false)}
+    ${bTog('ne-egenandel','Egenandel','Deltakeren bekrefter egenandel ved påmelding','💰',false)}
+    <div id="ne-egenandel-fields" style="display:none;padding:0 0 12px 44px;border-bottom:1px solid var(--border-light)">
+      <div class="form-row form-row-2" style="margin-top:8px">
+        <div class="form-group" style="margin-bottom:0"><label class="form-label">Beløp 1 person (kr)</label><input class="form-input" id="ne-egen1" type="number" placeholder="2000" value="2000"></div>
+        <div class="form-group" style="margin-bottom:0"><label class="form-label">Beløp 2 personer (kr)</label><input class="form-input" id="ne-egen2" type="number" placeholder="2000" value="2000"></div>
+      </div>
+      <div class="form-group" style="margin-top:8px;margin-bottom:0"><label class="form-label">Beskrivelse (vises til deltaker)</label><input class="form-input" id="ne-egendesc" placeholder="F.eks. Trekkes i lønn april–august"></div>
+    </div>
+    ${bTog('ne-airport','Avreiseflyplass','For deltakere som reiser fra et annet sted enn hovedflyplassen','✈️',false)}
+    ${bTog('ne-freetext','Egendefinert spørsmål','Du definerer spørsmålet, deltakeren svarer i fritekst','💬',false)}
+    <div class="form-group" id="ne-freetext-q" style="display:none;margin-top:12px">
+      <label class="form-label">Ditt spørsmål</label>
+      <input class="form-input" id="ne-ftq" placeholder="F.eks. Er det noe annet vi bør vite?">
+    </div>
+  </div></div>
+  <div class="card"><div class="card-header"><div><div class="card-title">Program / agenda</div><div class="card-subtitle">Kan også fylles inn senere</div></div>
+    <button class="btn btn-outline btn-sm" onclick="addProg()">+ Legg til</button>
+  </div><div class="card-body" id="ne-prog"></div></div>
+  <div class="card"><div class="card-header"><div><div class="card-title">Praktisk informasjon</div><div class="card-subtitle">Fritekst-blokker med nyttig info</div></div>
+    <button class="btn btn-outline btn-sm" onclick="addInf()">+ Legg til</button>
+  </div><div class="card-body" id="ne-info"></div></div>
+  <div style="display:flex;gap:12px;margin-top:20px;margin-bottom:40px">
+    <button class="btn btn-primary" style="padding:14px 32px" onclick="saveNE()">Opprett arrangement</button>
+    <button class="btn btn-outline" onclick="vAdminHub()">Avbryt</button>
+  </div></div>`;
+  R().innerHTML=h;
+}
+
+function bTog(id,label,desc,icon,on){
+  return `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border-light)">
+    <div style="font-size:20px;width:32px;text-align:center">${icon}</div>
+    <div style="flex:1"><div style="font-weight:600;font-size:14px;color:var(--navy)">${label}</div><div style="font-size:12px;color:var(--text-dim)">${desc}</div></div>
+    <input type="checkbox" id="${id}" ${on?'checked':''} style="display:none">
+    <div id="${id}-track" onclick="togSw('${id}')" style="position:relative;width:44px;height:24px;border-radius:12px;background:${on?'var(--tb-orange)':'var(--border)'};cursor:pointer;transition:background 0.2s;flex-shrink:0">
+      <div id="${id}-knob" style="position:absolute;top:2px;left:${on?'22':'2'}px;width:20px;height:20px;border-radius:10px;background:white;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></div>
     </div>
   </div>`;
+}
+
+function togSw(id){
+  var cb=$(id);if(!cb)return;cb.checked=!cb.checked;
+  var track=$(id+'-track');var knob=$(id+'-knob');
+  track.style.background=cb.checked?'var(--tb-orange)':'var(--border)';
+  knob.style.left=cb.checked?'22px':'2px';
+  if(id==='ne-freetext'){var q=$('ne-freetext-q');if(q)q.style.display=cb.checked?'':'none';}
+  if(id==='ne-egenandel'){var f=$('ne-egenandel-fields');if(f)f.style.display=cb.checked?'':'none';}
+}
+
+let nProg=0,nInf=0,neImgData='';
+function previewImg(input){
+  const file=input.files[0];if(!file)return;
+  $('ne-img-name').textContent=file.name;
+  const reader=new FileReader();
+  reader.onload=function(e){neImgData=e.target.result;$('ne-img-tag').src=neImgData;$('ne-img-preview').style.display='';};
+  reader.readAsDataURL(file);
+}
+function addProg(){const el=$('ne-prog');const i=nProg++;el.insertAdjacentHTML('beforeend',`<div style="display:flex;gap:8px;margin-bottom:10px" id="prg-${i}"><input class="form-input" style="width:180px;flex-shrink:0" placeholder="Tidspunkt" id="prg-t-${i}"><input class="form-input" style="flex:1" placeholder="Aktivitet / tittel" id="prg-n-${i}"><button class="btn btn-outline btn-sm" onclick="$('prg-${i}').remove()" style="flex-shrink:0">✕</button></div>`);}
+function addInf(){const el=$('ne-info');const i=nInf++;el.insertAdjacentHTML('beforeend',`<div style="margin-bottom:12px" id="inf-${i}"><div style="display:flex;gap:8px;margin-bottom:4px"><input class="form-input" placeholder="Overskrift" id="inf-t-${i}" style="flex:1"><button class="btn btn-outline btn-sm" onclick="$('inf-${i}').remove()" style="flex-shrink:0">✕</button></div><textarea class="form-input" placeholder="Innhold..." id="inf-b-${i}" rows="2" style="resize:vertical"></textarea></div>`);}
+
+function saveNE(){
+  const name=$('ne-name').value;const from=$('ne-from').value;
+  if(!name||!from){alert('Fyll inn navn og dato');return;}
+  const ev={id:'e'+Date.now(),name,type:'single',dateFrom:from,dateTo:$('ne-to').value||from,
+    loc:$('ne-loc').value||'',desc:$('ne-desc').value||'',img:neImgData||'',contact:$('ne-contact').value||'',
+    maxPax:parseInt($('ne-max').value)||80,deadline:$('ne-dl').value||from,status:'upcoming',
+    blocks:{diet:$('ne-diet').checked,dietOpts:['Ingen','Vegetar','Vegan','Halal','Glutenfri','Laktosefri','Annet'],
+      passport:$('ne-passport').checked,room:$('ne-room').checked,companion:$('ne-companion').checked,
+      tshirt:$('ne-tshirt').checked,
+      egenandel:$('ne-egenandel').checked,egenandel1:parseInt($('ne-egen1')?.value)||0,egenandel2:parseInt($('ne-egen2')?.value)||0,egenandelDesc:$('ne-egendesc')?.value||'',
+      airport:$('ne-airport').checked,airportDefault:'Stavanger (Sola)',
+      freetext:$('ne-freetext').checked,freetextQ:$('ne-ftq')?.value||''},
+    program:[],info:[],updates:[],registered:[]};
+  for(let i=0;i<nProg;i++){const t=$('prg-t-'+i);const n=$('prg-n-'+i);if(t&&n&&n.value)ev.program.push({time:t.value,title:n.value,desc:''});}
+  for(let i=0;i<nInf;i++){const t=$('inf-t-'+i);const b=$('inf-b-'+i);if(t&&b&&t.value)ev.info.push({title:t.value,text:b.value});}
+  events.push(ev);nProg=0;nInf=0;neImgData='';vLanding();
+}
+
+// ═══ EVENT DETAIL ═══
+function vEvent(eid){
+  const ev=events.find(x=>x.id===eid);if(!ev)return;
+  $('bc').textContent='Arrangement / '+ev.name;
+  const enrolled=ev.registered.some(r=>r.pid===CUR);
+  const days=ev.deadline?Math.ceil((new Date(ev.deadline+'T00:00:00')-new Date())/864e5):null;
+  const canReg=days!==null&&days>0;
+  let h=`<div style="margin-bottom:4px"><button class="detail-back" onclick="vLanding()">← Arrangement</button></div>
+  <div style="max-width:800px">
+  <div style="font-size:24px;font-weight:700;letter-spacing:-.3px;margin-bottom:2px">${ev.name}</div>
+  <div style="font-size:14px;color:var(--text-dim);margin-bottom:20px">${ev.loc} · ${fD(ev.dateFrom)}${ev.dateTo&&ev.dateTo!==ev.dateFrom?' – '+fD(ev.dateTo):''}</div>
+  <div class="card"><div class="card-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+      <div><div class="form-label">Deltakere</div><div style="font-weight:700;font-size:20px;font-family:'JetBrains Mono',monospace">${ev.registered.length}<span style="font-size:14px;color:var(--text-dim);font-weight:400"> / ${ev.maxPax}</span></div></div>
+      <div><div class="form-label">Påmeldingsfrist</div><div style="font-weight:600">${ev.deadline?fS(ev.deadline):'Ikke satt'}</div>${canReg?`<div style="font-size:12px;color:var(--green-text)">${days} dager igjen</div>`:''}</div>
+      <div><div class="form-label">Kontaktperson</div><div style="font-weight:600">${ev.contact||'Ikke oppgitt'}</div></div>
+    </div>
+    ${ev.desc?`<div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border-light);font-size:14px;color:var(--text-secondary);line-height:1.6">${ev.desc}</div>`:''}
+  </div></div>
+  ${!enrolled&&canReg?`<button class="btn btn-primary btn-block" style="padding:14px;margin-bottom:20px" onclick="openEvReg('${ev.id}')">Meld deg på</button>`
+    :enrolled?`<div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:8px;background:var(--green-bg);color:var(--green-text);font-weight:600;margin-bottom:20px">✓ Du er påmeldt</div>`:''}`;
+  if(ev.updates.length){h+=`<div class="section-title">Oppdateringer</div><div class="card"><div style="padding:4px 0">`;
+    ev.updates.slice().reverse().forEach(u=>{h+=`<div class="row"><div style="flex-shrink:0;font-size:12px;color:var(--text-dim);width:80px">${fS(u.date)}</div><div style="flex:1;font-size:14px">${u.text}</div></div>`;});
+    h+=`</div></div>`;}
+  if(ev.program.length){h+=`<div class="section-title">Program</div><div class="card"><div style="padding:4px 0">`;
+    ev.program.forEach(p=>{h+=`<div class="row" style="align-items:flex-start"><div style="flex-shrink:0;width:180px"><div style="font-size:12px;font-weight:600;color:var(--tb-orange)">${p.time}</div></div><div style="flex:1"><div style="font-weight:600;font-size:14px">${p.title}</div>${p.desc?`<div style="font-size:13px;color:var(--text-dim);margin-top:2px">${p.desc}</div>`:''}</div></div>`;});
+    h+=`</div></div>`;}
+  if(ev.info.length){h+=`<div class="section-title">Praktisk informasjon</div>`;
+    ev.info.forEach(inf=>{h+=`<div class="card"><div class="card-body"><div style="font-weight:700;font-size:14px;margin-bottom:6px">${inf.title}</div><div style="font-size:13px;color:var(--text-secondary);line-height:1.6">${inf.text}</div></div></div>`;});}
+  if(ev.registered.length){h+=`<div class="section-title">Påmeldte (${ev.registered.length})</div><div class="card">`;
+    ev.registered.forEach(r=>{const p=gP(r.pid);h+=`<div class="row">${av(p)}<div style="flex:1"><div style="font-weight:600;font-size:14px">${p.name}</div><div style="font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:4px"><span class="company-dot" style="background:${gc(p.co).color}"></span>${gc(p.co).name}</div></div>${r.diet&&r.diet!=='Ingen'?`<span class="badge badge-yellow">${r.diet}</span>`:''}${r.companion?`<span class="badge badge-blue">+1 ${r.companion}</span>`:''}${r.airport&&r.airport!==ev.blocks.airportDefault?`<span class="badge badge-gray">✈ ${r.airport}</span>`:''}</div>`;});
+    h+=`</div>`;}
+  h+=`</div>`;R().innerHTML=h;
+}
+
+// ═══ EVENT REGISTRATION ═══
+function openEvReg(eid){
+  const ev=events.find(x=>x.id===eid);if(!ev)return;
+  const b=ev.blocks;evRegRoom=null;evRegComp=null;
+  $('rmTitle').textContent='Meld deg på: '+ev.name;
+  $('rmSub').textContent=ev.loc+' · '+fS(ev.dateFrom)+(ev.dateTo&&ev.dateTo!==ev.dateFrom?' – '+fS(ev.dateTo):'');
+  let f='';
+  if(b.diet)f+=`<div class="form-group"><div class="form-label">Matpreferanser</div><select class="form-input" id="evr-diet">${b.dietOpts.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+  if(b.passport)f+=`<div class="form-row form-row-2"><div class="form-group"><div class="form-label">Passnummer</div><input class="form-input" id="evr-pass" placeholder="Passnummer"></div><div class="form-group"><div class="form-label">Pass utløpsdato</div><input class="form-input" type="date" id="evr-passexp"></div></div><div class="form-group"><div class="form-label">Fødselsdato</div><input class="form-input" type="date" id="evr-bday"></div>`;
+  if(b.room)f+=`<div class="form-group"><div class="form-label">Rompreferanse</div><div class="opt-group" id="evr-room"><div class="opt-card" onclick="sOpt('evr-room',this,'single')"><div class="opt-icon">🛏️</div><div class="opt-label">Enkeltrom</div></div><div class="opt-card" onclick="sOpt('evr-room',this,'double')"><div class="opt-icon">🛏️🛏️</div><div class="opt-label">Delt dobbeltrom</div></div></div></div><div class="form-group"><div class="form-label">Ønsker å dele rom med <span style="text-transform:none;font-weight:400">(valgfritt)</span></div><select class="form-input" id="evr-roommate"><option value="">Ingen preferanse</option>${PL.filter(x=>x.id!==CUR).map(x=>`<option value="${x.id}">${x.name}</option>`).join('')}</select></div>`;
+  if(b.companion)f+=`<div class="form-group"><div class="form-label">Reiser du med følge?</div><div class="opt-group" id="evr-comp"><div class="opt-card" onclick="sOpt('evr-comp',this,'no')"><div class="opt-label">Nei, reiser alene</div></div><div class="opt-card" onclick="sOpt('evr-comp',this,'yes')"><div class="opt-label">Ja, med følge</div></div></div></div><div id="evr-comp-detail" style="display:none"><div class="form-group"><div class="form-label">Fullt navn på følge</div><input class="form-input" id="evr-compname" placeholder="Fullt navn"></div><div class="form-group"><div class="form-label">Fødselsdato følge</div><input class="form-input" type="date" id="evr-compbday"></div>${b.diet?`<div class="form-group"><div class="form-label">Matpreferanse følge</div><select class="form-input" id="evr-compdiet">${b.dietOpts.map(o=>`<option>${o}</option>`).join('')}</select></div>`:''}</div>`;
+  if(b.tshirt)f+=`<div class="form-group"><div class="form-label">T-skjortestørrelse</div><select class="form-input" id="evr-tshirt"><option value="">Velg størrelse</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select></div>`;
+  if(b.airport)f+=`<div class="form-group"><div class="form-label">Avreiseflyplass</div><select class="form-input" id="evr-airport"><option>${b.airportDefault||'Stavanger (Sola)'}</option><option>Oslo (Gardermoen)</option><option>Bergen (Flesland)</option><option>Warszawa (Chopin)</option><option>Gdansk (Lech Wałęsa)</option><option>Kraków (Balice)</option><option>Annet (spesifiser i fritekst)</option></select></div>`;
+  if(b.egenandel)f+=`<div style="background:var(--yellow-bg);border:1px solid rgba(202,138,4,0.2);border-radius:8px;padding:16px;margin-top:8px"><div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:4px">💰 Egenandel</div><div style="font-size:13px;color:var(--text-secondary);line-height:1.5;margin-bottom:8px">${b.egenandelDesc||''}</div><div style="display:flex;gap:16px;margin-bottom:10px"><div style="font-size:14px"><strong>1 person:</strong> kr ${(b.egenandel1||0).toLocaleString('nb-NO')}</div><div style="font-size:14px"><strong>2 personer:</strong> kr ${(b.egenandel2||0).toLocaleString('nb-NO')}</div></div><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600;color:var(--navy)"><input type="checkbox" id="evr-egenandel-ok" style="width:18px;height:18px;accent-color:var(--tb-orange)"> Jeg bekrefter egenandel og bindende påmelding</label></div>`;
+  if(b.freetext&&b.freetextQ)f+=`<div class="form-group" style="margin-top:12px"><div class="form-label">${b.freetextQ}</div><textarea class="form-input" id="evr-free" rows="2" style="resize:vertical" placeholder="Skriv her..."></textarea></div>`;
+  f+=`<button class="btn btn-primary btn-block" style="margin-top:16px;padding:14px" onclick="subEvReg('${eid}')">Bekreft påmelding</button>`;
+  $('rmBody').innerHTML=f;$('regModal').style.display='flex';
+}
+
+function subEvReg(eid){
+  const ev=events.find(x=>x.id===eid);if(!ev)return;const b=ev.blocks;
+  if(b.egenandel&&!$('evr-egenandel-ok')?.checked){alert('Du må bekrefte egenandel og bindende påmelding');return;}
+  const reg={pid:CUR};
+  if(b.diet)reg.diet=$('evr-diet')?.value||'';
+  if(b.passport){reg.passport=$('evr-pass')?.value||'';reg.passExp=$('evr-passexp')?.value||'';reg.bday=$('evr-bday')?.value||'';}
+  if(b.room)reg.room=evRegRoom||'';
+  if(b.companion&&evRegComp==='yes'){reg.companion=$('evr-compname')?.value||'';reg.compBday=$('evr-compbday')?.value||'';reg.compDiet=$('evr-compdiet')?.value||'';}
+  if(b.tshirt)reg.tshirt=$('evr-tshirt')?.value||'';
+  if(b.airport)reg.airport=$('evr-airport')?.value||'';
+  if(b.freetext)reg.freetext=$('evr-free')?.value||'';
+  ev.registered.push(reg);closeReg();vEvent(eid);
 }
 
 function vGolf(){$('bc').textContent='Arrangement / GolfCup 2026';gTab='kalender';rShell();}
@@ -281,7 +557,7 @@ function openReg(tid){regTid=tid;const t=T.find(x=>x.id===tid);const p=gP(CUR);r
     <button class="btn btn-primary btn-block" style="margin-top:16px;padding:14px" onclick="subReg()">Bekreft påmelding</button>`;
   $('regModal').style.display='flex';}
 function closeReg(){$('regModal').style.display='none';regTid=null;}
-function sOpt(g,el,v){document.querySelectorAll('#'+g+' .opt-card').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');if(g==='rXp'){regXp=v;$('rHG').style.display=v==='regular'?'':'none';}if(g==='rEq')regEq=v;}
+function sOpt(g,el,v){document.querySelectorAll('#'+g+' .opt-card').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');if(g==='rXp'){regXp=v;$('rHG').style.display=v==='regular'?'':'none';}if(g==='rEq')regEq=v;if(g==='evr-room')evRegRoom=v;if(g==='evr-comp'){evRegComp=v;var d=$('evr-comp-detail');if(d)d.style.display=v==='yes'?'':'none';}}
 function subReg(){if(!regXp){alert('Velg erfaringsnivå');return;}if(!regEq){alert('Velg utstyr');return;}const t=T.find(x=>x.id===regTid);if(!t)return;const p=gP(CUR);p.xp=regXp;p.eq=regEq;const hv=$('rHcp').value;p.hcp=hv?parseInt(hv):null;if(!t.reg.includes(CUR))t.reg.push(CUR);closeReg();vDet(t.id);}
 
 // ═══ RANKING ═══
@@ -422,6 +698,9 @@ function rAR(el){const pending=T.filter(t=>t.status==='upcoming'&&t.res.length>0
   if(!h)h=`<div style="text-align:center;padding:48px;color:var(--text-dim)"><p style="font-weight:600">Ingen resultater å behandle</p><p style="font-size:13px">Venter på innleverte scorecards</p></div>`;
   el.innerHTML=h;}
 function fin(tid){const t=T.find(x=>x.id===tid);if(t){t.status='completed';rAdmin($('gC'));}}
+
+// ═══ INIT ═══
+vLanding();
 </script>
 </body>
 </html>
