@@ -476,8 +476,9 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 @keyframes pulse { 0%, 100% { opacity:1; } 50% { opacity:0.55; } }
 .state-published-card { border-left:3px solid var(--green); }
 .state-active-card { border-left:3px solid var(--tb-orange); background:#FFFBF5; }
-.rcc-share-icon { position:absolute; top:8px; right:76px; background:none; border:1px solid var(--border-light); color:var(--text-dim); padding:4px 8px; font-size:12px; border-radius:4px; cursor:pointer; font-family:inherit; }
-.rcc-share-icon:hover { color:var(--text-primary); border-color:var(--text-secondary); }
+.rcc-share-btn { position:absolute; top:9px; right:90px; display:inline-flex; align-items:center; gap:5px; background:none; border:1px solid var(--border); color:var(--text-secondary); padding:4px 10px; font-size:11px; font-weight:600; border-radius:var(--radius-sm); cursor:pointer; font-family:inherit; transition:all 0.12s; }
+.rcc-share-btn:hover { background:var(--bg-page); color:var(--text-primary); border-color:var(--text-secondary); }
+.rcc-share-btn svg { opacity:0.7; }
 .rcc-actions { display:flex; gap:8px; margin-top:4px; flex-wrap:wrap; }
 .rcc-btn-secondary { background:#FFFFFF; color:var(--text-primary); border:1px solid var(--border); padding:9px 14px; border-radius:var(--radius-sm); font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; flex:1; }
 .rcc-btn-secondary:hover { background:var(--bg-page); border-color:var(--text-secondary); }
@@ -499,6 +500,43 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .sm-hint { font-size:10px; color:var(--text-dim); margin-top:4px; font-style:italic; }
 /* Modal overlay styling — reuse existing */
 #startMeetingModal.hidden { display:none; }
+/* Share / meeting invite modal */
+#shareModal.hidden { display:none; }
+#shareModal:not(.hidden) { display:block; }
+#shareModal .modal-overlay { position:fixed; inset:0; background:rgba(27,42,74,0.55); display:flex; align-items:center; justify-content:center; z-index:9000; padding:20px; box-sizing:border-box; }
+.share-modal { background:#FFFFFF; border-radius:var(--radius); box-shadow:0 10px 40px rgba(0,0,0,0.2); width:100%; max-width:580px; max-height:calc(100vh - 40px); display:flex; flex-direction:column; position:relative; }
+.share-modal-head { padding:18px 22px; border-bottom:1px solid var(--border-light); }
+.share-modal-head .modal-title { font-size:14px; font-weight:700; color:var(--text-primary); }
+.share-modal-body { padding:18px 22px; overflow-y:auto; flex:1; }
+.share-modal-footer { padding:14px 22px; border-top:1px solid var(--border-light); background:var(--bg-page); border-radius:0 0 var(--radius) var(--radius); display:flex; justify-content:space-between; align-items:center; }
+.share-tabs { display:flex; gap:0; margin-top:10px; border-bottom:1px solid var(--border-light); }
+.share-tab { padding:8px 16px; font-size:12px; font-weight:600; color:var(--text-dim); background:none; border:none; cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; margin-bottom:-1px; }
+.share-tab:hover { color:var(--text-secondary); }
+.share-tab.active { color:var(--tb-orange); border-bottom-color:var(--tb-orange); }
+.share-link-section { padding:14px 0; }
+.share-link-row { display:flex; gap:8px; align-items:center; }
+.share-link-input { flex:1; padding:9px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:12px; font-family:'JetBrains Mono',monospace; color:var(--text-secondary); background:var(--bg-page); }
+.share-link-copy { padding:9px 14px; background:var(--tb-orange); color:#FFF; border:none; border-radius:var(--radius-sm); font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; white-space:nowrap; }
+.share-link-copy:hover { background:#D26F1A; }
+.invite-field { margin-bottom:14px; }
+.invite-field label { display:block; font-size:11px; font-weight:700; color:var(--text-primary); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:5px; }
+.invite-field input, .invite-field textarea, .invite-field select { width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:12px; font-family:inherit; color:var(--text-primary); background:#FFFFFF; box-sizing:border-box; }
+.invite-field input:focus, .invite-field textarea:focus, .invite-field select:focus { outline:none; border-color:var(--tb-orange); }
+.invite-field textarea { resize:vertical; min-height:80px; }
+.invite-row { display:flex; gap:10px; }
+.invite-row .invite-field { flex:1; }
+.invite-toggle-row { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.invite-toggle { position:relative; width:38px; height:20px; background:var(--border); border-radius:10px; cursor:pointer; transition:background 0.2s; flex-shrink:0; }
+.invite-toggle.on { background:var(--green); }
+.invite-toggle::after { content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; background:#FFF; border-radius:50%; transition:transform 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.15); }
+.invite-toggle.on::after { transform:translateX(18px); }
+.invite-toggle-label { font-size:12px; color:var(--text-primary); font-weight:500; }
+.invite-room-status { font-size:10px; margin-left:2px; }
+.invite-room-status.ledig { color:var(--green); }
+.invite-room-status.opptatt { color:var(--red); }
+.invite-book-btn { padding:10px 18px; background:var(--tb-orange); color:#FFF; border:none; border-radius:var(--radius-sm); font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+.invite-book-btn:hover:not(:disabled) { background:#D26F1A; }
+.invite-book-btn:disabled { opacity:0.4; cursor:not-allowed; }
 #startMeetingModal:not(.hidden) { display:block; }
 #startMeetingModal .modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(27,42,74,0.55); display:flex; align-items:center; justify-content:center; z-index:9000; }
 #startMeetingModal .modal { background:#FFFFFF; border-radius:var(--radius); box-shadow:0 10px 40px rgba(0,0,0,0.2); display:flex; flex-direction:column; }
@@ -615,6 +653,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 .detail-tab.active { color:var(--tb-orange); border-bottom-color:var(--tb-orange); }
 .detail-tab svg { opacity:0.6; }
 .detail-tab.active svg { opacity:1; }
+.detail-tab-sep { width:1px; background:var(--border); margin:6px 8px; align-self:stretch; }
 .log-badge { font-size:10px; font-weight:700; background:var(--tb-orange); color:#fff; border-radius:10px; padding:1px 6px; min-width:18px; text-align:center; margin-left:4px; }
 .log-badge:empty { display:none; }
 
@@ -841,8 +880,9 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
       <div id="healthSummary"></div>
       <div class="detail-tabs">
         <span class="detail-tab active" id="tabKpi" onclick="showTab('kpi')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> KPI-detaljer</span>
-        <span class="detail-tab" id="tabReview" onclick="showTab('review')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Gjennomgang <span class="log-badge" id="reviewBadge"></span></span>
-        <span class="detail-tab" id="tabLog" onclick="showTab('log')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Endringslogg <span class="log-badge" id="logBadge"></span></span>
+        <span class="detail-tab" id="tabLog" onclick="showTab('log')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> KPI-Mål (Endringslogg) <span class="log-badge" id="logBadge"></span></span>
+        <span class="detail-tab-sep"></span>
+        <span class="detail-tab" id="tabReview" onclick="showTab('review')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Gjennomganger <span class="log-badge" id="reviewBadge"></span></span>
       </div>
       <div id="viewKpi">
         <div class="kpi-section-header">
@@ -920,6 +960,8 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg-page); color:var(--
 </div>
 <!-- Start meeting modal -->
 <div id="startMeetingModal" class="hidden"></div>
+<!-- Share/invite modal -->
+<div id="shareModal" class="hidden"></div>
 <!-- AI assessment modal -->
 <div id="aiAssessmentModal" class="hidden"></div>
 <!-- Unlock confirmation modal -->
@@ -1784,7 +1826,7 @@ function renderBreadcrumb() {
     `<span class="bc-sep">›</span>`,
     `<span class="bc-item ${activeTab === 'kpi' ? 'current' : ''}" onclick="showTab('kpi')">${p.name}</span>`
   ];
-  const tabLabels = { review: 'Gjennomgang', log: 'Endringslogg' };
+  const tabLabels = { review: 'Gjennomganger', log: 'KPI-Mål (Endringslogg)' };
   if (activeTab !== 'kpi') {
     parts.push(`<span class="bc-sep">›</span>`);
     parts.push(`<span class="bc-item ${!reviewReadonlyId ? 'current' : ''}" onclick="${reviewReadonlyId ? `exitReviewReadonly()` : ''}">${tabLabels[activeTab]}</span>`);
@@ -2262,17 +2304,6 @@ function renderReviewTab() {
 
 function renderReviewTimeline(el, p) {
   const reviews = projectReviews[p.id] || [];
-  // Active (godkjente) decisions from history — banner at top
-  const openItems = reviews.filter(r => r.status === 'godkjent').reduce((acc, r) => acc.concat(r.decisions.filter(d => d.status === 'pågående').map(d => ({...d, reviewDate: r.date, type: r.type}))), []);
-
-  const openBanner = openItems.length > 0 ? `
-    <div class="review-open-banner">
-      <div class="rob-icon">⚠</div>
-      <div class="rob-body">
-        <div class="rob-title">${openItems.length} åpne beslutninger fra tidligere gjennomganger</div>
-        <div class="rob-meta">Følger automatisk med inn i neste gjennomgang av samme type</div>
-      </div>
-    </div>` : '';
 
   // Two cards: each reflects current living state for that type
   const projectCard = renderLivingCard(p, 'project');
@@ -2290,7 +2321,6 @@ function renderReviewTimeline(el, p) {
         <span class="ai-sparkles">✦</span>
       </button>
     </div>
-    ${openBanner}
     <div class="review-cta-grid">
       <div class="review-cta-col">
         ${projectCard}
@@ -2384,7 +2414,7 @@ function renderLivingCard(p, type) {
     return `
       <div class="review-cta-card state-published-card">
         <div class="rcc-state-badge state-published">PUBLISERT</div>
-        <button class="rcc-share-icon" onclick="shareReviewLink('${active.id}')" title="Kopier lenke">🔗</button>
+        <button class="rcc-share-btn" onclick="event.stopPropagation();openShareModal('${active.id}')" title="Del gjennomgang"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Del</button>
         <div class="rcc-head">
           <span class="rcc-icon" style="color:${typeCfg.color}">${typeCfg.icon}</span>
           <div>
@@ -2691,12 +2721,202 @@ function cancelReviewWizard() {
 function shareReviewLink(reviewId) {
   const p = projects.find(x => x.id === currentProjectId);
   const url = window.location.origin + window.location.pathname + '#/project/' + p.id + '/review/' + reviewId;
-  // Copy to clipboard
   if (navigator.clipboard) {
     navigator.clipboard.writeText(url).then(() => showToast('Lenke kopiert'));
   } else {
     showToast('Lenke: ' + url);
   }
+}
+
+// Room availability seed (per date)
+const MEETING_ROOMS = ['Bjelken','Søyla','Fundamentet','Balkongen','Konsollen'];
+const roomBookings = {
+  '2026-04-22': { 'Bjelken': ['09:00-10:00','13:00-14:30'], 'Søyla': ['10:00-12:00'], 'Fundamentet': [], 'Balkongen': ['08:00-16:00'], 'Konsollen': ['14:00-15:00'] },
+  '2026-04-23': { 'Bjelken': [], 'Søyla': ['09:00-11:00'], 'Fundamentet': ['13:00-15:00'], 'Balkongen': [], 'Konsollen': ['09:00-10:30','14:00-16:00'] },
+  '2026-04-24': { 'Bjelken': ['10:00-11:00'], 'Søyla': [], 'Fundamentet': [], 'Balkongen': ['09:00-12:00'], 'Konsollen': [] },
+  '2026-04-25': { 'Bjelken': ['08:30-10:00','14:00-16:00'], 'Søyla': ['11:00-12:00'], 'Fundamentet': ['09:00-11:00','13:00-14:00'], 'Balkongen': [], 'Konsollen': ['10:00-12:00'] }
+};
+
+function isRoomAvailable(room, date, time, durationMin) {
+  const bookings = roomBookings[date]?.[room] || [];
+  if (bookings.length === 0) return true;
+  if (!time) return bookings.length === 0;
+  const [h,m] = time.split(':').map(Number);
+  const startMin = h*60+m;
+  const endMin = startMin + durationMin;
+  return !bookings.some(b => {
+    const [bs,be] = b.split('-');
+    const [bsh,bsm] = bs.split(':').map(Number);
+    const [beh,bem] = be.split(':').map(Number);
+    const bStart = bsh*60+bsm, bEnd = beh*60+bem;
+    return startMin < bEnd && endMin > bStart;
+  });
+}
+
+let shareActiveTab = 0;
+let shareReviewId = null;
+
+function openShareModal(reviewId) {
+  shareReviewId = reviewId;
+  shareActiveTab = 0;
+  const p = projects.find(x => x.id === currentProjectId);
+  const reviews = projectReviews[p.id] || [];
+  const review = reviews.find(r => r.id === reviewId);
+  if (!review) return;
+  renderShareModal(review, p);
+}
+
+function renderShareModal(review, p) {
+  const typeCfg = REVIEW_TYPE[review.type];
+  const url = window.location.origin + window.location.pathname + '#/project/' + p.id + '/review/' + review.id;
+  const defaultTitle = `${typeCfg.label} — ${p.name} (${monthLabel(review.period)})`;
+  const defaultBody = `Hei,\n\nDu er invitert til ${typeCfg.label.toLowerCase()} for ${p.name}.\n\nKlargjort gjennomgang kan leses her:\n${url}\n\nVennligst gjennomgå innholdet før møtet.\n\nMvh\n${p.leader}`;
+  const defaultTo = review.participants || '';
+
+  const modal = document.getElementById('shareModal');
+  modal.innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeShareModal()">
+      <div class="share-modal">
+        <div class="share-modal-head">
+          <div class="modal-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:6px"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Del gjennomgang</div>
+          <div class="share-tabs">
+            <button class="share-tab ${shareActiveTab===0?'active':''}" onclick="setShareTab(0)">Kopier lenke</button>
+            <button class="share-tab ${shareActiveTab===1?'active':''}" onclick="setShareTab(1)">Send møteinnkalling</button>
+          </div>
+        </div>
+        <div class="share-modal-body">
+          ${shareActiveTab === 0 ? `
+            <div class="share-link-section">
+              <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">Kopier lenke til den klargjorte gjennomgangen. Mottaker kan lese innholdet direkte i TOTALKontroll.</div>
+              <div class="share-link-row">
+                <input type="text" class="share-link-input" value="${url}" readonly onclick="this.select()">
+                <button class="share-link-copy" onclick="copyShareLink()">Kopier</button>
+              </div>
+            </div>
+          ` : `
+            <div class="invite-field">
+              <label>Til (obligatorisk)</label>
+              <input type="text" id="inviteTo" value="${defaultTo}" placeholder="Navn eller e-post, separert med komma" oninput="validateInvite()">
+            </div>
+            <div class="invite-field">
+              <label>Valgfritt</label>
+              <input type="text" id="inviteOptional" value="" placeholder="Valgfrie deltakere">
+            </div>
+            <div class="invite-field">
+              <label>Tittel</label>
+              <input type="text" id="inviteTitle" value="${defaultTitle}">
+            </div>
+            <div class="invite-field">
+              <label>Innhold</label>
+              <textarea id="inviteBody">${defaultBody}</textarea>
+            </div>
+            <div class="invite-row">
+              <div class="invite-field">
+                <label>Dato</label>
+                <input type="date" id="inviteDate" value="" onchange="updateRoomAvailability()">
+              </div>
+              <div class="invite-field">
+                <label>Tidspunkt</label>
+                <input type="time" id="inviteTime" value="09:00" onchange="updateRoomAvailability()">
+              </div>
+              <div class="invite-field">
+                <label>Varighet</label>
+                <select id="inviteDuration" onchange="updateRoomAvailability()">
+                  <option value="30">30 min</option>
+                  <option value="60" selected>1 time</option>
+                  <option value="90">1,5 timer</option>
+                  <option value="120">2 timer</option>
+                </select>
+              </div>
+            </div>
+            <div class="invite-toggle-row">
+              <div class="invite-toggle on" id="teamsToggle" onclick="this.classList.toggle('on')"></div>
+              <span class="invite-toggle-label">Teams-møte</span>
+            </div>
+            <div class="invite-field">
+              <label>Møterom</label>
+              <select id="inviteRoom" disabled>
+                <option value="">Velg dato og tidspunkt først</option>
+              </select>
+            </div>
+          `}
+        </div>
+        <div class="share-modal-footer">
+          <button class="btn btn-cancel" onclick="closeShareModal()">Avbryt</button>
+          ${shareActiveTab === 1 ? `<button class="invite-book-btn" id="bookBtn" disabled onclick="bookMeeting()">Book møte</button>` : '<div></div>'}
+        </div>
+      </div>
+    </div>`;
+  modal.classList.remove('hidden');
+  if (shareActiveTab === 1) validateInvite();
+}
+
+function setShareTab(idx) {
+  shareActiveTab = idx;
+  const p = projects.find(x => x.id === currentProjectId);
+  const reviews = projectReviews[p.id] || [];
+  const review = reviews.find(r => r.id === shareReviewId);
+  if (review) renderShareModal(review, p);
+}
+
+function copyShareLink() {
+  const input = document.querySelector('.share-link-input');
+  if (input) {
+    input.select();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(input.value).then(() => showToast('Lenke kopiert til utklippstavlen'));
+    }
+  }
+}
+
+function updateRoomAvailability() {
+  const date = document.getElementById('inviteDate')?.value;
+  const time = document.getElementById('inviteTime')?.value;
+  const duration = parseInt(document.getElementById('inviteDuration')?.value || '60');
+  const roomSelect = document.getElementById('inviteRoom');
+  if (!roomSelect) return;
+  if (!date || !time) {
+    roomSelect.disabled = true;
+    roomSelect.innerHTML = '<option value="">Velg dato og tidspunkt først</option>';
+    validateInvite();
+    return;
+  }
+  roomSelect.disabled = false;
+  const options = MEETING_ROOMS.map(room => {
+    const available = isRoomAvailable(room, date, time, duration);
+    return `<option value="${room}">${room} <span>(${available ? 'ledig' : 'opptatt'})</span></option>`;
+  });
+  // Use text-based status since <option> doesn't support HTML
+  roomSelect.innerHTML = '<option value="">— Velg møterom —</option>' +
+    MEETING_ROOMS.map(room => {
+      const available = isRoomAvailable(room, date, time, duration);
+      return `<option value="${room}" ${!available?'style="color:var(--red)"':''}>${room} (${available ? '✓ ledig' : '✗ opptatt'})</option>`;
+    }).join('');
+  validateInvite();
+}
+
+function validateInvite() {
+  const btn = document.getElementById('bookBtn');
+  if (!btn) return;
+  const to = document.getElementById('inviteTo')?.value?.trim();
+  const date = document.getElementById('inviteDate')?.value;
+  const time = document.getElementById('inviteTime')?.value;
+  btn.disabled = !(to && date && time);
+}
+
+function bookMeeting() {
+  const room = document.getElementById('inviteRoom')?.value;
+  const date = document.getElementById('inviteDate')?.value;
+  const time = document.getElementById('inviteTime')?.value;
+  const teams = document.getElementById('teamsToggle')?.classList.contains('on');
+  const roomText = room ? ` · Rom: ${room}` : '';
+  const teamsText = teams ? ' · Teams-lenke vedlagt' : '';
+  closeShareModal();
+  showToast(`Møteinnkalling sendt for ${formatDateNO(date)} kl ${time}${roomText}${teamsText}`);
+}
+
+function closeShareModal() {
+  document.getElementById('shareModal').classList.add('hidden');
 }
 
 function showToast(msg) {
