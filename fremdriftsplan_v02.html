@@ -1,0 +1,2786 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOTALKontroll – Fremdriftsplan</title>
+<script src="tk-nav.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.4/dist/ag-grid-community.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.4/styles/ag-grid.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.4/styles/ag-theme-quartz.css">
+<style>
+:root{
+  --navy:#1a2744;
+  --navy-2:#243054;
+  --navy-3:#2d3a63;
+  --orange:#e67e22;
+  --orange-dark:#cf6d15;
+  --bg:#f4f5f7;
+  --card:#ffffff;
+  --border:#e3e5e9;
+  --border-strong:#cfd2d9;
+  --text:#1a2744;
+  --text-2:#5a6177;
+  --text-3:#8a8f9e;
+  --green:#27ae60;
+  --green-soft:#e8f5ee;
+  --blue:#3498db;
+  --blue-soft:#eaf4fb;
+  --yellow:#f39c12;
+  --yellow-soft:#fef5e6;
+  --red:#e74c3c;
+  --red-soft:#fdecea;
+  --orange-soft:#fdf0e3;
+  --shadow:0 1px 2px rgba(26,39,68,.06), 0 1px 3px rgba(26,39,68,.04);
+  --shadow-md:0 4px 12px rgba(26,39,68,.08);
+  --radius:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:13px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+
+/* ===== LOGIN ===== */
+#login{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#1a2744 0%,#243054 100%);
+  z-index:9999;
+}
+.login-card{
+  background:white;padding:40px;border-radius:8px;width:380px;
+  box-shadow:0 10px 40px rgba(0,0,0,.25);
+}
+.login-card h1{font-size:20px;margin-bottom:6px;color:var(--navy);font-weight:600}
+.login-card p{color:var(--text-2);font-size:13px;margin-bottom:24px}
+.login-card .logo{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+.login-card input{
+  width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);
+  font-size:14px;margin-bottom:12px;
+}
+.login-card input:focus{outline:none;border-color:var(--orange)}
+.login-card button{
+  width:100%;padding:11px;background:var(--orange);color:white;
+  border-radius:var(--radius);font-weight:600;font-size:14px;
+}
+.login-card button:hover{background:var(--orange-dark)}
+.login-error{color:var(--red);font-size:12px;margin-top:8px;display:none}
+
+/* ===== APP LAYOUT ===== */
+#app{display:none;min-height:100vh}
+.layout{display:flex;min-height:100vh}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+  width:240px;background:var(--navy);color:#cfd6e7;
+  display:flex;flex-direction:column;flex-shrink:0;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.sidebar-logo{padding:18px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--navy-3)}
+.logo-mark{
+  width:28px;height:28px;background:var(--orange);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:13px;
+}
+.logo-text{color:white;font-weight:600;font-size:14px;letter-spacing:.3px}
+.logo-text span{color:var(--orange);font-weight:700}
+
+.nav{padding:14px 0;flex:1}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:9px 20px;cursor:pointer;
+  color:#a8b1c5;font-size:13px;border-left:3px solid transparent;
+  transition:background .15s,color .15s;
+}
+.nav-item:hover{background:var(--navy-2);color:white}
+.nav-item.active{background:var(--navy-2);color:white;border-left-color:var(--orange)}
+.nav-item .ico{width:16px;height:16px;flex-shrink:0;opacity:.85}
+.nav-item.active .ico{opacity:1}
+.nav-sub{padding-left:30px;font-size:12px;color:#8d97ad}
+.nav-sub.active{color:white;background:var(--navy-2);border-left-color:var(--orange)}
+.nav-sub:hover{background:var(--navy-2);color:white}
+
+.sidebar-footer{padding:14px 20px;border-top:1px solid var(--navy-3);font-size:11px;color:#7c87a0}
+.sidebar-footer .demo-badge{
+  display:inline-block;padding:3px 7px;background:rgba(230,126,34,.15);
+  color:var(--orange);border-radius:3px;font-weight:600;letter-spacing:.3px;
+}
+
+/* ===== MAIN ===== */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{
+  background:white;border-bottom:1px solid var(--border);
+  padding:14px 24px;display:flex;align-items:center;gap:18px;
+}
+.crumb{display:flex;align-items:center;gap:8px;color:var(--text-2);font-size:12px}
+.crumb b{color:var(--text);font-weight:600;font-size:13px}
+.project-pill{
+  display:flex;align-items:center;gap:8px;background:#f7f8fa;border:1px solid var(--border);
+  padding:6px 12px;border-radius:20px;font-size:12px;font-weight:500;
+}
+.project-pill .dot{width:6px;height:6px;background:var(--green);border-radius:50%}
+.topbar .spacer{flex:1}
+.user-chip{
+  display:flex;align-items:center;gap:8px;padding:5px 10px 5px 5px;
+  background:#f7f8fa;border-radius:20px;font-size:12px;
+}
+.user-chip .avatar{
+  width:24px;height:24px;background:var(--navy);color:white;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;
+}
+
+/* ===== PROJECT HEADER ===== */
+.project-header{
+  background:white;padding:18px 24px;border-bottom:1px solid var(--border);
+}
+.project-header-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.project-title{font-size:18px;font-weight:600;color:var(--navy)}
+.project-name-input{
+  font-size:14px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);
+  background:#fafbfc;width:240px;
+}
+.project-name-input:focus{outline:none;border-color:var(--orange);background:white}
+
+.banner{
+  background:linear-gradient(90deg,#fdf0e3 0%,#fef5e6 100%);
+  border-left:3px solid var(--orange);
+  padding:8px 14px;font-size:12px;color:#8a5a1a;border-radius:4px;
+  margin-top:10px;
+}
+.banner b{color:var(--orange-dark)}
+
+/* ===== PLAN TABS ===== */
+.plan-tabs{
+  background:white;padding:0 24px;border-bottom:1px solid var(--border);
+  display:flex;gap:4px;
+}
+.plan-tab{
+  padding:11px 16px;font-size:13px;color:var(--text-2);
+  border-bottom:2px solid transparent;font-weight:500;cursor:pointer;
+  transition:color .15s,border-color .15s;
+  display:flex;align-items:center;gap:7px;
+}
+.plan-tab:hover{color:var(--navy)}
+.plan-tab.active{color:var(--navy);border-bottom-color:var(--orange);font-weight:600}
+.plan-tab .count{
+  background:#eef0f5;color:var(--text-2);padding:1px 7px;border-radius:10px;
+  font-size:11px;font-weight:600;
+}
+.plan-tab.active .count{background:var(--orange);color:white}
+
+/* ===== ACTION BARS ===== */
+.toolbar{
+  background:white;padding:10px 24px;border-bottom:1px solid var(--border);
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+}
+.tool-group{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fafbfc}
+.tool-group-label{
+  background:var(--navy);padding:6px 10px;font-size:10px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.6px;color:white;
+  border-right:1px solid var(--navy);display:flex;align-items:center;
+}
+.btn{
+  padding:6px 11px;font-size:12px;background:white;color:var(--text);
+  border-right:1px solid var(--border);font-weight:500;
+  display:inline-flex;align-items:center;gap:5px;transition:background .12s;
+}
+.btn:last-child{border-right:none}
+.btn:hover:not(:disabled){background:#f4f6fa;color:var(--navy)}
+.btn:disabled{color:var(--text-3);cursor:not-allowed;background:#fafbfc}
+.btn:disabled:hover{background:#fafbfc}
+.btn .ico{width:13px;height:13px;opacity:.7}
+.btn.primary{background:var(--orange);color:white;border:none;border-radius:var(--radius)}
+.btn.primary:hover{background:var(--orange-dark)}
+.btn.danger{color:var(--red)}
+.btn.danger:hover{background:var(--red-soft);color:var(--red)}
+
+.toolbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.search{
+  padding:6px 10px 6px 30px;border:1px solid var(--border);border-radius:var(--radius);
+  font-size:12px;width:200px;background:white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="%238a8f9e" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>') 9px center/14px no-repeat;
+}
+.search:focus{outline:none;border-color:var(--orange)}
+
+.filter-select{
+  padding:5px 8px;font-size:12px;border:1px solid var(--border);
+  border-radius:var(--radius);background:white;min-width:120px;
+}
+.filter-select:focus{outline:none;border-color:var(--orange)}
+
+.toggle-bar{
+  background:#fafbfc;padding:7px 24px;border-bottom:1px solid var(--border);
+  display:flex;gap:18px;align-items:center;font-size:12px;
+}
+.toggle{display:flex;align-items:center;gap:7px;cursor:pointer;color:var(--text-2)}
+.toggle-switch{
+  position:relative;width:30px;height:16px;background:#cfd2d9;border-radius:10px;
+  transition:background .15s;
+}
+.toggle-switch::after{
+  content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;
+  background:white;border-radius:50%;transition:left .15s;
+  box-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+.toggle input{display:none}
+.toggle input:checked + .toggle-switch{background:var(--orange)}
+.toggle input:checked + .toggle-switch::after{left:16px}
+
+/* ===== AG GRID CONTAINER ===== */
+.grid-wrap{
+  flex:1;display:flex;background:white;
+}
+#fdpGrid{
+  flex:1;width:100%;height:100%;
+}
+
+/* AG Grid theme overrides for TOTALKontroll */
+.ag-theme-quartz{
+  --ag-font-family:'DM Sans',sans-serif;
+  --ag-font-size:12.5px;
+  --ag-foreground-color:var(--text);
+  --ag-background-color:white;
+  --ag-header-background-color:#fafbfc;
+  --ag-header-foreground-color:var(--text-2);
+  --ag-header-cell-hover-background-color:#f4f6fa;
+  --ag-row-hover-color:#fafbfc;
+  --ag-selected-row-background-color:#fef5e6;
+  --ag-range-selection-background-color:rgba(230,126,34,.18);
+  --ag-range-selection-border-color:var(--orange);
+  --ag-border-color:var(--border);
+  --ag-row-border-color:var(--border);
+  --ag-header-column-separator-color:transparent;
+  --ag-input-focus-border-color:var(--orange);
+  --ag-input-focus-box-shadow:0 0 0 3px rgba(230,126,34,.15);
+  --ag-checkbox-checked-color:var(--orange);
+  --ag-control-panel-background-color:white;
+  --ag-cell-horizontal-padding:10px;
+  --ag-grid-size:6px;
+  --ag-list-item-height:28px;
+  --ag-row-height:38px;
+  --ag-header-height:38px;
+}
+.ag-theme-quartz .ag-header-cell-text{
+  font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;
+}
+.ag-theme-quartz .ag-row{transition:none}
+.ag-theme-quartz .ag-header-icon.ag-header-cell-menu-button{
+  opacity:1;color:var(--text-3);
+}
+.ag-theme-quartz .ag-header-icon.ag-header-cell-menu-button:hover{
+  color:var(--orange);
+}
+.ag-theme-quartz .ag-header-cell-filtered .ag-header-icon.ag-header-cell-menu-button{
+  color:var(--orange);
+}
+.ag-theme-quartz .ag-header-cell-filtered{
+  background:rgba(230,126,34,0.06);
+}
+
+/* Custom Set-like Filter (Excel-stil checkbox-popup) */
+.fp-set-filter{
+  width:240px;background:white;font-size:13px;
+  display:flex;flex-direction:column;max-height:380px;
+}
+.fp-sf-search{padding:10px;border-bottom:1px solid var(--border)}
+.fp-sf-search input{
+  width:100%;padding:6px 8px;font-size:12px;
+  border:1px solid var(--border);border-radius:var(--radius);
+  box-sizing:border-box;
+}
+.fp-sf-search input:focus{outline:none;border-color:var(--orange)}
+.fp-sf-actions{
+  padding:6px 10px;border-bottom:1px solid var(--border);
+  background:#fafbfc;
+}
+.fp-sf-list{
+  overflow-y:auto;flex:1;padding:4px 0;max-height:240px;
+}
+.fp-sf-option{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 10px;cursor:pointer;font-size:12px;line-height:1.3;
+}
+.fp-sf-option:hover{background:#f4f5f7}
+.fp-sf-option input[type="checkbox"]{margin:0;cursor:pointer;flex-shrink:0}
+.fp-sf-option span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fp-sf-all{font-weight:600;color:var(--text-2)}
+.fp-sf-empty{
+  padding:16px;text-align:center;color:var(--text-3);font-size:11px;font-style:italic;
+}
+.fp-sf-footer{
+  padding:8px 10px;border-top:1px solid var(--border);background:#fafbfc;
+}
+.fp-sf-clear{
+  background:none;border:none;color:var(--orange);font-size:12px;
+  cursor:pointer;font-weight:500;padding:0;
+}
+.fp-sf-clear:hover{text-decoration:underline}
+.ag-theme-quartz .ag-row.row-highlighted .ag-cell:not(.cell-rag-wrap){color:var(--red);font-weight:600}
+.ag-theme-quartz .ag-row.row-missing{background:#fef5e6}
+
+/* Cell renderers */
+.fp-firma-pill{
+  display:inline-flex;align-items:center;
+  height:20px;padding:0 10px;border-radius:10px;
+  font-size:11px;font-weight:600;letter-spacing:.1px;
+  white-space:nowrap;line-height:1;
+}
+.fp-kritisk-mark{color:var(--red);font-weight:700;margin-right:4px}
+.fp-aktivitet-cell{font-weight:500}
+
+.fp-fremdrift-wrap{
+  display:flex;align-items:center;gap:8px;width:100%;
+}
+.fp-fremdrift-bar{
+  flex:1;height:6px;background:#eef0f5;border-radius:3px;overflow:hidden;
+}
+.fp-fremdrift-fill{
+  height:100%;background:var(--green);border-radius:3px;
+}
+.fp-fremdrift-fill.partial{background:var(--blue)}
+.fp-fremdrift-fill.starting{background:var(--orange)}
+.fp-fremdrift-pct{
+  font-size:11px;font-weight:500;color:var(--text-2);min-width:32px;text-align:right;
+}
+
+.fp-rag{
+  display:inline-flex;align-items:center;gap:6px;font-size:11px;
+}
+.fp-rag-dot{
+  width:10px;height:10px;border-radius:50%;flex-shrink:0;
+  border:1px solid rgba(0,0,0,.1);
+}
+.fp-rag.rag-red .fp-rag-dot{background:var(--red)}
+.fp-rag.rag-yellow .fp-rag-dot{background:var(--yellow)}
+.fp-rag.rag-green .fp-rag-dot{background:var(--green)}
+.fp-rag.rag-white .fp-rag-dot{background:white;border-color:var(--border-strong)}
+.fp-rag-text{color:var(--text-2);font-weight:500}
+
+.fp-logg-btn{
+  width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:3px;color:var(--text-3);cursor:pointer;background:transparent;border:none;
+}
+.fp-logg-btn:hover{background:#eef0f5;color:var(--navy)}
+
+.fp-sunn-check{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:16px;height:16px;border:1.5px solid var(--border-strong);
+  border-radius:3px;cursor:pointer;background:white;font-size:11px;color:transparent;
+}
+.fp-sunn-check.checked{background:var(--green);border-color:var(--green);color:white}
+
+.fp-uke-cell{font-size:11px;color:var(--text-3);text-align:center}
+.fp-dager-cell{color:var(--text-2);text-align:right}
+
+/* Gantt */
+.gantt-wrap{
+  background:white;padding:18px 24px;border-top:1px solid var(--border);
+  display:none;
+}
+.gantt-wrap.visible{display:block}
+.gantt-header{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--navy)}
+.gantt-canvas{
+  border:1px solid var(--border);border-radius:var(--radius);overflow-x:auto;
+  background:#fafbfc;max-height:300px;
+}
+.gantt-row{
+  display:flex;align-items:center;height:24px;border-bottom:1px solid var(--border);
+  position:relative;
+}
+.gantt-label{
+  width:200px;flex-shrink:0;padding:0 10px;font-size:11px;
+  background:white;border-right:1px solid var(--border);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:24px;
+}
+.gantt-track{flex:1;position:relative;height:100%;display:flex}
+.gantt-week{
+  flex-shrink:0;width:32px;border-right:1px dashed #eef0f5;
+  font-size:9px;color:var(--text-3);text-align:center;line-height:24px;
+}
+.gantt-bar{
+  position:absolute;height:14px;top:5px;background:var(--orange);
+  border-radius:2px;opacity:.85;
+}
+.gantt-bar.completed{background:var(--green)}
+.gantt-bar.future{background:var(--blue);opacity:.6}
+.gantt-bar.kritisk{outline:1.5px solid var(--red);outline-offset:1px}
+
+/* Footer / status */
+.status-footer{
+  background:white;border-top:1px solid var(--border);padding:8px 24px;
+  display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);
+}
+.status-footer .stat-group{display:flex;gap:18px}
+.status-footer b{color:var(--navy);font-weight:600}
+
+/* ===== MODALS ===== */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(26,39,68,.45);z-index:1000;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-backdrop.visible{display:flex}
+.modal{
+  background:white;border-radius:8px;max-width:560px;width:100%;
+  max-height:85vh;overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 25px 50px rgba(0,0,0,.25);
+}
+.modal-lg{max-width:780px}
+.modal-header{
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-title{font-size:15px;font-weight:600;color:var(--navy)}
+.modal-close{
+  width:28px;height:28px;display:flex;align-items:center;justify-content:center;
+  border-radius:4px;color:var(--text-2);cursor:pointer;
+}
+.modal-close:hover{background:#f4f6fa;color:var(--navy)}
+.modal-body{padding:20px;overflow-y:auto;flex:1}
+.modal-footer{
+  padding:14px 20px;border-top:1px solid var(--border);
+  display:flex;justify-content:flex-end;gap:8px;background:#fafbfc;
+}
+
+/* Logg-modal */
+.logg-list{display:flex;flex-direction:column;gap:0}
+.logg-entry{
+  padding:10px 12px;border-left:2px solid var(--border);
+  display:flex;gap:12px;align-items:flex-start;font-size:12px;
+}
+.logg-entry:hover{background:#fafbfc;border-left-color:var(--orange)}
+.logg-time{
+  color:var(--text-3);font-size:11px;white-space:nowrap;min-width:90px;
+}
+.logg-content{flex:1}
+.logg-content b{color:var(--navy)}
+.logg-content .change-from{color:var(--red);text-decoration:line-through;font-size:11px}
+.logg-content .change-to{color:var(--green);font-size:11px;font-weight:500}
+
+/* Reason modal */
+.reason-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.reason-opt{
+  padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);
+  cursor:pointer;font-size:12px;background:white;text-align:left;
+}
+.reason-opt:hover{border-color:var(--orange);background:#fef5e6}
+.reason-opt.selected{border-color:var(--orange);background:var(--orange);color:white}
+
+/* Workshop modal */
+.ws-step{margin-bottom:20px}
+.ws-step-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;background:var(--orange);color:white;border-radius:50%;
+  font-size:11px;font-weight:600;margin-right:8px;
+}
+.ws-step-title{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px}
+.ws-tavle{
+  border:2px dashed var(--border-strong);border-radius:var(--radius);
+  padding:24px;text-align:center;background:#fafbfc;cursor:pointer;
+  transition:border-color .15s,background .15s;
+}
+.ws-tavle:hover{border-color:var(--orange);background:#fef5e6}
+.ws-tavle.uploaded{border-style:solid;border-color:var(--green);background:var(--green-soft);padding:12px}
+.ws-tavle-img{
+  width:100%;max-width:480px;border-radius:4px;margin:0 auto;display:block;
+}
+.ws-tavle-empty{color:var(--text-3);font-size:12px}
+.ws-tavle-empty .upl-ico{
+  font-size:32px;display:block;margin-bottom:8px;color:var(--text-3);
+}
+.ws-extracted{
+  border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;
+  margin-top:12px;font-size:12px;
+}
+.ws-extracted table{width:100%;border-collapse:collapse}
+.ws-extracted th{
+  background:#fafbfc;padding:7px 10px;text-align:left;font-size:11px;
+  font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;
+  border-bottom:1px solid var(--border);
+}
+.ws-extracted td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.ws-extracted td input{
+  width:100%;padding:3px 6px;border:1px solid transparent;border-radius:3px;
+  font-size:12px;background:transparent;
+}
+.ws-extracted td input:hover{border-color:var(--border);background:white}
+.ws-extracted td input:focus{outline:none;border-color:var(--orange);background:white}
+.ws-extracted tr:last-child td{border-bottom:none}
+.ws-confidence{
+  display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;
+  font-weight:600;
+}
+.ws-conf-high{background:var(--green-soft);color:var(--green)}
+.ws-conf-med{background:var(--yellow-soft);color:var(--yellow)}
+.ws-mock-note{
+  background:#fef5e6;border-left:3px solid var(--orange);padding:8px 12px;
+  font-size:11px;color:#8a5a1a;border-radius:3px;margin-bottom:14px;
+}
+
+/* Nye aktiviteter modal */
+.input-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.input-row label{font-size:12px;color:var(--text-2);min-width:120px}
+.input-row input,.input-row select{
+  padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);
+  font-size:13px;flex:1;
+}
+.input-row input:focus,.input-row select:focus{outline:none;border-color:var(--orange)}
+
+/* Tooltip on disabled buttons */
+[data-tooltip]{position:relative}
+[data-tooltip]:hover::after{
+  content:attr(data-tooltip);
+  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:var(--navy);color:white;padding:5px 10px;border-radius:4px;
+  font-size:11px;white-space:nowrap;z-index:100;pointer-events:none;
+  font-weight:500;
+}
+[data-tooltip]:hover::before{
+  content:'';position:absolute;bottom:calc(100% + 1px);left:50%;
+  transform:translateX(-50%);border:5px solid transparent;
+  border-top-color:var(--navy);z-index:100;pointer-events:none;
+}
+
+/* SVG icons inline-friendly */
+.ico-svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+/* ===== LISTER MODAL ===== */
+.lister-tabs{
+  display:flex;border-bottom:1px solid var(--border);background:white;
+  padding:0 20px;gap:4px;
+}
+.lister-tab{
+  padding:11px 14px;font-size:12px;color:var(--text-2);
+  border-bottom:2px solid transparent;font-weight:500;cursor:pointer;
+  display:flex;align-items:center;gap:7px;background:transparent;border-top:none;border-left:none;border-right:none;
+  transition:color .12s,border-color .12s;
+}
+.lister-tab:hover{color:var(--navy)}
+.lister-tab.active{color:var(--navy);border-bottom-color:var(--orange);font-weight:600}
+.scope-badge{
+  font-size:9px;padding:2px 6px;border-radius:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.scope-prosjekt{background:#fdf0e3;color:var(--orange-dark)}
+.scope-felles{background:#e3e8f4;color:var(--navy)}
+
+.lister-content{padding:18px 20px;max-height:50vh;overflow-y:auto}
+.lister-list{display:flex;flex-direction:column;gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border)}
+.lister-row{
+  background:white;padding:8px 12px;display:flex;align-items:center;gap:10px;
+  font-size:12.5px;
+}
+.lister-row:hover{background:#fafbfc}
+.lister-row .row-name{flex:1;font-weight:500}
+.lister-row .row-meta{font-size:11px;color:var(--text-3)}
+.lister-row .row-actions{display:flex;gap:4px}
+.lister-row input.row-edit{
+  padding:4px 8px;border:1px solid var(--orange);border-radius:3px;
+  font-size:12.5px;flex:1;font-family:inherit;background:white;
+}
+.lister-row input.row-edit:focus{outline:none}
+.lister-row .row-orgnr{
+  font-family:monospace;font-size:11px;color:var(--text-3);
+  background:#f4f5f7;padding:2px 6px;border-radius:3px;
+}
+.usage-pill{
+  background:#eef0f5;color:var(--text-2);padding:2px 8px;border-radius:10px;
+  font-size:10px;font-weight:600;
+}
+.usage-pill.zero{background:transparent;color:var(--text-3)}
+
+.lister-add-row{
+  background:white;padding:10px 12px;display:flex;gap:8px;align-items:center;
+  border-top:1px dashed var(--border-strong);
+}
+.lister-add-row input{
+  flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);
+  font-size:12px;font-family:inherit;
+}
+.lister-add-row input:focus{outline:none;border-color:var(--orange)}
+.lister-add-row select{
+  padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);
+  font-size:12px;background:white;
+}
+.lister-add-row select:focus{outline:none;border-color:var(--orange)}
+
+.lister-empty{
+  text-align:center;padding:30px 20px;color:var(--text-3);font-size:12px;
+}
+
+.lister-section-title{
+  font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;
+  letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+
+.icon-btn-small{
+  width:22px;height:22px;border:none;background:transparent;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;border-radius:3px;
+  color:var(--text-3);
+}
+.icon-btn-small:hover{background:#eef0f5;color:var(--navy)}
+.icon-btn-small.danger:hover{background:var(--red-soft);color:var(--red)}
+.icon-btn-small:disabled{opacity:.3;cursor:not-allowed}
+.icon-btn-small:disabled:hover{background:transparent}
+
+.lister-warn{
+  background:var(--yellow-soft);border-left:3px solid var(--yellow);
+  padding:9px 12px;border-radius:3px;font-size:11px;color:#8a5a1a;
+  margin-bottom:14px;
+}
+
+.brreg-source-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  background:var(--green-soft);color:var(--green);padding:1px 7px;
+  border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;
+}
+.brreg-source-pill.manual{background:#f0f2f5;color:var(--text-3)}
+
+/* Tre-struktur for områder + subområder */
+.tree-area-row{
+  background:white;padding:10px 12px;display:flex;align-items:center;gap:10px;
+  font-size:13px;font-weight:600;cursor:pointer;user-select:none;
+}
+.tree-area-row:hover{background:#fafbfc}
+.tree-area-row .chevron{
+  width:14px;height:14px;color:var(--text-3);transition:transform .15s;flex-shrink:0;
+}
+.tree-area-row.collapsed .chevron{transform:rotate(-90deg)}
+.tree-area-row .area-name{flex:1}
+.tree-subs{background:#fafbfc}
+.tree-subs.collapsed{display:none}
+.tree-sub-row{
+  padding:7px 12px 7px 36px;display:flex;align-items:center;gap:10px;
+  font-size:12px;border-top:1px solid var(--border);position:relative;
+}
+.tree-sub-row::before{
+  content:'';position:absolute;left:22px;top:0;bottom:50%;
+  border-left:1px solid var(--border-strong);border-bottom:1px solid var(--border-strong);
+  width:8px;border-bottom-left-radius:3px;
+}
+.tree-sub-row:hover{background:white}
+.tree-sub-row .sub-name{flex:1;font-weight:500}
+.tree-add-sub{
+  padding:6px 12px 6px 36px;display:flex;gap:6px;align-items:center;
+  background:#fafbfc;border-top:1px dashed var(--border-strong);position:relative;
+}
+.tree-add-sub::before{
+  content:'';position:absolute;left:22px;top:0;height:50%;
+  border-left:1px solid var(--border-strong);
+}
+.tree-add-sub input{
+  flex:1;padding:5px 9px;border:1px solid var(--border);border-radius:3px;
+  font-size:11.5px;font-family:inherit;background:white;
+}
+.tree-add-sub input:focus{outline:none;border-color:var(--orange)}
+.tree-add-sub button{
+  font-size:11px;padding:5px 10px;background:white;border:1px solid var(--border);
+  border-radius:3px;color:var(--text-2);font-weight:500;cursor:pointer;font-family:inherit;
+}
+.tree-add-sub button:hover{border-color:var(--orange);color:var(--orange)}
+
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.toast{
+  position:fixed;bottom:24px;right:24px;background:var(--navy);color:white;
+  padding:10px 16px;border-radius:6px;font-size:12px;z-index:2000;
+  box-shadow:0 4px 12px rgba(0,0,0,.2);transform:translateY(100px);opacity:0;
+  transition:transform .25s,opacity .25s;
+}
+.toast.visible{transform:translateY(0);opacity:1}
+.toast.success{background:var(--green)}
+.toast.warn{background:var(--yellow);color:#5a3a02}
+.toast.error{background:var(--red)}
+</style>
+</head>
+<body>
+
+<!-- ============== APP ============== -->
+<div id="app" style="display:block">
+  <div class="layout">
+
+    <!-- ============== MAIN ============== -->
+    <main class="main">
+
+      <!-- TOPBAR -->
+      <div class="topbar">
+        <div class="crumb">
+          Prosjekt <span style="color:var(--text-3)">›</span>
+          <b>Jåtunparken</b> <span style="color:var(--text-3)">›</span>
+          <b>Fremdriftsplan</b>
+        </div>
+        <div class="project-pill">
+          <div class="dot"></div>
+          Aktiv
+        </div>
+        <div class="spacer"></div>
+        <div class="user-chip">
+          <div class="avatar">JG</div>
+          Jan Gunnar Helgaland
+        </div>
+      </div>
+
+      <!-- PROJECT HEADER -->
+      <div class="project-header">
+        <div class="project-header-row">
+          <div class="project-title">Hovedfremdriftsplan</div>
+          <input type="text" class="project-name-input" id="projectName" value="Jåtunparken BT1-3 / KBA1-2">
+        </div>
+      </div>
+
+      <!-- PLAN TABS -->
+      <div class="plan-tabs" id="planTabs">
+        <div class="plan-tab active" data-plan="alle">Alle <span class="count" id="cnt-alle">0</span></div>
+        <div class="plan-tab" data-plan="Hovedfremdriftsplan">Hovedfremdriftsplan <span class="count" id="cnt-hoved">0</span></div>
+        <div class="plan-tab" data-plan="Prosjekteringsplan">Prosjekteringsplan <span class="count" id="cnt-pros">0</span></div>
+        <div class="plan-tab" data-plan="Faseplan">Faseplan <span class="count" id="cnt-fase">0</span></div>
+        <div class="plan-tab" data-plan="Utkikksplan" title="Faseplan-aktiviteter neste 8 uker">Utkikksplan <span class="count" id="cnt-utk">0</span></div>
+        <div class="plan-tab" data-plan="Ukeplan" title="Faseplan-aktiviteter neste 2 uker">Ukeplan <span class="count" id="cnt-uke">0</span></div>
+      </div>
+
+      <!-- ACTION TOOLBAR -->
+      <div class="toolbar">
+        <div class="tool-group">
+          <span class="tool-group-label">Aktivitet</span>
+          <button class="btn" onclick="newActivity()" title="Ny rad rett under valgt celle">
+            <svg class="ico ico-svg" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Ny aktivitet
+          </button>
+          <button class="btn" onclick="openMultiNew()" title="Klargjør flere tomme rader">
+            Nye aktiviteter
+          </button>
+          <button class="btn" onclick="duplicateRow()" title="Dupliser valgt aktivitet">
+            <svg class="ico ico-svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Dupliser
+          </button>
+          <button class="btn danger" onclick="deleteRows()" title="Slett valgte rader">
+            <svg class="ico ico-svg" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            Slett
+          </button>
+          <button class="btn" onclick="markCritical()" title="Legg til ⚠️ foran aktivitetsnavn">
+            ⚠️ Kritisk
+          </button>
+          <button class="btn" onclick="highlightRows()" title="Marker valgte rader visuelt">
+            Synliggjør
+          </button>
+          <button class="btn" onclick="markCompleted()" title="Sett fremdrift = 100%">
+            ✓ Fullført
+          </button>
+        </div>
+
+        <div class="tool-group">
+          <span class="tool-group-label">Datoer</span>
+          <button class="btn" onclick="shiftDays(1)" title="Behold varighet, flytt 1 dag">
+            +1 dag
+          </button>
+          <button class="btn" onclick="shiftDays(7)" title="Behold varighet, flytt 1 uke">
+            +1 uke
+          </button>
+          <button class="btn" onclick="startToday()" title="Sett startdato til idag, behold varighet">
+            Start idag
+          </button>
+          <select class="filter-select" id="dayCalc" style="border-radius:0;border:none;border-left:1px solid var(--border);background:white" onchange="recomputeAll()">
+            <option value="5">Man-Fre</option>
+            <option value="6" selected>Man-Lør</option>
+            <option value="7">Man-Søn</option>
+          </select>
+        </div>
+
+        <div class="tool-group">
+          <span class="tool-group-label">Verktøy</span>
+          <button class="btn" onclick="checkMissing()" title="Marker rader med manglende felt">
+            Sjekk mangler
+          </button>
+          <button class="btn" onclick="openLister()" title="Områder, subområder og underentreprenører (master data)">
+            <svg class="ico ico-svg" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            Lister
+          </button>
+          <button class="btn" onclick="openWorkshop()" title="Last opp bilde av tavle og strukturer aktiviteter med AI">
+            <svg class="ico ico-svg" viewBox="0 0 24 24"><path d="M3 3h18v14H3zM3 21h18M9 17v4M15 17v4"/></svg>
+            Workshop-import
+            <span style="font-size:9px;background:var(--orange);color:white;padding:1px 4px;border-radius:2px;margin-left:3px">MOCKUP</span>
+          </button>
+          <button class="btn" disabled data-tooltip="Kommer i v0.2">
+            Opprett ukeplan
+          </button>
+          <button class="btn" onclick="exportPDF()" title="A3 liggende, kun synlige rader">
+            <svg class="ico ico-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            Lag PDF
+          </button>
+        </div>
+
+        <div class="toolbar-right">
+          <input type="text" class="search" placeholder="Søk aktivitet..." id="searchInput">
+        </div>
+      </div>
+
+      <!-- TOGGLE BAR -->
+      <div class="toggle-bar">
+        <label class="toggle">
+          <input type="checkbox" id="tglSunn" onchange="toggleSunn()">
+          <span class="toggle-switch"></span>
+          Sunn aktivitet
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="tglGantt" onchange="toggleGantt()">
+          <span class="toggle-switch"></span>
+          Gantt-diagram
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="tglReason" checked>
+          <span class="toggle-switch"></span>
+          Årsakslogg
+        </label>
+        <span style="margin-left:auto;font-size:11px;color:var(--text-3)">
+          <b style="color:var(--navy);font-weight:600">Idag: </b><span id="todayDisplay"></span>
+        </span>
+      </div>
+
+      <!-- TABLE (AG Grid) -->
+      <div class="grid-wrap">
+        <div id="fdpGrid" class="ag-theme-quartz"></div>
+      </div>
+
+      <!-- GANTT -->
+      <div class="gantt-wrap" id="ganttWrap">
+        <div class="gantt-header">Gantt-diagram – synlige aktiviteter</div>
+        <div class="gantt-canvas" id="ganttCanvas"></div>
+      </div>
+
+      <!-- STATUS FOOTER -->
+      <div class="status-footer">
+        <div class="stat-group">
+          <span><b id="totalRows">0</b> aktiviteter totalt</span>
+          <span><b id="visibleRows">0</b> synlige</span>
+          <span><b id="kritiskRows">0</b> kritiske</span>
+        </div>
+        <div class="stat-group">
+          <span>Snitt fremdrift: <b id="avgFremdrift">0%</b></span>
+          <span style="color:var(--red)" id="overdueRows"></span>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+</div>
+
+<!-- ============== MODALS ============== -->
+
+<!-- Logg-modal -->
+<div class="modal-backdrop" id="loggModal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title">Aktivitetslogg – <span id="loggActivityName"></span></div>
+      <div class="modal-close" onclick="closeModal('loggModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="logg-list" id="loggList"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('loggModal')">Lukk</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reason-modal -->
+<div class="modal-backdrop" id="reasonModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Årsak til datoendring</div>
+      <div class="modal-close" onclick="closeModal('reasonModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--text-2);margin-bottom:14px">
+        Velg hovedårsak. Loggføres automatisk i aktivitetsloggen.
+      </p>
+      <div class="reason-grid" id="reasonGrid"></div>
+      <div style="margin-top:14px">
+        <label style="font-size:12px;color:var(--text-2)">Utdypning (valgfritt)</label>
+        <textarea id="reasonText" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;margin-top:4px;resize:vertical;min-height:60px"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('reasonModal')">Avbryt</button>
+      <button class="btn primary" onclick="confirmReason()">Lagre</button>
+    </div>
+  </div>
+</div>
+
+<!-- Multi-new modal -->
+<div class="modal-backdrop" id="multiNewModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Klargjør flere aktiviteter</div>
+      <div class="modal-close" onclick="closeModal('multiNewModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="input-row">
+        <label>Antall rader</label>
+        <input type="number" id="multiCount" value="5" min="1" max="50">
+      </div>
+      <div class="input-row">
+        <label>Område (forhåndsutfylt)</label>
+        <select id="multiArea"><option value="">— Ingen —</option></select>
+      </div>
+      <div class="input-row">
+        <label>Plan-type</label>
+        <select id="multiPlan">
+          <option value="Hovedfremdriftsplan">Hovedfremdriftsplan</option>
+          <option value="Prosjekteringsplan">Prosjekteringsplan</option>
+          <option value="Faseplan">Faseplan</option>
+        </select>
+      </div>
+      <p style="font-size:11px;color:var(--text-3);margin-top:8px">
+        Tomme rader klargjøres øverst i tabellen. Fyll inn aktivitetsnavn og datoer etterpå.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('multiNewModal')">Avbryt</button>
+      <button class="btn primary" onclick="confirmMultiNew()">Klargjør rader</button>
+    </div>
+  </div>
+</div>
+
+<!-- Workshop-import modal -->
+<div class="modal-backdrop" id="workshopModal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title">Workshop-import med AI <span style="font-size:10px;background:var(--orange);color:white;padding:1px 6px;border-radius:3px;margin-left:6px;font-weight:600;letter-spacing:.4px">MOCKUP</span></div>
+      <div class="modal-close" onclick="closeModal('workshopModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="ws-mock-note">
+        <b>Konseptvisning:</b> Funksjonaliteten er ikke bygget ennå. Dette viser hvordan flyten kan se ut. Etter workshop med UE-er og lapper på tavle, tar prosjektleder bilde, AI strukturerer lappene til aktiviteter, prosjektleder bekrefter og legger til.
+      </div>
+
+      <div class="ws-step">
+        <div class="ws-step-title"><span class="ws-step-num">1</span>Last opp bilde av tavlen</div>
+        <div class="ws-tavle" id="wsTavle" onclick="simulateUpload()">
+          <div class="ws-tavle-empty">
+            <span class="upl-ico">📷</span>
+            Klikk for å laste opp bilde, eller dra hit
+          </div>
+        </div>
+      </div>
+
+      <div class="ws-step" id="wsStep2" style="display:none">
+        <div class="ws-step-title"><span class="ws-step-num">2</span>Bekreft AI-tolket struktur</div>
+        <p style="font-size:12px;color:var(--text-2);margin-bottom:8px">
+          AI har identifisert <b>8 aktiviteter</b> fordelt på 3 områder. Korriger felter ved behov.
+        </p>
+        <div class="ws-extracted">
+          <table>
+            <thead>
+              <tr><th>Område</th><th>Subområde</th><th>Firma</th><th>Aktivitet</th><th>Varighet</th><th>Trygghet</th></tr>
+            </thead>
+            <tbody id="wsExtractedBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('workshopModal')">Avbryt</button>
+      <button class="btn primary" id="wsConfirmBtn" onclick="confirmWorkshop()" style="display:none">Legg til 8 aktiviteter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lister-modal: master data -->
+<div class="modal-backdrop" id="listerModal">
+  <div class="modal modal-lg" style="max-width:840px">
+    <div class="modal-header">
+      <div class="modal-title">Lister – Master data</div>
+      <div class="modal-close" onclick="closeModal('listerModal')">✕</div>
+    </div>
+    <div class="modal-body" style="padding:0">
+
+      <!-- Tabs -->
+      <div class="lister-tabs">
+        <button class="lister-tab active" data-tab="omrader" onclick="switchListerTab('omrader')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Områder &amp; subområder <span class="scope-badge scope-prosjekt">Prosjekt</span>
+        </button>
+        <button class="lister-tab" data-tab="firma" onclick="switchListerTab('firma')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg>
+          Underentreprenører <span class="scope-badge scope-felles">Felles register</span>
+        </button>
+      </div>
+
+      <!-- Tab-innhold -->
+      <div class="lister-content" id="listerContent"></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Brreg-modal -->
+<div class="modal-backdrop" id="brregModal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Ny underentreprenør</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:2px">Hent firmainformasjon fra Brønnøysundregistrene</div>
+      </div>
+      <div class="modal-close" onclick="closeModal('brregModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="input-row">
+        <label>Org.nr <span style="color:var(--red)">*</span></label>
+        <input type="text" id="brregOrgnr" placeholder="9 sifre, f.eks. 912345678" maxlength="9" inputmode="numeric" oninput="resetBrregLookup()">
+      </div>
+      <div style="text-align:right;margin-top:-6px;margin-bottom:14px">
+        <button class="btn primary" onclick="lookupBrreg()" id="brregLookupBtn" style="font-size:11px;padding:6px 12px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          Hent fra Brreg
+        </button>
+      </div>
+
+      <div id="brregResult" style="display:none">
+        <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:11px;color:var(--green);font-weight:600">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+            Funnet i Brreg – navn er låst
+          </div>
+          <div class="input-row">
+            <label>Navn</label>
+            <input type="text" id="brregNavn" disabled style="background:#f0f2f5;color:var(--navy);font-weight:500">
+          </div>
+          <div class="input-row">
+            <label>Adresse</label>
+            <input type="text" id="brregAdresse" disabled style="background:#f0f2f5">
+          </div>
+          <div class="input-row">
+            <label>Postnr / Kommune</label>
+            <input type="text" id="brregPostnr" disabled style="background:#f0f2f5;flex:0 0 80px"> 
+            <input type="text" id="brregKommune" disabled style="background:#f0f2f5;flex:1">
+          </div>
+        </div>
+      </div>
+
+      <div id="brregNotFound" style="display:none;padding:14px;background:var(--yellow-soft);border-left:3px solid var(--yellow);border-radius:3px;font-size:12px;color:#8a5a1a;margin-top:8px">
+        <b>Org.nr ikke funnet i Brreg.</b><br>
+        Sjekk at nummeret er riktig, eller kontakt prosesseier hvis det er et nytt selskap som ikke ennå er registrert.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('brregModal')">Avbryt</button>
+      <button class="btn primary" onclick="saveBrregFirma()" id="brregSaveBtn" style="display:none">Legg til underentreprenør</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// Auth håndteres av tk-nav.js. Init kalles fra bunnen av filen.
+
+// Liten hash-funksjon brukt til å velge konsistent firmafarge
+function djb2(s){let h=5381;for(let i=0;i<s.length;i++){h=((h<<5)+h)+s.charCodeAt(i);h=h&0xFFFFFFFF}return h>>>0}
+
+// ===== "TODAY" (frosset til dagens dato i prototypen) =====
+const TODAY = new Date(2026,2,12); // Tor 12 Mar 2026 - dato Fredrik eksporterte Excel-filen
+document.addEventListener('DOMContentLoaded',()=>{
+  const el=document.getElementById('todayDisplay');
+  if(el) el.textContent=fmtDate(TODAY)+' · uke '+isoWeek(TODAY);
+});
+
+// ===== UTILS =====
+function fmtDate(d){
+  const days=['Søn','Man','Tir','Ons','Tor','Fre','Lør'];
+  const dd=String(d.getDate()).padStart(2,'0');
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const yy=String(d.getFullYear()).slice(2);
+  return `${days[d.getDay()]} ${dd}/${mm}/${yy}`;
+}
+function fmtDateInput(d){
+  const dd=String(d.getDate()).padStart(2,'0');
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  return `${d.getFullYear()}-${mm}-${dd}`;
+}
+function parseDate(s){
+  const [y,m,d]=s.split('-').map(Number);
+  return new Date(y,m-1,d);
+}
+function isoWeek(d){
+  const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  t.setUTCDate(t.getUTCDate()+4-(t.getUTCDay()||7));
+  const yearStart=new Date(Date.UTC(t.getUTCFullYear(),0,1));
+  return Math.ceil((((t-yearStart)/86400000)+1)/7);
+}
+function daysBetween(from,to,mode){
+  // mode: 5=Man-Fre, 6=Man-Lør, 7=Man-Søn
+  let d=new Date(from), n=0;
+  while(d<=to){
+    const dow=d.getDay(); // 0=Søn, 1=Man...6=Lør
+    if(mode==7) n++;
+    else if(mode==6 && dow!==0) n++;
+    else if(mode==5 && dow!==0 && dow!==6) n++;
+    d=new Date(d); d.setDate(d.getDate()+1);
+  }
+  return n;
+}
+function weeksBetween(from,to){
+  return Math.ceil((to-TODAY)/(86400000*7));
+}
+function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+// Kuratert palett av distinkte, lyse pastellfarger - 14 stk for å sikre at
+// alle firma får unik farge selv ved 10-12 firma i listen.
+const FIRMA_PALETTE=[
+  {bg:'#fee2e2',text:'#991b1b',border:'#fecaca'}, // rød
+  {bg:'#ffedd5',text:'#9a3412',border:'#fed7aa'}, // oransje
+  {bg:'#fef3c7',text:'#92400e',border:'#fde68a'}, // amber
+  {bg:'#ecfccb',text:'#3f6212',border:'#d9f99d'}, // lime
+  {bg:'#dcfce7',text:'#166534',border:'#bbf7d0'}, // grønn
+  {bg:'#ccfbf1',text:'#115e59',border:'#99f6e4'}, // teal
+  {bg:'#cffafe',text:'#155e75',border:'#a5f3fc'}, // cyan
+  {bg:'#e0f2fe',text:'#075985',border:'#bae6fd'}, // sky
+  {bg:'#dbeafe',text:'#1e40af',border:'#bfdbfe'}, // blå
+  {bg:'#e0e7ff',text:'#3730a3',border:'#c7d2fe'}, // indigo
+  {bg:'#ede9fe',text:'#5b21b6',border:'#ddd6fe'}, // fiolett
+  {bg:'#f3e8ff',text:'#6b21a8',border:'#e9d5ff'}, // lilla
+  {bg:'#fce7f3',text:'#9d174d',border:'#fbcfe8'}, // rosa
+  {bg:'#ffe4e6',text:'#9f1239',border:'#fecdd3'}  // rose
+];
+
+// Indeks-basert: garantert unik farge per firma (mod palett-lengde).
+// Stabil så lenge FIRMAS-arrayet ikke omorganiseres - og det gjør det ikke,
+// vi pusher kun nye firma på slutten.
+function firmaColor(name){
+  const idx=FIRMAS.indexOf(name);
+  if(idx>=0) return FIRMA_PALETTE[idx%FIRMA_PALETTE.length];
+  // Fallback for firma som ikke er i hovedlisten (cache-edge cases)
+  return FIRMA_PALETTE[djb2(name)%FIRMA_PALETTE.length];
+}
+
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.className='toast visible'+(type?' '+type:'');
+  t.textContent=msg;
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('visible'),2500);
+}
+
+// ===== DATA: Jåtunparken =====
+let AREAS=['BT1','Rema 100','BT2','BT3','KBA1','KBA2','B1','B2','Hovedbedrift','Riggområde'];
+let SUB_BY_AREA={
+  'BT1':['Rema 1000','KBA1'],
+  'Rema 100':[],
+  'BT2':['KBA2'],
+  'BT3':['Parkeringskjeller','B2','B1'],
+  'KBA1':['1 Etg','2 Etg','3 Etg','4 Etg','5 Etg','U-etg'],
+  'KBA2':['1 Etg','2 Etg','3 Etg','4 Etg','U-etg'],
+  'B1':['U-etg'],
+  'B2':[],
+  'Hovedbedrift':['1 Etg','Rigg'],
+  'Riggområde':['Rigg']
+};
+let FIRMAS=['Milepæl','Total Betong','Total Betong Hovedbedrift','Stangeland','Br.Aase','Elektro komfort','Bryne rør','L-nett','RIB','Naboen'];
+
+// Felles register: berikende metadata om firma (org.nr, adresse).
+// Tom som default - alle eksisterende firma vises som MANUELT.
+// Nye firma som legges til via Brreg-flowen får source:'brreg' og full meta-data.
+let FIRMA_META={};
+
+// Sunn aktivitet: 7 forutsetninger som må være på plass før jobb kan starte
+// (Last Planner-prinsipp). Felles register av navngitte felter.
+const SUNN_FIELDS=[
+  {key:'utstyr',     label:'Utst.',  full:'Utstyr'},
+  {key:'materialer', label:'Mat.',   full:'Materialer'},
+  {key:'personell',  label:'Pers.',  full:'Personell'},
+  {key:'tegninger',  label:'Tegn.',  full:'Tegninger'},
+  {key:'plass',      label:'Plass',  full:'Plass'},
+  {key:'sja',        label:'SJA',    full:'Sikker Jobb Analyse'}
+];
+function emptySunn(){
+  const s={};
+  SUNN_FIELDS.forEach(f=>s[f.key]=false);
+  return s;
+}
+
+// Mock Brreg-oppslag
+const BRREG_MOCK={
+  '912345678':{navn:'Sørby Entreprenør AS',adresse:'Industrivegen 42',postnr:'4032',kommune:'Stavanger'},
+  '923456789':{navn:'Block Berge Bygg AS',adresse:'Kvadratvegen 8',postnr:'4365',kommune:'Hå'},
+  '934567890':{navn:'Faber Bygg AS',adresse:'Tastagata 19',postnr:'4007',kommune:'Stavanger'},
+  '945678901':{navn:'Vassbakk & Stol AS',adresse:'Søre Klepp 5',postnr:'4344',kommune:'Klepp'},
+  '956789012':{navn:'Sandnes Anlegg AS',adresse:'Hanaveien 42',postnr:'4327',kommune:'Sandnes'}
+};
+
+const PLAN_TYPES=['Hovedfremdriftsplan','Prosjekteringsplan','Faseplan'];
+
+const REASONS=[
+  'Tegningsmangel','Materiell forsinket','Værforhold','Underentreprenør forsinket',
+  'Endringsordre','Mannskap omdisponert','Tekniske avklaringer','Logistikk/leveranse',
+  'HMS-stopp','Annet'
+];
+
+// Generer realistisk Jåtunparken-data
+// Generer aktiviteter fra faktisk Jåtunparken-data
+function generateData(){
+  const baseTime=new Date(2026,1,15,9,30);
+  const raw=[
+    [1,'Hovedbedrift','Rigg','Total Betong','Bestille fiber/VA brakkerigg','Faseplan',[2025,12,1],[2025,12,5],100,''],
+    [2,'Hovedbedrift','Rigg','Total Betong','Byggegjerde riggområde','Faseplan',[2025,12,1],[2025,12,12],100,''],
+    [3,'Hovedbedrift','Rigg','Total Betong Hovedbedrift','Byggestrøm klar','Faseplan',[2025,12,22],[2026,3,13],50,'mangler 2 skap'],
+    [4,'KBA1','U-etg','RIB','Tegningsgrunnlag Heisgruber','Prosjekteringsplan',[2025,12,19],[2025,12,19],0,''],
+    [5,'','','RIB','Tegningsgrunnlag yttervegg/fundament akse A','Prosjekteringsplan',[2025,12,19],[2025,12,19],0,''],
+    [6,'KBA1','U-etg','Stangeland','boring/sprengning','Faseplan',[2026,1,16],[2026,2,20],100,'2 salver igjen'],
+    [7,'KBA1','U-etg','Bryne rør','Bunnledningsplan','Prosjekteringsplan',[2026,1,5],[2026,1,9],0,''],
+    [8,'Riggområde','Rigg','Naboen','Montering Brakkerigg','Faseplan',[2026,1,8],[2026,1,27],100,''],
+    [9,'','','RIB','Tegningsgrunnlag fundamenter under kranskinner(8 stk)','Prosjekteringsplan',[2026,1,9],[2026,1,9],0,''],
+    [10,'KBA1','U-etg','Stangeland','utlasting av tomt','Faseplan',[2026,1,11],[2026,2,5],100,'bunnledningsplan, fundamentplan/kotehøyder, tilkomst'],
+    [11,'KBA1','U-etg','Stangeland','klargjøring høy mur mot vest','Faseplan',[2026,1,26],[2026,2,5],100,''],
+    [12,'KBA1','U-etg','Stangeland','fundament til kran akse 10-11/i-h','Faseplan',[2026,1,26],[2026,2,5],100,'mulig problematikk mtp fjell, stangeland prøvegraver'],
+    [13,'KBA1','U-etg','Stangeland','fundament til liten kran','Faseplan',[2026,1,26],[2026,1,30],100,''],
+    [14,'','','RIB','Tegningsgrunnlag Stripefundament akse 1-4, D-K','Prosjekteringsplan',[2026,1,30],[2026,1,30],0,''],
+    [15,'KBA1','U-etg','Stangeland','klargjøring for stor kran','Faseplan',[2026,2,2],[2026,2,6],100,'John Morten svarer opp'],
+    [16,'KBA1','U-etg','Total Betong','Montasje kran, Akse F','Faseplan',[2026,2,2],[2026,2,2],100,''],
+    [17,'KBA1','U-etg','Total Betong','Yttervegg, akse a','Faseplan',[2026,2,7],[2026,3,20],85,'tegninger lavere mur v/B1 uke 12??'],
+    [18,'KBA1','U-etg','Stangeland','klargjøring fundament, akse K til E','Faseplan',[2026,2,9],[2026,2,20],100,'Mangler fundament i veg, tas etter veg er flyttet ut.'],
+    [19,'KBA2','U-etg','Stangeland','Utlasting p-kjeller','Faseplan',[2026,2,13],[2026,3,6],95,'kan nok dra ut'],
+    [20,'KBA1','U-etg','Total Betong','8 stk punktfundament for tårnkran','Faseplan',[2026,2,6],[2026,2,14],100,''],
+    [21,'KBA1','U-etg','Total Betong','Fundamentering KBA1','Faseplan',[2026,2,16],[2026,3,20],70,''],
+    [22,'KBA1','U-etg','Stangeland','fylle over 6 stk punktfundament for tårnkran','Faseplan',[2026,2,10],[2026,2,13],100,''],
+    [23,'KBA1','U-etg','Total Betong','Innervegger','Faseplan',[2026,2,23],[2026,4,10],5,''],
+    [24,'Hovedbedrift','1 Etg','Total Betong Hovedbedrift','Bestilling innstøpningsgods','Faseplan',[2026,3,2],[2026,3,13],0,'Svein Tore bestiller fra spenncon'],
+    [25,'KBA1','U-etg','Total Betong','Montasje tårnkran','Faseplan',[2026,2,17],[2026,2,21],100,''],
+    [26,'KBA2','U-etg','Stangeland','Utlasting resten','Faseplan',[2026,3,2],[2026,3,13],50,''],
+    [27,'KBA1','U-etg','Stangeland','Heisgruber, akse D(etter at stor kran har komt in)','Faseplan',[2026,2,23],[2026,2,27],100,''],
+    [28,'KBA1','U-etg','Total Betong Hovedbedrift','Avklare fjernvarme, Høy/lavspent og vann','Faseplan',[2026,3,2],[2026,3,27],0,'Sanitærabonoment godkjent? \nSøknad fjernvarme - lyse neo?\n Høyspent godkjenning på trase Stavanger kommune. \nLavspent til nabo?\nHvem bestiller FV og HS/LS Total Betong'],
+    [29,'KBA1','U-etg','Elektro komfort','Ring jording','Faseplan',[2026,3,4],[2026,3,31],0,'Følger stangeland'],
+    [30,'KBA1','U-etg','Stangeland','intillfylling høy mur akse A','Faseplan',[2026,3,4],[2026,3,11],0,'Kan fylitt brukes?'],
+    [31,'KBA1','U-etg','Stangeland','Utgraving for lav mur akse B1-A','Faseplan',[2026,3,5],[2026,3,19],0,''],
+    [32,'Hovedbedrift','','Total Betong Hovedbedrift','Bestilling trafo','Faseplan',[2026,3,9],[2026,3,20],0,'20 uker leveringstid, (ønskes uke 32?)'],
+    [33,'KBA1','U-etg','Stangeland','Klargjøring for fundament akse C og B','Faseplan',[2026,3,11],[2026,3,18],0,''],
+    [34,'Hovedbedrift','Rigg','Total Betong Hovedbedrift','Bakoverplanlegging 2','Faseplan',[2026,3,16],[2026,3,20],0,''],
+    [35,'KBA2','U-etg','Stangeland','Klargjøring fundament og heisgruber','Faseplan',[2026,3,16],[2026,3,27],0,''],
+    [36,'KBA1','U-etg','Total Betong','støping av mur og fundament akse B1-A','Faseplan',[2026,3,20],[2026,4,16],0,''],
+    [37,'KBA2','U-etg','Total Betong','Fundament KBA2 og søyler parkering','Faseplan',[2026,3,23],[2026,5,22],0,''],
+    [38,'KBA2','U-etg','Total Betong','Fundamentering og heisgruber','Faseplan',[2026,3,30],[2026,5,1],0,''],
+    [39,'Hovedbedrift','1 Etg','Total Betong Hovedbedrift','Bestilling ventiler/dør til trafo','Faseplan',[2026,4,6],[2026,4,6],0,'venter på tegninger'],
+    [40,'KBA1','U-etg','Bryne rør','bunnledninger akse 7-10','Faseplan',[2026,4,13],[2026,4,17],0,'Følger stangeland'],
+    [41,'KBA1','U-etg','Elektro komfort','Rør i grunn','Faseplan',[2026,4,13],[2026,4,17],0,'Følger stangeland'],
+    [42,'KBA1','U-etg','Stangeland','Fylling for gulv på grunn + bunnledning','Faseplan',[2026,4,13],[2026,4,17],0,''],
+    [43,'KBA2','U-etg','Total Betong','Vegger','Faseplan',[2026,4,13],[2026,5,22],0,''],
+    [44,'KBA1','U-etg','Stangeland','Anlegging av ny anleggsveg','Faseplan',[2026,4,17],[2026,5,1],0,'Høyspent, vannkumm, fjernvarme'],
+    [45,'KBA1','U-etg','Total Betong','Bjelker-dekke','Faseplan',[2026,4,20],[2026,5,1],0,'begynner i akse c-g'],
+    [46,'KBA1','U-etg','Total Betong','Dekke over U-etg','Faseplan',[2026,4,20],[2026,5,15],0,''],
+    [47,'KBA1','U-etg','Stangeland','VA','Faseplan',[2026,5,4],[2026,5,15],0,'noe må holdes igjen pga logistikk, John Morten'],
+    [48,'KBA1','U-etg','Bryne rør','montering av utsparinger, dekke over u etg','Faseplan',[2026,5,4],[2026,5,8],0,''],
+    [49,'KBA1','U-etg','Elektro komfort','Stusser og rør i dekke over u etg','Faseplan',[2026,5,4],[2026,5,8],0,''],
+    [50,'KBA2','U-etg','Total Betong','Dekke over U-etg','Faseplan',[2026,5,11],[2026,5,29],0,'Starter fra KBA1'],
+    [51,'Hovedbedrift','1 Etg','Total Betong Hovedbedrift','Bestilling kabelluker til trafo','Faseplan',[2026,5,18],[2026,5,18],0,'2 uker leveingstid tegning?'],
+    [52,'KBA2','U-etg','Stangeland','VA','Faseplan',[2026,5,18],[2026,5,29],0,''],
+    [53,'KBA1','1 Etg','Total Betong','Dekke over 1 etg','Faseplan',[2026,5,18],[2026,6,19],0,''],
+    [54,'KBA1','1 Etg','Total Betong','Vegger','Faseplan',[2026,5,18],[2026,6,5],0,''],
+    [55,'KBA2','U-etg','Bryne rør','Sette utsparinger i dekke over u-etg','Faseplan',[2026,5,18],[2026,5,22],0,''],
+    [56,'KBA1','1 Etg','Elektro komfort','rør og bokser i vegger','Faseplan',[2026,5,18],[2026,5,29],0,'OBS - flyttet fra uke 26-27'],
+    [57,'KBA2','U-etg','Elektro komfort','Stusser og rør i dekke over u etg','Faseplan',[2026,5,18],[2026,5,22],0,''],
+    [58,'KBA2','U-etg','Total Betong','Mellom vegg akse K og første bjelke','Faseplan',[2026,5,25],[2026,5,29],0,''],
+    [59,'KBA1','1 Etg','Bryne rør','Sprinkler/utsparing i dekke over 1 etg','Faseplan',[2026,6,1],[2026,6,5],0,''],
+    [60,'KBA1','1 Etg','Elektro komfort','Stusser og rør i dekke over 1 etg','Faseplan',[2026,6,1],[2026,6,12],0,''],
+    [61,'KBA2','1 Etg','Elektro komfort','rør og bokser i vegger','Faseplan',[2026,6,1],[2026,6,19],0,''],
+    [62,'KBA1','U-etg','Stangeland','Høyspent/fjernvarmegrøft','Faseplan',[2026,6,1],[2026,6,19],0,''],
+    [63,'KBA2','1 Etg','Total Betong','vegger','Faseplan',[2026,6,1],[2026,6,19],0,''],
+    [64,'KBA2','1 Etg','Total Betong','dekke over 1 etg','Faseplan',[2026,6,1],[2026,6,26],0,''],
+    [65,'KBA1','U-etg','Total Betong','Støvbinding trafo','Faseplan',[2026,6,8],[2026,6,12],0,''],
+    [66,'KBA2','1 Etg','Elektro komfort','Stusser og rør i dekke over 1 etg','Faseplan',[2026,6,8],[2026,6,26],0,''],
+    [67,'KBA1','2 Etg','Total Betong','Vegger','Faseplan',[2026,6,15],[2026,7,31],0,''],
+    [68,'KBA1','2 Etg','Total Betong','Dekke over 2 etg','Faseplan',[2026,6,15],[2026,8,7],0,''],
+    [69,'KBA1','2 Etg','Elektro komfort','rør og bokser i vegger','Faseplan',[2026,6,15],[2026,7,31],0,''],
+    [70,'KBA1','2 Etg','Elektro komfort','stusser og rør i dekke','Faseplan',[2026,6,29],[2026,7,31],0,''],
+    [71,'KBA2','2 Etg','Elektro komfort','rør og bokser i vegger','Faseplan',[2026,6,29],[2026,8,14],0,''],
+    [72,'KBA2','2 Etg','Total Betong','vegger','Faseplan',[2026,6,29],[2026,8,7],0,''],
+    [73,'KBA2','2 Etg','Total Betong','Dekke over 2 etg','Faseplan',[2026,6,29],[2026,8,14],0,''],
+    [74,'KBA1','2 Etg','Bryne rør','Sprinkler/utsparing i dekke over 2 etg','Faseplan',[2026,7,20],[2026,7,31],0,''],
+    [75,'KBA1','1 Etg','Bryne rør','Rørføringer i sjakter','Faseplan',[2026,7,27],[2026,7,31],0,''],
+    [76,'KBA2','2 Etg','Elektro komfort','stusser og rør i dekke over 2 etg','Faseplan',[2026,7,27],[2026,8,14],0,''],
+    [77,'KBA1','U-etg','L-nett','Montering trafo','Faseplan',[2026,7,27],[2026,8,7],0,''],
+    [78,'KBA1','3 Etg','Total Betong','Vegger','Faseplan',[2026,8,3],[2026,8,21],0,''],
+    [79,'KBA1','3 Etg','Total Betong','Dekke over 3 etg','Faseplan',[2026,8,3],[2026,8,28],0,''],
+    [80,'KBA1','3 Etg','Bryne rør','Sette utsparinger, dekke over 3 etg','Faseplan',[2026,8,10],[2026,8,14],0,''],
+    [81,'KBA1','3 Etg','Elektro komfort','Stusser og rør i dekke over 3 etg','Faseplan',[2026,8,17],[2026,8,28],0,''],
+    [82,'KBA2','3 Etg','Elektro komfort','rør og bokser i vegger','Faseplan',[2026,8,17],[2026,9,4],0,''],
+    [83,'KBA2','3 Etg','Total Betong','vegger','Faseplan',[2026,8,17],[2026,9,4],0,''],
+    [84,'KBA2','3 Etg','Total Betong','Dekke over 3 etg','Faseplan',[2026,8,17],[2026,9,11],0,''],
+    [85,'KBA2','3 Etg','Elektro komfort','stusser og rør i dekke over 2 etg','Faseplan',[2026,8,24],[2026,9,11],0,''],
+    [86,'KBA1','4 Etg','Total Betong','vegger','Faseplan',[2026,8,31],[2026,9,18],0,''],
+    [87,'KBA1','4 Etg','Total Betong','Dekke over 4 etg','Faseplan',[2026,8,31],[2026,9,25],0,''],
+    [88,'KBA1','2 Etg','Bryne rør','Rørføringer i sjakter','Faseplan',[2026,8,31],[2026,9,4],0,''],
+    [89,'KBA1','2 Etg','Bryne rør','Spillvann','Faseplan',[2026,8,31],[2026,9,4],0,''],
+    [90,'KBA1','4 Etg','Elektro komfort','rør og bokser i vegger','Faseplan',[2026,8,31],[2026,9,18],0,''],
+    [91,'KBA1','4 Etg','Elektro komfort','Stusser og rør i dekke over 4 etg','Faseplan',[2026,9,7],[2026,9,18],0,''],
+    [92,'KBA1','3 Etg','Bryne rør','Rørføringer i sjakter','Faseplan',[2026,9,14],[2026,9,18],0,''],
+    [93,'KBA1','3 Etg','Bryne rør','Spillvann','Faseplan',[2026,9,14],[2026,9,18],0,''],
+    [94,'KBA1','4 Etg','Bryne rør','Sprinkler i dekke over 4 etg','Faseplan',[2026,9,14],[2026,9,18],0,''],
+    [95,'KBA1','4 Etg','Bryne rør','Sette utsparinger, dekke over 4 etg','Faseplan',[2026,9,14],[2026,9,18],0,''],
+    [96,'BT1','','','Grunnarbeid','Hovedfremdriftsplan',[2026,1,5],[2026,3,31],0,''],
+    [97,'BT1','Rema 1000','Total Betong','Betongarbeid + park kjeller','Hovedfremdriftsplan',[2026,3,2],[2026,11,24],0,''],
+    [98,'BT2','KBA2','','Grunnarbeid','Hovedfremdriftsplan',[2026,3,30],[2026,6,23],0,''],
+    [99,'BT2','KBA2','Total Betong','Betongarbeid','Hovedfremdriftsplan',[2026,5,4],[2026,12,22],0,''],
+    [100,'BT1','KBA1','Total Betong','Betongarbeid','Hovedfremdriftsplan',[2026,7,6],[2026,11,24],0,''],
+    [101,'KBA1','5 Etg','Total Betong','Vegger 5 etg','Hovedfremdriftsplan',[2026,9,28],[2027,1,29],0,''],
+    [102,'BT1','KBA1','','Tekniske fag','Hovedfremdriftsplan',[2026,12,7],[2027,3,26],0,''],
+    [103,'BT2','KBA2','','Tømmerarbeid','Hovedfremdriftsplan',[2026,12,7],[2027,4,23],0,''],
+    [104,'BT1','KBA1','Milepæl','Tett bygg','Hovedfremdriftsplan',[2027,1,29],[2027,1,29],0,''],
+    [105,'BT1','KBA1','','Tømmerarbeid (vegger, himling)','Hovedfremdriftsplan',[2027,2,1],[2027,5,21],0,''],
+    [106,'BT3','','','Grunnarbeid','Hovedfremdriftsplan',[2027,3,1],[2027,5,21],0,''],
+    [107,'BT1','KBA1','','Maler/overflater','Hovedfremdriftsplan',[2027,3,9],[2027,8,9],0,''],
+    [108,'BT2','KBA2','','Tett bygg','Hovedfremdriftsplan',[2027,4,23],[2027,4,23],0,''],
+    [109,'BT3','Parkeringskjeller','Total Betong','Betongarbeid','Hovedfremdriftsplan',[2027,4,26],[2027,9,10],0,''],
+    [110,'BT2','KBA2','','Tømmerarbeid (vegger, himling)','Hovedfremdriftsplan',[2027,5,10],[2027,9,24],0,''],
+    [111,'BT1','KBA1','','Sluttmontasje Teknisk','Hovedfremdriftsplan',[2027,5,12],[2027,10,12],0,''],
+    [112,'BT3','B1','Total Betong','Betongarbeid','Hovedfremdriftsplan',[2027,7,19],[2027,12,3],0,''],
+    [113,'BT3','B2','Total Betong','Betongarbeid','Hovedfremdriftsplan',[2027,7,19],[2027,12,3],0,''],
+    [114,'BT2','KBA2','','Maler/overflater','Hovedfremdriftsplan',[2027,8,2],[2027,12,31],0,''],
+    [115,'BT1','KBA1','','Flikk og etterarbeid','Hovedfremdriftsplan',[2027,9,15],[2027,11,9],0,''],
+    [116,'BT2','KBA2','','Sluttmontasje Teknisk','Hovedfremdriftsplan',[2027,10,11],[2028,3,10],0,''],
+    [117,'BT3','','','Tømmerarbeid','Hovedfremdriftsplan',[2027,11,8],[2028,2,25],0,''],
+    [118,'BT1','KBA1','Milepæl','Deloverlevering','Hovedfremdriftsplan',[2027,11,17],[2027,11,17],0,''],
+    [119,'BT3','','','Tekniske fag','Hovedfremdriftsplan',[2028,1,31],[2028,4,21],0,''],
+    [120,'BT2','KBA2','','Flikk og etterarbeid','Hovedfremdriftsplan',[2028,2,14],[2028,4,7],0,''],
+    [121,'BT3','','','Tett bygg','Hovedfremdriftsplan',[2028,2,25],[2028,2,25],0,''],
+    [122,'BT3','','','Tømmerarbeid (vegger, himling)','Hovedfremdriftsplan',[2028,2,28],[2028,5,19],0,''],
+    [123,'BT2','KBA2','Milepæl','Deloverlevering','Hovedfremdriftsplan',[2028,4,21],[2028,4,21],0,''],
+    [124,'BT3','','','Maler/overflater','Hovedfremdriftsplan',[2028,5,22],[2028,8,11],0,''],
+    [125,'BT3','','','Sluttmontasje Teknisk','Hovedfremdriftsplan',[2028,7,3],[2028,9,22],0,''],
+    [126,'BT3','','','Flikk og etterarbeid','Hovedfremdriftsplan',[2028,8,28],[2028,10,20],0,''],
+    [127,'BT3','','','Deloverlevering','Hovedfremdriftsplan',[2028,11,17],[2028,11,17],0,''],
+    [128,'KBA2','','Elektro komfort','rør og bokser i vegger','Faseplan',[2026,9,14],[2026,10,2],0,''],
+    [129,'KBA2','4 Etg','Total Betong','vegger','Faseplan',[2026,9,14],[2026,10,2],0,''],
+    [130,'KBA2','4 Etg','Total Betong','Dekke over 4 etg','Faseplan',[2026,9,14],[2026,10,9],0,''],
+    [131,'B1','U-etg','Milepæl','Teknisk rom ferdigstilt','Faseplan',[2026,12,1],[2026,12,1],0,''],
+    [132,'','','RIB','Tegningsgrunnlag Punktfundament akse 1-4, D-K','Prosjekteringsplan',[2026,2,6],[2026,2,6],0,''],
+    [133,'','','RIB','Tegningsgrunnlag Ferdig hele U-etg, trafo m.m','Prosjekteringsplan',[2026,2,13],[2026,2,13],0,''],
+    [134,'','','RIB','Tegningsgrunnlag fundament, stripe og punktfundamenter alle knyttet til REMA1000','Prosjekteringsplan',[2026,2,27],[2026,2,27],0,''],
+    [135,'KBA1','U-etg','Bryne rør','Tegning utsparinger','Prosjekteringsplan',[2026,4,20],[2026,4,24],0,''],
+    [136,'KBA2','U-etg','Bryne rør','Tegning utsparinger dekke over u-etg','Prosjekteringsplan',[2026,5,11],[2026,5,15],0,''],
+    [137,'KBA1','2 Etg','Bryne rør','Tegning utsparinger','Prosjekteringsplan',[2026,6,29],[2026,7,3],0,''],
+    [138,'KBA1','3 Etg','Bryne rør','Tegning utsparinger','Prosjekteringsplan',[2026,8,3],[2026,8,7],0,''],
+    [139,'KBA1','4 Etg','Bryne rør','tegninger utsparinger','Prosjekteringsplan',[2026,9,7],[2026,9,11],0,'']
+  ];
+  return raw.map(([id,a,s,f,n,p,fr,to,pct,k])=>({
+    id,
+    area:a,sub:s,firma:f,name:n,plan:p,
+    fromDate:new Date(fr[0],fr[1]-1,fr[2]),
+    toDate:new Date(to[0],to[1]-1,to[2]),
+    fremdrift:pct,
+    kommentar:k,
+    kritisk:false,
+    highlighted:false,
+    sunn:emptySunn(),
+    history:[
+      {time:baseTime,user:'Fredrik Meidell',action:'Opprettet aktivitet',detail:'Importert fra Excel-mal'}
+    ]
+  }));
+}
+
+// ===== STATE =====
+let DATA=[];
+let activePlanFilter='alle';
+let pendingDateChange=null;
+let gridApi=null;
+let columnApi=null;
+
+// ===== AG GRID CELL RENDERERS =====
+class FirmaPillRenderer{
+  init(p){
+    this.eGui=document.createElement('div');
+    this.render(p);
+  }
+  render(p){
+    if(p.value){
+      const c=firmaColor(p.value);
+      this.eGui.innerHTML=`<span class="fp-firma-pill" style="background:${c.bg};color:${c.text};border:1px solid ${c.border}">${escapeHtml(p.value)}</span>`;
+    }else{
+      this.eGui.innerHTML='<span style="color:var(--text-3);font-size:11px">—</span>';
+    }
+  }
+  getGui(){return this.eGui}
+  refresh(p){this.render(p);return true}
+}
+
+class AktivitetRenderer{
+  init(p){
+    this.eGui=document.createElement('div');
+    this.eGui.className='fp-aktivitet-cell';
+    this.render(p);
+  }
+  render(p){
+    const d=p.data;
+    this.eGui.innerHTML=`${d.kritisk?'<span class="fp-kritisk-mark">⚠️</span>':''}${escapeHtml(d.name||'')}`;
+  }
+  getGui(){return this.eGui}
+  refresh(p){this.render(p);return true}
+}
+
+class FremdriftRenderer{
+  init(p){
+    this.eGui=document.createElement('div');
+    this.eGui.className='fp-fremdrift-wrap';
+    this.render(p);
+  }
+  render(p){
+    const v=p.value||0;
+    const fillCls=v>=100?'':(v>0?'partial':'starting');
+    this.eGui.innerHTML=`
+      <div class="fp-fremdrift-bar"><div class="fp-fremdrift-fill ${fillCls}" style="width:${v}%"></div></div>
+      <span class="fp-fremdrift-pct">${v}%</span>
+    `;
+  }
+  getGui(){return this.eGui}
+  refresh(p){this.render(p);return true}
+}
+
+class RagRenderer{
+  init(p){
+    this.eGui=document.createElement('div');
+    this.render(p);
+  }
+  render(p){
+    const r=ragStatus(p.data);
+    this.eGui.innerHTML=`<span class="fp-rag ${r.cls}"><span class="fp-rag-dot"></span><span class="fp-rag-text">${r.label}</span></span>`;
+  }
+  getGui(){return this.eGui}
+  refresh(p){this.render(p);return true}
+}
+
+class LoggButtonRenderer{
+  init(p){
+    this.eGui=document.createElement('button');
+    this.eGui.className='fp-logg-btn';
+    this.eGui.title='Vis aktivitetslogg';
+    this.eGui.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h12"/></svg>';
+    this.eGui.addEventListener('click',(e)=>{e.stopPropagation();openLogg(p.data.id)});
+  }
+  getGui(){return this.eGui}
+  refresh(){return false}
+}
+
+class SunnRenderer{
+  init(p){
+    const key=p.colDef.field.split('.')[1];
+    const checked=p.data.sunn && p.data.sunn[key];
+    this.eGui=document.createElement('span');
+    this.eGui.className='fp-sunn-check'+(checked?' checked':'');
+    this.eGui.textContent=checked?'✓':'';
+    this.eGui.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      toggleSunnField(p.data.id,key);
+    });
+  }
+  getGui(){return this.eGui}
+  refresh(){return false}
+}
+
+// ===== CUSTOM SET-LIKE FILTER (Excel-stil) =====
+// Implementerer AG Grid Filter Component-grensesnittet (Community).
+// Tilstand lagres som "excluded" sett (verdier som er HUKET AV) - mer effektivt
+// enn å lagre aktive når default er at alle er valgt.
+class SetLikeFilter{
+  init(params){
+    this.params=params;
+    this.excluded=new Set(); // Verdier som er ekskludert (uten hake)
+    this.searchText='';
+    this.eGui=document.createElement('div');
+    this.eGui.className='fp-set-filter';
+    // Tom inntil afterGuiAttached - da har grid populated
+  }
+
+  afterGuiAttached(){
+    this.refreshUi();
+    setTimeout(()=>{
+      const s=this.eGui.querySelector('.fp-sf-search input');
+      if(s) s.focus();
+    },0);
+  }
+
+  collectUniqueValues(){
+    const set=new Set();
+    const colId=this.params.column.getColId();
+    this.params.api.forEachNode(node=>{
+      if(!node.data) return;
+      const v=this.params.api.getCellValue?
+        this.params.api.getCellValue({rowNode:node,colKey:colId}):
+        this.params.api.getValue(colId,node);
+      const key=(v==null||v==='')?'':String(v);
+      set.add(key);
+    });
+    return [...set].sort((a,b)=>{
+      if(a==='') return 1;
+      if(b==='') return -1;
+      return a.localeCompare(b,'nb');
+    });
+  }
+
+  refreshUi(){
+    const all=this.collectUniqueValues();
+    const q=this.searchText.toLowerCase();
+    const visible=q?all.filter(v=>v.toLowerCase().includes(q)):all;
+    const visibleAllChecked=visible.every(v=>!this.excluded.has(v));
+
+    this.eGui.innerHTML=`
+      <div class="fp-sf-search">
+        <input type="text" placeholder="Søk..." value="${escapeAttr(this.searchText)}">
+      </div>
+      <div class="fp-sf-actions">
+        <label class="fp-sf-option fp-sf-all">
+          <input type="checkbox" data-action="toggle-all" ${visibleAllChecked?'checked':''}>
+          <span>(Velg alle${q?' synlige':''})</span>
+        </label>
+      </div>
+      <div class="fp-sf-list">
+        ${visible.length===0?'<div class="fp-sf-empty">Ingen treff</div>':
+          visible.map(v=>`
+            <label class="fp-sf-option">
+              <input type="checkbox" data-value="${escapeAttr(v)}" ${!this.excluded.has(v)?'checked':''}>
+              <span>${v===''?'<em style="color:var(--text-3)">(tom)</em>':escapeHtml(v)}</span>
+            </label>
+          `).join('')}
+      </div>
+      ${this.excluded.size>0?'<div class="fp-sf-footer"><button class="fp-sf-clear">Fjern filter</button></div>':''}
+    `;
+
+    // Søk
+    const search=this.eGui.querySelector('.fp-sf-search input');
+    search.addEventListener('input',(e)=>{
+      this.searchText=e.target.value;
+      this.refreshUi();
+      const ns=this.eGui.querySelector('.fp-sf-search input');
+      if(ns){ns.focus();ns.setSelectionRange(ns.value.length,ns.value.length);}
+    });
+
+    // Toggle all (på synlige verdier)
+    const tgl=this.eGui.querySelector('[data-action="toggle-all"]');
+    if(tgl) tgl.addEventListener('change',(e)=>{
+      if(e.target.checked) visible.forEach(v=>this.excluded.delete(v));
+      else visible.forEach(v=>this.excluded.add(v));
+      this.params.filterChangedCallback();
+      this.refreshUi();
+    });
+
+    // Individuelle checkboxer
+    this.eGui.querySelectorAll('.fp-sf-list input[type="checkbox"]').forEach(cb=>{
+      cb.addEventListener('change',(e)=>{
+        const v=cb.dataset.value;
+        if(cb.checked) this.excluded.delete(v);
+        else this.excluded.add(v);
+        this.params.filterChangedCallback();
+        // Oppdater bare "velg alle"-state, ikke hele listen
+        const all=this.collectUniqueValues();
+        const q=this.searchText.toLowerCase();
+        const visible=q?all.filter(x=>x.toLowerCase().includes(q)):all;
+        const tglNew=this.eGui.querySelector('[data-action="toggle-all"]');
+        if(tglNew) tglNew.checked=visible.every(x=>!this.excluded.has(x));
+        // Vis/skjul "Fjern filter"-knapp
+        const footer=this.eGui.querySelector('.fp-sf-footer');
+        if(this.excluded.size>0 && !footer){
+          const f=document.createElement('div');
+          f.className='fp-sf-footer';
+          f.innerHTML='<button class="fp-sf-clear">Fjern filter</button>';
+          this.eGui.appendChild(f);
+          f.querySelector('.fp-sf-clear').addEventListener('click',()=>{
+            this.excluded.clear();
+            this.params.filterChangedCallback();
+            this.refreshUi();
+          });
+        } else if(this.excluded.size===0 && footer){
+          footer.remove();
+        }
+      });
+    });
+
+    // Fjern filter
+    const clr=this.eGui.querySelector('.fp-sf-clear');
+    if(clr) clr.addEventListener('click',()=>{
+      this.excluded.clear();
+      this.params.filterChangedCallback();
+      this.refreshUi();
+    });
+  }
+
+  doesFilterPass(params){
+    const colId=this.params.column.getColId();
+    const v=this.params.api.getValue(colId,params.node);
+    const key=(v==null||v==='')?'':String(v);
+    return !this.excluded.has(key);
+  }
+
+  isFilterActive(){return this.excluded.size>0}
+
+  getModel(){
+    return this.isFilterActive()?{excluded:[...this.excluded]}:null;
+  }
+
+  setModel(m){
+    this.excluded=new Set(m?.excluded||[]);
+  }
+
+  getGui(){return this.eGui}
+}
+
+// Hjelpefunksjoner for HTML-eskaping
+function escapeHtml(s){
+  return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s){return escapeHtml(s)}
+
+// ===== AG GRID CELL EDITORS =====
+// Standard agSelectCellEditor brukes for area/firma/plan
+// For sub-område trenger vi dynamisk liste basert på area, vha valueGetter på cellEditorParams
+
+// ===== VALUE FORMATTERS =====
+function dateFormatter(p){
+  if(!p.value) return '';
+  const d=p.value instanceof Date?p.value:new Date(p.value);
+  return fmtDate(d);
+}
+
+// ===== COLUMN DEFINITIONS =====
+function getColumnDefs(){
+  const showSunn=document.getElementById('tglSunn').checked;
+  const cols=[
+    {
+      field:'area',headerName:'Område',minWidth:110,maxWidth:140,
+      editable:true,
+      cellEditor:'agSelectCellEditor',
+      cellEditorParams:{values:['',...AREAS]},
+      cellStyle:{fontWeight:'500'},
+      filter:SetLikeFilter
+    },
+    {
+      field:'sub',headerName:'Subområde',minWidth:110,maxWidth:140,
+      editable:true,
+      cellEditor:'agSelectCellEditor',
+      cellEditorParams:(p)=>({values:['',...(SUB_BY_AREA[p.data.area]||[])]}),
+      filter:SetLikeFilter
+    },
+    {
+      field:'firma',headerName:'Firma',minWidth:140,maxWidth:170,
+      editable:true,
+      cellEditor:'agSelectCellEditor',
+      cellEditorParams:{values:['',...FIRMAS]},
+      cellRenderer:FirmaPillRenderer,
+      filter:SetLikeFilter
+    },
+    {
+      field:'name',headerName:'Aktivitet',minWidth:240,flex:2,
+      editable:true,
+      cellRenderer:AktivitetRenderer,
+      filter:'agTextColumnFilter'
+    },
+    {
+      field:'plan',headerName:'Plan',minWidth:130,maxWidth:170,
+      editable:true,
+      cellEditor:'agSelectCellEditor',
+      cellEditorParams:{values:PLAN_TYPES},
+      filter:SetLikeFilter
+    },
+    {
+      field:'fromDate',headerName:'Fra dato',minWidth:115,maxWidth:140,
+      editable:true,
+      valueFormatter:dateFormatter,
+      cellEditor:'agDateCellEditor',
+      filter:'agDateColumnFilter'
+    },
+    {
+      field:'toDate',headerName:'Til dato',minWidth:115,maxWidth:140,
+      editable:true,
+      valueFormatter:dateFormatter,
+      cellEditor:'agDateCellEditor',
+      filter:'agDateColumnFilter'
+    },
+    {
+      headerName:'Uke',width:80,sortable:false,
+      valueGetter:(p)=>{
+        if(!p.data.fromDate) return '';
+        const f=isoWeek(p.data.fromDate);
+        const t=isoWeek(p.data.toDate);
+        return f===t?String(f):`${f}-${t}`;
+      },
+      cellClass:'fp-uke-cell',
+      filter:false
+    },
+    {
+      headerName:'Dager',width:80,sortable:false,
+      valueGetter:(p)=>{
+        if(!p.data.fromDate||!p.data.toDate) return 0;
+        const mode=parseInt(document.getElementById('dayCalc').value);
+        return daysBetween(p.data.fromDate,p.data.toDate,mode);
+      },
+      valueFormatter:(p)=>p.value?p.value+'d':'',
+      cellClass:'fp-dager-cell',
+      filter:false
+    },
+    {
+      field:'fremdrift',headerName:'Fremdrift',minWidth:140,maxWidth:170,
+      editable:true,
+      cellRenderer:FremdriftRenderer,
+      filter:'agNumberColumnFilter'
+    }
+  ];
+
+  if(showSunn){
+    SUNN_FIELDS.forEach(f=>{
+      cols.push({
+        field:'sunn.'+f.key,
+        headerName:f.label,
+        headerTooltip:f.full,
+        width:62,
+        sortable:false,
+        cellRenderer:SunnRenderer,
+        cellStyle:{textAlign:'center',padding:'0'},
+        filter:false
+      });
+    });
+  }
+
+  cols.push(
+    {
+      field:'kommentar',headerName:'Kommentar',minWidth:160,flex:1,
+      editable:true,
+      cellEditor:'agLargeTextCellEditor',
+      cellEditorPopup:true,
+      filter:'agTextColumnFilter'
+    },
+    {
+      headerName:'',width:48,sortable:false,filter:false,
+      cellRenderer:LoggButtonRenderer,
+      cellStyle:{padding:'0',display:'flex',alignItems:'center',justifyContent:'center'}
+    },
+    {
+      colId:'rag',
+      headerName:'Status',width:130,sortable:true,
+      valueGetter:(p)=>ragStatus(p.data).label,
+      cellRenderer:RagRenderer,
+      cellClass:'cell-rag-wrap',
+      filter:SetLikeFilter
+    }
+  );
+
+  return cols;
+}
+
+// ===== ROW STYLING (horisont-stripe + highlight + missing) =====
+function getRowStyle(p){
+  if(!p.data) return null;
+  const cls=horizonClass(p.data);
+  const colors={'h-green':'#27ae60','h-blue':'#3498db','h-white':'#cfd2d9','h-orange':'#e67e22'};
+  return {borderLeft:`4px solid ${colors[cls]}`};
+}
+
+function getRowClass(p){
+  if(!p.data) return null;
+  const classes=[];
+  if(p.data.highlighted) classes.push('row-highlighted');
+  if(p.data.missing) classes.push('row-missing');
+  return classes.join(' ');
+}
+
+// ===== HORIZON / RAG =====
+function horizonClass(act){
+  if(act.fremdrift>=100) return 'h-orange';
+  const w=weeksBetween(null,act.fromDate);
+  if(w<=2) return 'h-green';
+  if(w<=8) return 'h-blue';
+  return 'h-white';
+}
+
+function ragStatus(act){
+  if(act.fremdrift>=100) return {cls:'rag-white',label:'Fullført',hidden:true};
+  const today=TODAY;
+  if(act.toDate < today) return {cls:'rag-red',label:'Over tid'};
+  const daysLeft=Math.ceil((act.toDate-today)/86400000);
+  if(act.fromDate>today) return {cls:'rag-white',label:'Ikke startet'};
+  if(daysLeft<=3) return {cls:'rag-yellow',label:'<3 dager'};
+  return {cls:'rag-green',label:'Pågår'};
+}
+
+// ===== INIT =====
+function init(){
+  DATA=generateData();
+  // Populate multi-new modal
+  const mA=document.getElementById('multiArea');
+  AREAS.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;mA.appendChild(o)});
+  // Reason grid
+  const rg=document.getElementById('reasonGrid');
+  REASONS.forEach(r=>{
+    const b=document.createElement('button');
+    b.className='reason-opt';b.textContent=r;
+    b.onclick=()=>{
+      rg.querySelectorAll('.reason-opt').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
+      rg.dataset.selected=r;
+    };
+    rg.appendChild(b);
+  });
+  // Plan tabs
+  document.querySelectorAll('.plan-tab').forEach(t=>{
+    t.onclick=()=>{
+      document.querySelectorAll('.plan-tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      activePlanFilter=t.dataset.plan;
+      applyExternalFilters();
+    };
+  });
+  document.getElementById('searchInput').addEventListener('input',(e)=>{
+    if(gridApi) gridApi.setGridOption('quickFilterText',e.target.value);
+    updateStats();
+  });
+  initGrid();
+}
+
+function initGrid(){
+  const gridDiv=document.getElementById('fdpGrid');
+  const gridOptions={
+    columnDefs:getColumnDefs(),
+    rowData:DATA,
+    defaultColDef:{
+      resizable:true,
+      sortable:true,
+      filter:false,
+      suppressHeaderMenuButton:false
+    },
+    suppressMenuHide:true,
+    rowSelection:'multiple',
+    suppressRowClickSelection:false,    // Single click selects row
+    rowMultiSelectWithClick:false,       // Standard shift/ctrl behavior
+    enableRangeSelection:false,
+    singleClickEdit:false,                // Double-click to edit
+    stopEditingWhenCellsLoseFocus:true,
+    suppressCellFocus:false,
+    getRowStyle:getRowStyle,
+    getRowClass:getRowClass,
+    getRowId:(p)=>String(p.data.id),
+    isExternalFilterPresent:()=>true,
+    doesExternalFilterPass:externalFilterPass,
+    onCellValueChanged:onCellValueChanged,
+    onSelectionChanged:updateStats,
+    onFilterChanged:updateStats,
+    onGridReady:(p)=>{gridApi=p.api;columnApi=p.columnApi;updateStats()}
+  };
+  agGrid.createGrid(gridDiv,gridOptions);
+}
+
+// ===== EXTERNAL FILTERS =====
+function externalFilterPass(node){
+  const a=node.data;
+  if(activePlanFilter==='alle') return true;
+  if(activePlanFilter==='Utkikksplan'){
+    if(a.plan!=='Faseplan') return false;
+    const w=weeksBetween(null,a.fromDate);
+    return w<=8 && a.fremdrift<100;
+  }
+  if(activePlanFilter==='Ukeplan'){
+    if(a.plan!=='Faseplan') return false;
+    const w=weeksBetween(null,a.fromDate);
+    return w<=2 && a.fremdrift<100;
+  }
+  return a.plan===activePlanFilter;
+}
+
+function applyExternalFilters(){
+  if(gridApi) gridApi.onFilterChanged();
+}
+
+// ===== CELL VALUE CHANGED =====
+function onCellValueChanged(e){
+  const a=e.data;
+  const f=e.colDef.field;
+  if(!f) return;
+
+  // Handle date fields - parse string from agDateCellEditor
+  if(f==='fromDate'||f==='toDate'){
+    let nd=e.newValue;
+    if(typeof nd==='string') nd=new Date(nd);
+    const od=e.oldValue instanceof Date?e.oldValue:new Date(e.oldValue);
+    if(!nd || isNaN(nd.getTime())){
+      e.node.setDataValue(f,od); return;
+    }
+    if(nd.getTime()===od.getTime()) return;
+
+    if(document.getElementById('tglReason').checked){
+      pendingDateChange={id:a.id,field:f,oldDate:od,newDate:nd,node:e.node};
+      const rg=document.getElementById('reasonGrid');
+      rg.dataset.selected='';
+      rg.querySelectorAll('.reason-opt').forEach(x=>x.classList.remove('selected'));
+      document.getElementById('reasonText').value='';
+      // Revert until confirmed
+      e.node.setDataValue(f,od);
+      openModal('reasonModal');
+    }else{
+      applyDateChange(a.id,f,od,nd,'',null);
+    }
+    return;
+  }
+
+  // Area: hold subområde-konsistens
+  if(f==='area'){
+    const validSubs=SUB_BY_AREA[e.newValue]||[];
+    a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:'Endret område',from:e.oldValue||'(tom)',to:e.newValue||'(tom)'});
+    if(a.sub && !validSubs.includes(a.sub)){
+      a.history.push({time:new Date(),user:'System',action:'Subområde nullstilt',detail:`"${a.sub}" finnes ikke under ${e.newValue}`});
+      a.sub='';
+      toast(`Subområde nullstilt - velg nytt for ${e.newValue}`,'warn');
+      e.node.setDataValue('sub','');
+    }
+    refreshRow(e.node);
+    return;
+  }
+
+  // Andre felt: logg endring
+  const labels={name:'aktivitetsnavn',sub:'subområde',firma:'firma',plan:'plan-type',kommentar:'kommentar',fremdrift:'fremdrift'};
+  if(labels[f]){
+    let from=e.oldValue,to=e.newValue;
+    if(f==='fremdrift'){
+      to=Math.max(0,Math.min(100,parseInt(to)||0));
+      a.fremdrift=to;
+      from=from+'%';to=to+'%';
+    }else if(f==='name'){
+      to=String(to||'').replace(/^⚠️\s*/,'').trim();
+      a.name=to;
+    }else if(f==='kommentar'){
+      from=from||'(tom)';to=to||'(tom)';
+    }
+    a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:'Endret '+labels[f],from:from,to:to});
+  }
+  refreshRow(e.node);
+}
+
+function refreshRow(node){
+  if(!gridApi||!node) return;
+  gridApi.refreshCells({rowNodes:[node],force:true});
+  // Recompute row style if horizon may have changed (e.g. fremdrift = 100)
+  gridApi.redrawRows({rowNodes:[node]});
+  updateStats();
+}
+
+function refreshAll(){
+  if(!gridApi) return;
+  gridApi.setGridOption('rowData',DATA);
+  gridApi.onFilterChanged();
+  updateStats();
+}
+
+// ===== DATE CHANGE FLOW =====
+function confirmReason(){
+  const reason=document.getElementById('reasonGrid').dataset.selected;
+  if(!reason){toast('Velg en årsak','warn');return}
+  const text=document.getElementById('reasonText').value;
+  const {id,field,oldDate,newDate}=pendingDateChange;
+  applyDateChange(id,field,oldDate,newDate,reason,text);
+  closeModal('reasonModal');
+}
+
+function applyDateChange(id,field,oldDate,newDate,reason,text){
+  const a=DATA.find(x=>x.id===id);
+  if(!a) return;
+  a[field]=newDate;
+  if(field==='fromDate' && a.toDate<newDate) a.toDate=addDays(newDate,7);
+  if(field==='toDate' && newDate<a.fromDate) a.fromDate=addDays(newDate,-7);
+  a.history.push({
+    time:new Date(),user:'Jan Gunnar Helgaland',
+    action:'Endret '+(field==='fromDate'?'fra-dato':'til-dato'),
+    from:fmtDate(oldDate),to:fmtDate(newDate),
+    reason,detail:text
+  });
+  if(gridApi){
+    const node=gridApi.getRowNode(String(id));
+    if(node){
+      node.setData(a);
+      gridApi.redrawRows({rowNodes:[node]});
+    }
+  }
+  updateStats();
+  toast('Dato oppdatert med årsak: '+(reason||'ingen'),'success');
+}
+
+// ===== SUNN AKTIVITET =====
+function toggleSunnField(id,key){
+  const a=DATA.find(x=>x.id===id);
+  if(!a) return;
+  a.sunn[key]=!a.sunn[key];
+  a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:'Sunn aktivitet',detail:`${key}: ${a.sunn[key]?'OK':'mangler'}`});
+  if(gridApi){
+    const node=gridApi.getRowNode(String(id));
+    if(node) gridApi.refreshCells({rowNodes:[node],columns:[`sunn.${key}`],force:true});
+  }
+}
+
+// ===== SELECTION =====
+function getSelected(){
+  if(!gridApi) return [];
+  return gridApi.getSelectedRows();
+}
+
+// ===== ACTIONS =====
+function newActivity(){
+  // Velg plan basert på aktiv plan-tab så raden ikke filtreres ut
+  let targetPlan='Hovedfremdriftsplan';
+  if(activePlanFilter!=='alle'){
+    if(activePlanFilter==='Utkikksplan'||activePlanFilter==='Ukeplan') targetPlan='Faseplan';
+    else targetPlan=activePlanFilter;
+  }
+  const a={
+    id:Math.max(...DATA.map(x=>x.id),0)+1,
+    area:'',sub:'',firma:'',name:'Ny aktivitet',plan:targetPlan,
+    fromDate:new Date(TODAY),toDate:addDays(TODAY,7),
+    fremdrift:0,kommentar:'',kritisk:false,highlighted:false,
+    sunn:emptySunn(),
+    history:[{time:new Date(),user:'Jan Gunnar Helgaland',action:'Opprettet aktivitet',detail:'Manuelt opprettet'}]
+  };
+  DATA.unshift(a);
+
+  if(gridApi){
+    // Tøm aktive kolonnefiltre og søk så raden garantert vises
+    const hadFilters=Object.keys(gridApi.getFilterModel()||{}).length>0
+                   ||(document.getElementById('searchInput').value||'').length>0;
+    if(hadFilters){
+      gridApi.setFilterModel(null);
+      document.getElementById('searchInput').value='';
+      gridApi.setGridOption('quickFilterText','');
+    }
+
+    gridApi.applyTransaction({add:[a],addIndex:0});
+
+    // Velg den nye raden + scroll til toppen
+    requestAnimationFrame(()=>{
+      const node=gridApi.getRowNode(String(a.id));
+      if(node){
+        gridApi.deselectAll();
+        node.setSelected(true);
+        gridApi.ensureIndexVisible(node.rowIndex,'top');
+      }
+    });
+
+    toast(hadFilters?'Ny aktivitet lagt til (filtre nullstilt)':'Ny aktivitet lagt til øverst','success');
+  }
+  updateStats();
+}
+
+function openMultiNew(){openModal('multiNewModal')}
+function confirmMultiNew(){
+  const n=parseInt(document.getElementById('multiCount').value)||1;
+  const area=document.getElementById('multiArea').value;
+  const plan=document.getElementById('multiPlan').value;
+  let id=Math.max(...DATA.map(x=>x.id),0);
+  const newRows=[];
+  for(let i=0;i<n;i++){
+    id++;
+    const a={
+      id,area,sub:'',firma:'',name:'(ny aktivitet)',plan,
+      fromDate:new Date(TODAY),toDate:addDays(TODAY,7),
+      fremdrift:0,kommentar:'',kritisk:false,highlighted:false,
+      sunn:emptySunn(),
+      history:[{time:new Date(),user:'Jan Gunnar Helgaland',action:'Klargjort tom rad'}]
+    };
+    DATA.unshift(a);
+    newRows.push(a);
+  }
+  if(gridApi) gridApi.applyTransaction({add:newRows,addIndex:0});
+  closeModal('multiNewModal');
+  toast(`${n} tomme rader klargjort`,'success');
+  updateStats();
+}
+
+function duplicateRow(){
+  const sel=getSelected();
+  if(!sel.length){toast('Velg minst én rad å duplisere (klikk på rad)','warn');return}
+  let id=Math.max(...DATA.map(x=>x.id),0);
+  const newRows=[];
+  sel.forEach(a=>{
+    id++;
+    const dup={...a,id,name:a.name+' (kopi)',sunn:{...a.sunn},history:[{time:new Date(),user:'Jan Gunnar Helgaland',action:'Duplisert fra rad #'+a.id}]};
+    DATA.unshift(dup);
+    newRows.push(dup);
+  });
+  if(gridApi) gridApi.applyTransaction({add:newRows,addIndex:0});
+  toast(`${sel.length} rad(er) duplisert`,'success');
+  updateStats();
+}
+
+function deleteRows(){
+  const sel=getSelected();
+  if(!sel.length){toast('Velg minst én rad å slette (klikk på rad)','warn');return}
+  if(!confirm(`Slett ${sel.length} aktivitet(er)?`)) return;
+  const ids=new Set(sel.map(a=>a.id));
+  DATA=DATA.filter(a=>!ids.has(a.id));
+  if(gridApi) gridApi.applyTransaction({remove:sel});
+  toast(`${sel.length} rad(er) slettet`,'success');
+  updateStats();
+}
+
+function markCritical(){
+  const sel=getSelected();
+  if(!sel.length){toast('Velg minst én rad','warn');return}
+  sel.forEach(a=>{
+    a.kritisk=!a.kritisk;
+    a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:a.kritisk?'Markert som kritisk':'Fjernet kritisk-markering'});
+  });
+  if(gridApi){
+    const nodes=sel.map(a=>gridApi.getRowNode(String(a.id))).filter(Boolean);
+    gridApi.redrawRows({rowNodes:nodes});
+  }
+  toast('Kritisk-markering oppdatert','success');
+  updateStats();
+}
+
+function highlightRows(){
+  const sel=getSelected();
+  if(!sel.length){toast('Velg minst én rad','warn');return}
+  sel.forEach(a=>{a.highlighted=!a.highlighted});
+  if(gridApi){
+    const nodes=sel.map(a=>gridApi.getRowNode(String(a.id))).filter(Boolean);
+    gridApi.redrawRows({rowNodes:nodes});
+  }
+}
+
+function markCompleted(){
+  const sel=getSelected();
+  if(!sel.length){toast('Velg minst én rad','warn');return}
+  sel.forEach(a=>{
+    a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:'Markert som fullført',from:a.fremdrift+'%',to:'100%'});
+    a.fremdrift=100;
+  });
+  if(gridApi){
+    const nodes=sel.map(a=>gridApi.getRowNode(String(a.id))).filter(Boolean);
+    gridApi.redrawRows({rowNodes:nodes});
+  }
+  toast(`${sel.length} aktivitet(er) markert fullført`,'success');
+  updateStats();
+}
+
+function shiftDays(n){
+  const sel=getSelected();
+  if(!sel.length){toast('Velg minst én rad','warn');return}
+  sel.forEach(a=>{
+    a.fromDate=addDays(a.fromDate,n);
+    a.toDate=addDays(a.toDate,n);
+    a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:`Flyttet ${n} dag(er)`,detail:'Begge datoer'});
+  });
+  if(gridApi){
+    const nodes=sel.map(a=>gridApi.getRowNode(String(a.id))).filter(Boolean);
+    nodes.forEach(n2=>n2.setData(DATA.find(x=>x.id==n2.data.id)));
+    gridApi.redrawRows({rowNodes:nodes});
+  }
+  toast(`${sel.length} aktivitet(er) flyttet ${n} dag(er)`,'success');
+  updateStats();
+}
+
+function startToday(){
+  const sel=getSelected();
+  if(!sel.length){toast('Velg minst én rad','warn');return}
+  sel.forEach(a=>{
+    const dur=Math.round((a.toDate-a.fromDate)/86400000);
+    a.fromDate=new Date(TODAY);
+    a.toDate=addDays(TODAY,dur);
+    a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:'Satt til å starte idag'});
+  });
+  if(gridApi){
+    const nodes=sel.map(a=>gridApi.getRowNode(String(a.id))).filter(Boolean);
+    gridApi.redrawRows({rowNodes:nodes});
+  }
+  toast(`${sel.length} aktivitet(er) satt til å starte idag`,'success');
+  updateStats();
+}
+
+function recomputeAll(){
+  if(gridApi) gridApi.refreshCells({force:true});
+  updateStats();
+}
+
+function checkMissing(){
+  let count=0;
+  DATA.forEach(a=>{
+    a.missing=(!a.area||!a.sub||!a.firma||!a.name||a.name==='(ny aktivitet)');
+    if(a.missing) count++;
+  });
+  if(gridApi) gridApi.redrawRows();
+  if(count) toast(`${count} rad(er) har manglende felt – uthevet`,'warn');
+  else toast('Alle rader er komplette','success');
+}
+
+function exportPDF(){
+  toast('Genererer PDF (A3 liggende)... – mockup','warn');
+}
+
+function refreshAfterListChange(){
+  // Oppdater grid med nye column defs (slik at dropdowns reflekterer ny liste)
+  if(gridApi){
+    gridApi.setGridOption('columnDefs',getColumnDefs());
+    gridApi.refreshCells({force:true});
+    gridApi.onFilterChanged();
+  }
+  renderListerContent();
+  updateStats();
+}
+
+// ===== TOGGLES =====
+function toggleSunn(){
+  if(gridApi) gridApi.setGridOption('columnDefs',getColumnDefs());
+}
+
+function toggleGantt(){
+  const wrap=document.getElementById('ganttWrap');
+  if(document.getElementById('tglGantt').checked){
+    wrap.classList.add('visible');
+    renderGantt(getVisibleRows());
+  }else{
+    wrap.classList.remove('visible');
+  }
+}
+
+// ===== STATS =====
+function getVisibleRows(){
+  if(!gridApi) return DATA;
+  const rows=[];
+  gridApi.forEachNodeAfterFilter(n=>{if(n.data) rows.push(n.data)});
+  return rows;
+}
+
+function updateStats(){
+  const countOf=fn=>DATA.filter(fn).length;
+  document.getElementById('cnt-alle').textContent=DATA.length;
+  document.getElementById('cnt-hoved').textContent=countOf(a=>a.plan==='Hovedfremdriftsplan');
+  document.getElementById('cnt-pros').textContent=countOf(a=>a.plan==='Prosjekteringsplan');
+  document.getElementById('cnt-fase').textContent=countOf(a=>a.plan==='Faseplan');
+  document.getElementById('cnt-utk').textContent=countOf(a=>{const w=weeksBetween(null,a.fromDate);return a.plan==='Faseplan' && w<=8 && a.fremdrift<100});
+  document.getElementById('cnt-uke').textContent=countOf(a=>{const w=weeksBetween(null,a.fromDate);return a.plan==='Faseplan' && w<=2 && a.fremdrift<100});
+
+  const visible=getVisibleRows();
+  document.getElementById('totalRows').textContent=DATA.length;
+  document.getElementById('visibleRows').textContent=visible.length;
+  document.getElementById('kritiskRows').textContent=DATA.filter(a=>a.kritisk).length;
+  const avg=visible.length?Math.round(visible.reduce((s,a)=>s+a.fremdrift,0)/visible.length):0;
+  document.getElementById('avgFremdrift').textContent=avg+'%';
+  const overdue=visible.filter(a=>{const r=ragStatus(a);return r.cls==='rag-red'}).length;
+  document.getElementById('overdueRows').textContent=overdue?`⚠ ${overdue} over tid`:'';
+
+  if(document.getElementById('tglGantt').checked) renderGantt(visible);
+}
+
+// ===== GANTT =====
+function renderGantt(filtered){
+  const c=document.getElementById('ganttCanvas');
+  c.innerHTML='';
+  if(!filtered.length){c.innerHTML='<div style="padding:24px;text-align:center;color:var(--text-3);font-size:12px">Ingen aktiviteter å vise</div>';return}
+  const minD=new Date(Math.min(...filtered.map(a=>a.fromDate)));
+  const maxD=new Date(Math.max(...filtered.map(a=>a.toDate)));
+  const start=new Date(minD); start.setDate(start.getDate()-start.getDay()+1);
+  const end=new Date(maxD); end.setDate(end.getDate()+(7-end.getDay()));
+  const totalWeeks=Math.ceil((end-start)/(86400000*7));
+
+  const header=document.createElement('div');
+  header.className='gantt-row';
+  header.style.background='#fafbfc';header.style.fontWeight='600';
+  header.style.position='sticky';header.style.top='0';header.style.zIndex='2';
+  header.innerHTML=`<div class="gantt-label" style="font-weight:600">Aktivitet</div><div class="gantt-track">${
+    Array.from({length:totalWeeks},(_,i)=>{
+      const wd=addDays(start,i*7);
+      return `<div class="gantt-week">U${isoWeek(wd)}</div>`;
+    }).join('')
+  }</div>`;
+  c.appendChild(header);
+
+  filtered.forEach(a=>{
+    const row=document.createElement('div');
+    row.className='gantt-row';
+    const offset=Math.floor((a.fromDate-start)/86400000)/7;
+    const span=Math.ceil((a.toDate-a.fromDate)/86400000)/7;
+    const left=offset*32;
+    const width=Math.max(span*32,8);
+    const cls=a.fremdrift>=100?'completed':(a.fromDate>TODAY?'future':'');
+    row.innerHTML=`
+      <div class="gantt-label" title="${escapeHtml(a.name)}">${a.kritisk?'⚠️ ':''}${escapeHtml(a.name)}</div>
+      <div class="gantt-track">
+        ${Array.from({length:totalWeeks}).map(()=>'<div class="gantt-week"></div>').join('')}
+        <div class="gantt-bar ${cls} ${a.kritisk?'kritisk':''}" style="left:${left}px;width:${width}px"></div>
+      </div>
+    `;
+    c.appendChild(row);
+  });
+}
+
+
+// ===== MODALS =====
+function openModal(id){document.getElementById(id).classList.add('visible')}
+function closeModal(id){document.getElementById(id).classList.remove('visible')}
+
+function openLogg(id){
+  const a=DATA.find(x=>x.id===id);
+  if(!a) return;
+  document.getElementById('loggActivityName').textContent=a.name;
+  const list=document.getElementById('loggList');
+  list.innerHTML='';
+  const entries=[...a.history].reverse();
+  entries.forEach(e=>{
+    const div=document.createElement('div');
+    div.className='logg-entry';
+    let content=`<b>${escapeHtml(e.user||'')}</b> – ${escapeHtml(e.action||'')}`;
+    if(e.from!==undefined && e.to!==undefined){
+      content+=`<br><span class="change-from">${escapeHtml(e.from)}</span> → <span class="change-to">${escapeHtml(e.to)}</span>`;
+    }
+    if(e.reason){content+=`<br><span style="color:var(--orange);font-size:11px;font-weight:500">Årsak: ${escapeHtml(e.reason)}</span>`}
+    if(e.detail){content+=`<br><span style="color:var(--text-3);font-size:11px">${escapeHtml(e.detail)}</span>`}
+    div.innerHTML=`
+      <div class="logg-time">${fmtDate(e.time)}<br><span style="color:var(--text-3);font-size:10px">${String(e.time.getHours()).padStart(2,'0')}:${String(e.time.getMinutes()).padStart(2,'0')}</span></div>
+      <div class="logg-content">${content}</div>
+    `;
+    list.appendChild(div);
+  });
+  openModal('loggModal');
+}
+
+// ===== WORKSHOP IMPORT (mockup) =====
+function openWorkshop(){
+  document.getElementById('wsTavle').classList.remove('uploaded');
+  document.getElementById('wsTavle').innerHTML=`
+    <div class="ws-tavle-empty">
+      <span class="upl-ico">📷</span>
+      Klikk for å laste opp bilde, eller dra hit
+    </div>
+  `;
+  document.getElementById('wsStep2').style.display='none';
+  document.getElementById('wsConfirmBtn').style.display='none';
+  openModal('workshopModal');
+}
+
+const MOCK_EXTRACTED=[
+  {area:'KBA1',sub:'2.Etg',firma:'Bryne rør',name:'Tekniske rør 2.etg',duration:'2 uker',conf:'high'},
+  {area:'KBA1',sub:'2.Etg',firma:'Elektro komfort',name:'Føringer 2.etg',duration:'2 uker',conf:'high'},
+  {area:'KBA1',sub:'3.Etg',firma:'Total Betong',name:'Forskaling 3.etg',duration:'2 uker',conf:'high'},
+  {area:'KBA1',sub:'3.Etg',firma:'Total Betong',name:'Armering 3.etg',duration:'2 uker',conf:'high'},
+  {area:'KBA1',sub:'3.Etg',firma:'Spenncon',name:'Hulldekker 3.etg',duration:'1 uke',conf:'med'},
+  {area:'BT1',sub:'1.Etg',firma:'Total Betong',name:'Forskaling 1.etg BT1',duration:'2 uker',conf:'high'},
+  {area:'BT1',sub:'1.Etg',firma:'Br.Aase',name:'Yttervegger 1.etg',duration:'3 uker',conf:'med'},
+  {area:'Hovedbedrift',sub:'P-kjeller',firma:'?',name:'Avretting og maling',duration:'1 uke',conf:'med'}
+];
+
+function simulateUpload(){
+  const t=document.getElementById('wsTavle');
+  if(t.classList.contains('uploaded')) return;
+  t.classList.add('uploaded');
+  t.innerHTML=`
+    <div style="display:flex;gap:12px;align-items:center">
+      <div style="font-size:32px">📋</div>
+      <div style="text-align:left;flex:1">
+        <div style="font-weight:600;font-size:13px;color:var(--green);margin-bottom:2px">Bilde lastet opp</div>
+        <div style="font-size:11px;color:var(--text-2)">tavle_workshop_jaatunparken_27apr.jpg · 2.4 MB</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:4px">AI analyserer ${'.'.repeat(3)} <span style="color:var(--green)">ferdig på 4 sek</span></div>
+      </div>
+    </div>
+  `;
+  setTimeout(()=>{
+    document.getElementById('wsStep2').style.display='block';
+    document.getElementById('wsConfirmBtn').style.display='inline-flex';
+    const tb=document.getElementById('wsExtractedBody');
+    tb.innerHTML=MOCK_EXTRACTED.map(e=>`
+      <tr>
+        <td><input value="${e.area}"></td>
+        <td><input value="${e.sub}"></td>
+        <td><input value="${e.firma}"></td>
+        <td><input value="${e.name}"></td>
+        <td><input value="${e.duration}"></td>
+        <td><span class="ws-confidence ws-conf-${e.conf}">${e.conf==='high'?'Høy':'Medium'}</span></td>
+      </tr>
+    `).join('');
+  },800);
+}
+
+function confirmWorkshop(){
+  let id=Math.max(...DATA.map(x=>x.id));
+  MOCK_EXTRACTED.forEach(e=>{
+    id++;
+    const wks=parseInt(e.duration)||2;
+    DATA.unshift({
+      id,area:e.area,sub:e.sub,firma:e.firma==='?'?'':e.firma,name:e.name,plan:'Hovedfremdriftsplan',
+      fromDate:addDays(TODAY,7),toDate:addDays(TODAY,7+wks*7),
+      fremdrift:0,kommentar:'',kritisk:false,highlighted:false,
+      sunn:emptySunn(),
+      history:[{time:new Date(),user:'Jan Gunnar Helgaland',action:'Importert fra workshop',detail:'AI-strukturert fra tavlebilde'}]
+    });
+  });
+  closeModal('workshopModal');
+  toast(`${MOCK_EXTRACTED.length} aktiviteter importert fra workshop`,'success');
+  if(gridApi){
+    const newRows=DATA.slice(0,MOCK_EXTRACTED.length);
+    gridApi.applyTransaction({add:newRows,addIndex:0});
+  }
+  updateStats();
+}
+
+// ===== LISTER MODAL (master data) =====
+let activeListerTab='omrader';
+
+function openLister(){
+  collapsedAreas.clear();
+  AREAS.forEach(a=>collapsedAreas.add(a));
+  switchListerTab('omrader');
+  openModal('listerModal');
+}
+
+function switchListerTab(tab){
+  activeListerTab=tab;
+  document.querySelectorAll('.lister-tab').forEach(t=>{
+    t.classList.toggle('active',t.dataset.tab===tab);
+  });
+  renderListerContent();
+}
+
+function countAreaUsage(area){return DATA.filter(a=>a.area===area).length}
+function countSubUsage(area,sub){return DATA.filter(a=>a.area===area && a.sub===sub).length}
+function countFirmaUsage(firma){return DATA.filter(a=>a.firma===firma).length}
+
+// Toggle-state per område for tre-visning (åpne som default)
+const collapsedAreas=new Set();
+
+function renderListerContent(){
+  const c=document.getElementById('listerContent');
+  if(activeListerTab==='omrader') renderOmraderTab(c);
+  else if(activeListerTab==='firma') renderFirmaTab(c);
+}
+
+function renderOmraderTab(c){
+  c.innerHTML=`
+    <div class="lister-section-title">
+      Områder og subområder for Jåtunparken
+      <span class="scope-badge scope-prosjekt">Prosjekt</span>
+    </div>
+    <div class="lister-list">
+      ${AREAS.map((a,ai)=>{
+        const usage=countAreaUsage(a);
+        const subs=SUB_BY_AREA[a]||[];
+        const isCollapsed=collapsedAreas.has(a);
+        return `
+          <div class="tree-area-row ${isCollapsed?'collapsed':''}" onclick="toggleAreaCollapse('${escapeAttr(a)}')">
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+            <span class="area-name" id="area-name-${ai}">${escapeHtml(a)}</span>
+            <span class="row-meta">${subs.length} subområde${subs.length===1?'':'r'}</span>
+            <span class="usage-pill ${usage===0?'zero':''}">${usage} aktivitet${usage===1?'':'er'}</span>
+            <div class="row-actions" onclick="event.stopPropagation()">
+              <button class="icon-btn-small" onclick="editArea(${ai})" title="Endre navn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="m18.5 2.5 3 3L12 15l-4 1 1-4z"/></svg>
+              </button>
+              <button class="icon-btn-small danger" onclick="deleteArea(${ai})" ${(usage>0||subs.length>0)?'disabled title="Område er i bruk eller har subområder - kan ikke slettes"':'title="Slett område"'}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="tree-subs ${isCollapsed?'collapsed':''}">
+            ${subs.map((s,si)=>{
+              const subUsage=countSubUsage(a,s);
+              return `
+                <div class="tree-sub-row">
+                  <span class="sub-name" id="sub-name-${ai}-${si}">${escapeHtml(s)}</span>
+                  <span class="usage-pill ${subUsage===0?'zero':''}">${subUsage} aktivitet${subUsage===1?'':'er'}</span>
+                  <div class="row-actions">
+                    <button class="icon-btn-small" onclick="editSub('${escapeAttr(a)}',${si},${ai})" title="Endre navn">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="m18.5 2.5 3 3L12 15l-4 1 1-4z"/></svg>
+                    </button>
+                    <button class="icon-btn-small danger" onclick="deleteSub('${escapeAttr(a)}',${si})" ${subUsage>0?'disabled title="Subområde er i bruk - kan ikke slettes"':'title="Slett subområde"'}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+            <div class="tree-add-sub">
+              <input type="text" id="newSub-${ai}" placeholder="Nytt subområde under ${escapeHtml(a)}" onkeydown="if(event.key==='Enter')addSub('${escapeAttr(a)}',${ai})">
+              <button onclick="addSub('${escapeAttr(a)}',${ai})">+ Legg til</button>
+            </div>
+          </div>
+        `;
+      }).join('')}
+      <div class="lister-add-row">
+        <input type="text" id="newAreaName" placeholder="Navn på nytt område, f.eks. KBA3" onkeydown="if(event.key==='Enter')addArea()">
+        <button class="btn primary" onclick="addArea()" style="font-size:12px;padding:6px 14px">+ Legg til område</button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleAreaCollapse(area){
+  if(collapsedAreas.has(area)) collapsedAreas.delete(area);
+  else collapsedAreas.add(area);
+  renderListerContent();
+}
+
+function renderFirmaTab(c){
+  c.innerHTML=`
+    <div class="lister-section-title">
+      Underentreprenører
+      <span class="scope-badge scope-felles">Felles register</span>
+    </div>
+    <div class="lister-warn">
+      <b>Felles register:</b> Endringer her påvirker alle Totalbetong-prosjekter, ikke bare Jåtunparken.
+    </div>
+    <div class="lister-list">
+      ${FIRMAS.map((f,i)=>{
+        const usage=countFirmaUsage(f);
+        const meta=FIRMA_META[f];
+        return `
+          <div class="lister-row" data-idx="${i}">
+            <span class="row-name" id="firma-name-${i}">${escapeHtml(f)}</span>
+            ${meta?`
+              <span class="row-orgnr" title="Organisasjonsnummer">${meta.orgnr}</span>
+              <span class="brreg-source-pill ${meta.source==='brreg'?'':'manual'}">${meta.source==='brreg'?'BRREG':'MANUELT'}</span>
+            `:'<span class="brreg-source-pill manual">MANUELT</span>'}
+            <span class="usage-pill ${usage===0?'zero':''}">${usage}</span>
+            <div class="row-actions">
+              <button class="icon-btn-small" onclick="editFirma(${i})" title="Endre navn (kun ikke-Brreg)" ${meta && meta.source==='brreg'?'disabled':''}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="m18.5 2.5 3 3L12 15l-4 1 1-4z"/></svg>
+              </button>
+              <button class="icon-btn-small danger" onclick="deleteFirma(${i})" ${usage>0?'disabled title="Firma er i bruk - kan ikke slettes"':'title="Slett firma"'}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('')}
+      <div class="lister-add-row">
+        <button class="btn primary" onclick="openBrreg()" style="font-size:12px;padding:6px 14px;width:100%;justify-content:center">
+          + Ny underentreprenør (hent fra Brreg)
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function escapeAttr(s){return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;')}
+
+// ===== ÅPNE/LUKKE EDIT-RAD =====
+function editArea(idx){
+  const oldName=AREAS[idx];
+  const span=document.getElementById('area-name-'+idx);
+  const input=document.createElement('input');
+  input.className='row-edit';input.value=oldName;
+  span.replaceWith(input);input.focus();input.select();
+  const commit=()=>{
+    const newName=input.value.trim();
+    if(!newName||newName===oldName){renderListerContent();return}
+    if(AREAS.includes(newName)){toast('Område finnes allerede','warn');renderListerContent();return}
+    renameArea(oldName,newName);
+  };
+  input.addEventListener('blur',commit);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')commit();if(e.key==='Escape')renderListerContent()});
+}
+
+function renameArea(oldName,newName){
+  const idx=AREAS.indexOf(oldName);
+  AREAS[idx]=newName;
+  // Migrér subområder
+  if(SUB_BY_AREA[oldName]){SUB_BY_AREA[newName]=SUB_BY_AREA[oldName];delete SUB_BY_AREA[oldName]}
+  // Oppdater alle aktiviteter
+  let touched=0;
+  DATA.forEach(a=>{
+    if(a.area===oldName){
+      a.area=newName;
+      a.history.push({time:new Date(),user:'System',action:'Område omdøpt',from:oldName,to:newName,detail:'Via Lister-vedlikehold'});
+      touched++;
+    }
+  });
+  refreshAfterListChange();
+  toast(`Område omdøpt. ${touched} aktivitet${touched===1?'':'er'} oppdatert.`,'success');
+}
+
+function deleteArea(idx){
+  const name=AREAS[idx];
+  if(!confirm(`Slett område "${name}"?`)) return;
+  AREAS.splice(idx,1);
+  delete SUB_BY_AREA[name];
+  refreshAfterListChange();
+  toast(`Område "${name}" slettet`,'success');
+}
+
+function addArea(){
+  const inp=document.getElementById('newAreaName');
+  const name=inp.value.trim();
+  if(!name){toast('Skriv inn navn','warn');return}
+  if(AREAS.includes(name)){toast('Område finnes allerede','warn');return}
+  AREAS.push(name);
+  SUB_BY_AREA[name]=[];
+  refreshAfterListChange();
+  toast(`Område "${name}" lagt til`,'success');
+}
+
+function editSub(area,idx,areaIdx){
+  const oldName=SUB_BY_AREA[area][idx];
+  const span=document.getElementById('sub-name-'+areaIdx+'-'+idx);
+  const input=document.createElement('input');
+  input.className='row-edit';input.value=oldName;
+  span.replaceWith(input);input.focus();input.select();
+  const commit=()=>{
+    const newName=input.value.trim();
+    if(!newName||newName===oldName){renderListerContent();return}
+    if(SUB_BY_AREA[area].includes(newName)){toast('Subområde finnes allerede','warn');renderListerContent();return}
+    renameSub(area,oldName,newName);
+  };
+  input.addEventListener('blur',commit);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')commit();if(e.key==='Escape')renderListerContent()});
+}
+
+function renameSub(area,oldName,newName){
+  const idx=SUB_BY_AREA[area].indexOf(oldName);
+  SUB_BY_AREA[area][idx]=newName;
+  let touched=0;
+  DATA.forEach(a=>{
+    if(a.area===area && a.sub===oldName){
+      a.sub=newName;
+      a.history.push({time:new Date(),user:'System',action:'Subområde omdøpt',from:oldName,to:newName,detail:`I område ${area}`});
+      touched++;
+    }
+  });
+  refreshAfterListChange();
+  toast(`Subområde omdøpt. ${touched} aktivitet${touched===1?'':'er'} oppdatert.`,'success');
+}
+
+function deleteSub(area,idx){
+  const name=SUB_BY_AREA[area][idx];
+  if(!confirm(`Slett subområde "${name}" fra ${area}?`)) return;
+  SUB_BY_AREA[area].splice(idx,1);
+  refreshAfterListChange();
+  toast(`Subområde "${name}" slettet`,'success');
+}
+
+function addSub(area,areaIdx){
+  const inp=document.getElementById('newSub-'+areaIdx);
+  const name=inp.value.trim();
+  if(!name){toast('Skriv inn navn','warn');return}
+  if(!SUB_BY_AREA[area]) SUB_BY_AREA[area]=[];
+  if(SUB_BY_AREA[area].includes(name)){toast('Subområde finnes allerede','warn');return}
+  SUB_BY_AREA[area].push(name);
+  refreshAfterListChange();
+  toast(`Subområde "${name}" lagt til ${area}`,'success');
+}
+
+function editFirma(idx){
+  const oldName=FIRMAS[idx];
+  if(FIRMA_META[oldName] && FIRMA_META[oldName].source==='brreg'){
+    toast('Brreg-firma kan ikke omdøpes manuelt','warn');return;
+  }
+  const span=document.getElementById('firma-name-'+idx);
+  const input=document.createElement('input');
+  input.className='row-edit';input.value=oldName;
+  span.replaceWith(input);input.focus();input.select();
+  const commit=()=>{
+    const newName=input.value.trim();
+    if(!newName||newName===oldName){renderListerContent();return}
+    if(FIRMAS.includes(newName)){toast('Firma finnes allerede','warn');renderListerContent();return}
+    renameFirma(oldName,newName);
+  };
+  input.addEventListener('blur',commit);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')commit();if(e.key==='Escape')renderListerContent()});
+}
+
+function renameFirma(oldName,newName){
+  const idx=FIRMAS.indexOf(oldName);
+  FIRMAS[idx]=newName;
+  if(FIRMA_META[oldName]){FIRMA_META[newName]=FIRMA_META[oldName];delete FIRMA_META[oldName]}
+  let touched=0;
+  DATA.forEach(a=>{
+    if(a.firma===oldName){
+      a.firma=newName;
+      a.history.push({time:new Date(),user:'System',action:'Firma omdøpt',from:oldName,to:newName,detail:'Via Lister-vedlikehold (felles register)'});
+      touched++;
+    }
+  });
+  refreshAfterListChange();
+  toast(`Firma omdøpt. ${touched} aktivitet${touched===1?'':'er'} oppdatert.`,'success');
+}
+
+function deleteFirma(idx){
+  const name=FIRMAS[idx];
+  if(!confirm(`Slett firma "${name}" fra felles register?`)) return;
+  FIRMAS.splice(idx,1);
+  delete FIRMA_META[name];
+  refreshAfterListChange();
+  toast(`Firma "${name}" slettet`,'success');
+}
+
+// ===== BRREG-OPPSLAG (mock) =====
+let pendingBrregFirma=null;
+
+function openBrreg(){
+  document.getElementById('brregOrgnr').value='';
+  document.getElementById('brregResult').style.display='none';
+  document.getElementById('brregNotFound').style.display='none';
+  document.getElementById('brregSaveBtn').style.display='none';
+  pendingBrregFirma=null;
+  openModal('brregModal');
+  setTimeout(()=>document.getElementById('brregOrgnr').focus(),100);
+}
+
+function resetBrregLookup(){
+  document.getElementById('brregResult').style.display='none';
+  document.getElementById('brregNotFound').style.display='none';
+  document.getElementById('brregSaveBtn').style.display='none';
+  pendingBrregFirma=null;
+}
+
+function lookupBrreg(){
+  const orgnr=document.getElementById('brregOrgnr').value.trim();
+  if(!/^\d{9}$/.test(orgnr)){
+    toast('Org.nr må være 9 sifre','warn');
+    return;
+  }
+  // Sjekk om allerede i listen
+  const existing=Object.entries(FIRMA_META).find(([_,m])=>m.orgnr===orgnr);
+  if(existing){
+    toast(`Allerede registrert som "${existing[0]}"`,'warn');
+    return;
+  }
+
+  const btn=document.getElementById('brregLookupBtn');
+  const origText=btn.innerHTML;
+  btn.disabled=true;
+  btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px;animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Henter...';
+
+  setTimeout(()=>{
+    btn.disabled=false;
+    btn.innerHTML=origText;
+    const hit=BRREG_MOCK[orgnr];
+    if(hit){
+      pendingBrregFirma={orgnr,...hit};
+      document.getElementById('brregNavn').value=hit.navn;
+      document.getElementById('brregAdresse').value=hit.adresse;
+      document.getElementById('brregPostnr').value=hit.postnr;
+      document.getElementById('brregKommune').value=hit.kommune;
+      document.getElementById('brregResult').style.display='block';
+      document.getElementById('brregNotFound').style.display='none';
+      document.getElementById('brregSaveBtn').style.display='inline-flex';
+    }else{
+      document.getElementById('brregResult').style.display='none';
+      document.getElementById('brregNotFound').style.display='block';
+      document.getElementById('brregSaveBtn').style.display='none';
+    }
+  },800);
+}
+
+function saveBrregFirma(){
+  if(!pendingBrregFirma) return;
+  const f=pendingBrregFirma;
+  if(FIRMAS.includes(f.navn)){toast('Firma med dette navnet finnes allerede','warn');return}
+  FIRMAS.push(f.navn);
+  FIRMA_META[f.navn]={
+    orgnr:f.orgnr,adresse:f.adresse,postnr:f.postnr,kommune:f.kommune,source:'brreg'
+  };
+  closeModal('brregModal');
+  refreshAfterListChange();
+  toast(`"${f.navn}" lagt til fra Brreg`,'success');
+}
+
+// Start appen direkte (auth håndteres av tk-nav.js)
+init();
+
+</script>
+</body>
+</html>
