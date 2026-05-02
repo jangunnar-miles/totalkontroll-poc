@@ -356,10 +356,6 @@ body.walkthrough-active .walkthrough-dropdown-wrap{
   background:var(--orange);color:white;font-weight:600;
 }
 .wp-tb-btn.primary:hover:not(:disabled){background:var(--orange-dark);color:white}
-.wp-tb-btn.faseplan{
-  color:#065f46;
-}
-.wp-tb-btn.faseplan:hover:not(:disabled){background:#d1fae5;color:#065f46}
 .wp-tb-btn.danger{
   color:var(--red);border:1px solid var(--red);
 }
@@ -443,16 +439,6 @@ body.weekplan-active .toggle-bar{display:none}
 /* Subtil zebra på dag-cellene for å forsterke */
 .ag-theme-quartz .ag-row .ag-cell.wp-day-cell{background:#fcfdff}
 .ag-theme-quartz .ag-row-odd .ag-cell.wp-day-cell{background:#f8fafc}
-
-/* "Fullfør i faseplan"-knapp som kun synlig på Faseplan-rader */
-.wp-fp-btn{
-  display:inline-flex;align-items:center;gap:4px;
-  background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;
-  padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;
-  cursor:pointer;font-family:inherit;
-}
-.wp-fp-btn:hover:not(:disabled){background:#d1fae5;border-color:#34d399}
-.wp-fp-btn:disabled{opacity:.4;cursor:not-allowed}
 
 /* Reason popover (inline ved klikk på N-celle) */
 .reason-popover{
@@ -1447,10 +1433,7 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
             Legg til aktivitet
           </button>
           <button class="wp-tb-btn" onclick="openMultiNewWp()" title="Klargjør flere rader med pre-populert område, subområde og firma">
-            Multi-new
-          </button>
-          <button class="wp-tb-btn" onclick="deleteWeekplanRows()" title="Fjern valgte rader fra ukeplanen">
-            Fjern fra uke
+            ++ Nye aktiviteter
           </button>
         </div>
         <span class="wp-tb-divider"></span>
@@ -1476,14 +1459,6 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
           </button>
         </div>
         <span class="wp-tb-divider"></span>
-
-        <!-- Sentral handling: Fullfør i faseplan -->
-        <div class="wp-tb-section">
-          <button class="wp-tb-btn faseplan" onclick="completeInFaseplanFromToolbar()" title="Marker valgt rad som 100% fullført i Faseplan (kun arvede rader)">
-            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            Fullfør i faseplan
-          </button>
-        </div>
 
         <!-- Sjeldne handlinger samlet i Mer-meny -->
         <div class="wp-tb-section wp-more-wrap">
@@ -1559,7 +1534,7 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
             Ny aktivitet
           </button>
           <button class="btn" onclick="openMultiNew()" title="Klargjør flere tomme rader">
-            Nye aktiviteter
+            ++ Nye aktiviteter
           </button>
           <button class="btn" onclick="duplicateRow()" title="Dupliser valgt aktivitet">
             <svg class="ico ico-svg" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -1952,31 +1927,6 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
 </div>
 
 <!-- Bekreft fullføring i Faseplan -->
-<div class="modal-backdrop" id="completeInFaseplanModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Fullfør aktivitet i Faseplan</div>
-      <div class="modal-close" onclick="closeModal('completeInFaseplanModal')">✕</div>
-    </div>
-    <div class="modal-body">
-      <p style="font-size:13px;color:var(--text);margin-bottom:14px">
-        Marker denne aktiviteten som <strong>100% fullført</strong> i Faseplan?
-      </p>
-      <div style="padding:12px 14px;background:#fafbfc;border:1px solid var(--border);border-radius:6px;font-size:12px">
-        <div style="font-weight:600;color:var(--navy);margin-bottom:6px" id="completeFaseplanName">—</div>
-        <div style="color:var(--text-2)">Nåværende fremdrift: <strong id="completeFaseplanCurrent">—</strong></div>
-      </div>
-      <p style="font-size:11px;color:var(--text-3);margin-top:10px">
-        Endringen reflekteres umiddelbart i Faseplan og kan angres med Ctrl+Z.
-      </p>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal('completeInFaseplanModal')">Avbryt</button>
-      <button class="btn primary" onclick="confirmCompleteInFaseplan()">Marker fullført</button>
-    </div>
-  </div>
-</div>
-
 <!-- Dangerzone: Slett ukeplan -->
 <div class="modal-backdrop" id="dangerzoneModal">
   <div class="modal">
@@ -2584,6 +2534,16 @@ function weekKeyShift(weekKey,delta){
   mon.setDate(mon.getDate()+delta*7);
   return isoWeekKey(mon);
 }
+
+// Returnerer min/max-datoer i YYYY-MM-DD-format for den aktive uken.
+// Brukes til å begrense dato-velgeren i ukeplan så bruker ikke kan sette
+// datoer utenfor uken. Mandag-Lørdag (samme spenn som dag-allokeringer i ukeplanen).
+function getActiveWeekDateRange(){
+  if(!activeWeekKey) return {min:undefined,max:undefined};
+  const mon=weekKeyToMonday(activeWeekKey);
+  const sat=new Date(mon);sat.setDate(sat.getDate()+5);
+  return {min:fmtDateInput(mon),max:fmtDateInput(sat)};
+}
 function fmtWeekRange(weekKey){
   const mon=weekKeyToMonday(weekKey);
   const sat=new Date(mon);sat.setDate(sat.getDate()+5);
@@ -2604,7 +2564,8 @@ function makeEmptyDays(){
   return Array.from({length:6},()=>({x:false,status:'',reason:null}));
 }
 function makeWeekplanRow(source,opts){
-  // source: 'faseplan' (arvet) eller 'weekplan' (kun for denne uka)
+  // source: 'faseplan' (arvet) eller 'weekplan' (legacy - kun for bakoverkompatibilitet,
+  // nye rader skal alltid være 'faseplan' med en DATA-aktivitet i bakgrunnen).
   const r={id:weekplanRowIdCounter++,source,days:makeEmptyDays(),history:[]};
   if(source==='faseplan'){
     r.actId=opts.actId;
@@ -2618,6 +2579,33 @@ function makeWeekplanRow(source,opts){
   // Initial entry
   r.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:'Lagt til i ukeplan',detail:source==='faseplan'?'Arvet fra Faseplan':'Manuelt opprettet'});
   return r;
+}
+
+// Lag DATA-aktivitet basert på ukeplan-input. Brukes når brukeren oppretter en
+// aktivitet inne i ukeplan-modus - aktiviteten skal speiles tilbake til hovedsiden
+// som en Faseplan-aktivitet. Datoer er null som default (samme oppførsel som
+// "Ny aktivitet" på hovedsiden), bruker setter dem selv etterpå.
+function createDataActivityFromWeekplan(opts){
+  // opts: {area, sub, firma, name, kommentar, weekKey}
+  const id=Math.max(...DATA.map(x=>x.id),0)+1;
+  const a={
+    id,
+    area:opts.area||'',
+    sub:opts.sub||'',
+    firma:opts.firma||'',
+    name:opts.name||'(ny aktivitet)',
+    plan:'Faseplan',
+    fromDate:null,
+    toDate:null,
+    fremdrift:0,
+    kommentar:opts.kommentar||'',
+    kritisk:false,
+    highlighted:false,
+    sunn:emptySunn(),
+    history:[{time:new Date(),user:'Jan Gunnar Helgaland',action:'Opprettet aktivitet',detail:`Fra ukeplan U${opts.weekKey.split('-W')[1]}`}]
+  };
+  DATA.unshift(a);
+  return a;
 }
 
 // Pre-populér ukeplan med faseplan-aktiviteter som overlapper denne uka,
@@ -3815,56 +3803,121 @@ function onCellValueChanged(e){
   if(!f) return;
   if(undoApplying) return; // unngå rekursjon ved redo
 
-  // Ukeplan-modus: weekplan-kildede rader skriver tilbake til wp.rows-objektet.
-  // Faseplan-arvede rader skal ikke kunne redigeres her (sjekkes via editable-callback)
-  // - UNNTAK: Fremdrift, som har toveis sync med hovedsiden.
+  // Ukeplan-modus: faseplan-source rader skriver tilbake til DATA[actId],
+  // weekplan-source rader (legacy) skriver til wp.rows.
   if(activeWeekKey){
-    // Spesialtilfelle: Fremdrift på faseplan-rad i ukeplan -> skriv til DATA
-    if(a._wpSource==='faseplan' && f==='fremdrift'){
+    // Faseplan-rad i ukeplan: synk til DATA. Gjelder alle redigerbare felt.
+    if(a._wpSource==='faseplan'){
       const act=DATA.find(x=>x.id===a.actId);
       if(!act) return;
-      // Hent ny verdi fra _pendingFremdrift (satt i valueSetter) eller e.newValue
-      let newVal=a._pendingFremdrift!=null?a._pendingFremdrift:parseInt(e.newValue);
-      delete a._pendingFremdrift;
-      if(isNaN(newVal)) return;
-      newVal=Math.max(0,Math.min(100,newVal));
-      const oldVal=act.fremdrift;
-      if(oldVal===newVal) return;
-      act.fremdrift=newVal;
-      // Logg i HOVEDAKTIVITETENS historikk - det er kilden, ukeplanen er bare en visning
-      act.history.push({
-        time:new Date(),user:'Jan Gunnar Helgaland',
-        action:'Endret fremdrift (fra ukeplan)',
-        from:oldVal+'%',to:newVal+'%'
-      });
-      refreshWpRow(a._wpId);
-      const actId=act.id;
-      recordCommand({
-        label:`Endret fremdrift til ${newVal}%`,
-        loggInfo:{activityId:actId,detail:'fremdrift'},
-        undo:()=>{
-          const r=DATA.find(x=>x.id===actId);if(!r)return;
-          r.fremdrift=oldVal;
-          if(activeWeekKey){
-            const wp=WEEKPLANS[activeWeekKey];
-            const wpRow=wp?.rows.find(x=>x.actId===actId);
-            if(wpRow) refreshWpRow(wpRow.id);
-          }
-        },
-        redo:()=>{
-          const r=DATA.find(x=>x.id===actId);if(!r)return;
-          r.fremdrift=newVal;
-          if(activeWeekKey){
-            const wp=WEEKPLANS[activeWeekKey];
-            const wpRow=wp?.rows.find(x=>x.actId===actId);
-            if(wpRow) refreshWpRow(wpRow.id);
+
+      // Fremdrift håndteres separat (har egen valueSetter med _pendingFremdrift)
+      if(f==='fremdrift'){
+        let newVal=a._pendingFremdrift!=null?a._pendingFremdrift:parseInt(e.newValue);
+        delete a._pendingFremdrift;
+        if(isNaN(newVal)) return;
+        newVal=Math.max(0,Math.min(100,newVal));
+        const oldVal=act.fremdrift;
+        if(oldVal===newVal) return;
+        act.fremdrift=newVal;
+        act.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:'Endret fremdrift (fra ukeplan)',from:oldVal+'%',to:newVal+'%'});
+        refreshWpRow(a._wpId);
+        const actId=act.id;
+        recordCommand({
+          label:`Endret fremdrift til ${newVal}%`,
+          loggInfo:{activityId:actId,detail:'fremdrift'},
+          undo:()=>{const r=DATA.find(x=>x.id===actId);if(!r)return;r.fremdrift=oldVal;if(activeWeekKey){const wp=WEEKPLANS[activeWeekKey];const wpRow=wp?.rows.find(x=>x.actId===actId);if(wpRow) refreshWpRow(wpRow.id);}},
+          redo:()=>{const r=DATA.find(x=>x.id===actId);if(!r)return;r.fremdrift=newVal;if(activeWeekKey){const wp=WEEKPLANS[activeWeekKey];const wpRow=wp?.rows.find(x=>x.actId===actId);if(wpRow) refreshWpRow(wpRow.id);}}
+        });
+        return;
+      }
+
+      // Datofelter: parse, validér mot uke-spenn og motsatt dato, skriv til DATA
+      if(f==='fromDate'||f==='toDate'){
+        let nd=e.newValue;
+        if(typeof nd==='string') nd=new Date(nd);
+        if(!nd||isNaN(nd.getTime())){
+          act[f]=null;
+          refreshWpRow(a._wpId);
+          return;
+        }
+        // Validér mot ukens spenn (selv om CommitOnChangeDateEditor begrenser min/max,
+        // er manuell input via tastatur fortsatt mulig).
+        // VIKTIG: Bruk parseDate (lokal tid) ikke new Date(string) som tolkes som UTC.
+        // Ellers blir mandag tidlig i en uke "før" range fordi UTC midnatt er kveld
+        // dagen før i lokal norsk tidssone.
+        const range=getActiveWeekDateRange();
+        const min=parseDate(range.min);
+        const max=parseDate(range.max);
+        if(nd<min||nd>max){
+          undoApplying=true;
+          try{e.node.setDataValue(f,e.oldValue);}finally{undoApplying=false}
+          toast(`Dato må være innenfor ukens spenn (${range.min} – ${range.max})`,'warn');
+          return;
+        }
+        // Validér rekkefølge fra/til
+        if(f==='toDate'&&act.fromDate&&nd<act.fromDate){
+          undoApplying=true;
+          try{e.node.setDataValue('toDate',e.oldValue);}finally{undoApplying=false}
+          toast(`Til-dato kan ikke være før fra-dato (${fmtDate(act.fromDate)})`,'warn');
+          return;
+        }
+        if(f==='fromDate'&&act.toDate&&nd>act.toDate){
+          undoApplying=true;
+          try{e.node.setDataValue('fromDate',e.oldValue);}finally{undoApplying=false}
+          toast(`Fra-dato kan ikke være etter til-dato (${fmtDate(act.toDate)})`,'warn');
+          return;
+        }
+        const oldVal=act[f];
+        act[f]=nd;
+        act.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:'Satt '+(f==='fromDate'?'fra-dato':'til-dato')+' (fra ukeplan)',from:oldVal?fmtDate(oldVal):'(tom)',to:fmtDate(nd)});
+        // INGEN cleanup her - dato-endring fra ukeplan er begrenset til ukens range
+        // (CommitOnChangeDateEditor med min/max), så aktiviteten kan aldri bli orphan
+        // i den aktive uken. Hvis aktiviteten ligger i flere ukeplaner samtidig
+        // (overlappet flere uker tidligere), er det fortsatt overlap med de andre
+        // siden vi kun setter dato til innenfor aktiv uke.
+        refreshWpRow(a._wpId);
+        const actId=act.id;
+        recordCommand({
+          label:`Endret ${f==='fromDate'?'fra-dato':'til-dato'}`,
+          loggInfo:{activityId:actId,detail:f},
+          undo:()=>{const r=DATA.find(x=>x.id===actId);if(!r)return;r[f]=oldVal;if(activeWeekKey){const wp=WEEKPLANS[activeWeekKey];const wpRow=wp?.rows.find(x=>x.actId===actId);if(wpRow) refreshWpRow(wpRow.id);}},
+          redo:()=>{const r=DATA.find(x=>x.id===actId);if(!r)return;r[f]=nd;if(activeWeekKey){const wp=WEEKPLANS[activeWeekKey];const wpRow=wp?.rows.find(x=>x.actId===actId);if(wpRow) refreshWpRow(wpRow.id);}}
+        });
+        return;
+      }
+
+      // Tekst-/dropdown-felt: area, sub, firma, name, kommentar
+      if(['area','sub','firma','name','kommentar'].includes(f)){
+        const oldVal=act[f]||'';
+        const newVal=e.newValue||'';
+        if(oldVal===newVal) return;
+        act[f]=newVal;
+        // Område-bytte: rens sub hvis ikke lenger gyldig
+        let subWasReset=false,oldSub=act.sub;
+        if(f==='area'){
+          const validSubs=SUB_BY_AREA[newVal]||[];
+          if(act.sub&&!validSubs.includes(act.sub)){
+            act.sub='';subWasReset=true;
+            toast(`Subområde nullstilt - velg nytt for ${newVal}`,'warn');
           }
         }
-      });
+        const labels={area:'område',sub:'subområde',firma:'firma',name:'aktivitetsnavn',kommentar:'kommentar'};
+        act.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:`Endret ${labels[f]} (fra ukeplan)`,from:oldVal||'(tom)',to:newVal||'(tom)'});
+        refreshWpRow(a._wpId);
+        const actId=act.id;
+        recordCommand({
+          label:`Endret ${labels[f]}`,
+          loggInfo:{activityId:actId,detail:labels[f]},
+          undo:()=>{const r=DATA.find(x=>x.id===actId);if(!r)return;r[f]=oldVal;if(subWasReset)r.sub=oldSub;if(activeWeekKey){const wp=WEEKPLANS[activeWeekKey];const wpRow=wp?.rows.find(x=>x.actId===actId);if(wpRow) refreshWpRow(wpRow.id);}},
+          redo:()=>{const r=DATA.find(x=>x.id===actId);if(!r)return;r[f]=newVal;if(subWasReset)r.sub='';if(activeWeekKey){const wp=WEEKPLANS[activeWeekKey];const wpRow=wp?.rows.find(x=>x.actId===actId);if(wpRow) refreshWpRow(wpRow.id);}}
+        });
+        return;
+      }
       return;
     }
 
-    // Vanlig weekplan-rad-redigering
+    // Vanlig weekplan-rad-redigering (legacy)
     if(a._wpSource==='weekplan'){
       const r=getWpRow(a._wpId);if(!r) return;
       if(['area','sub','firma','name','kommentar'].includes(f)){
@@ -3888,7 +3941,7 @@ function onCellValueChanged(e){
       }
       return;
     }
-    return; // andre kombinasjoner i ukeplan: ignorer
+    return;
   }
 
   // Handle date fields - parse string from agDateCellEditor
@@ -3923,6 +3976,9 @@ function onCellValueChanged(e){
       // Skriv verdi, logg, refresh - ingen modal, ingen revert.
       a[f]=nd;
       a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:'Satt '+(f==='fromDate'?'fra-dato':'til-dato'),from:'(tom)',to:fmtDate(nd)});
+      // Hvis aktiviteten er i en eller flere ukeplaner og den nye datoen
+      // tar den utenfor noen av dem, fjern tomme orphan-rader
+      cleanupOrphanedWeekplanRows(a.id);
       refreshRow(e.node);
       // Tilby å legge i ukeplaner som nå overlapper (krever begge datoer satt)
       if(a.fromDate && a.toDate){
@@ -4063,6 +4119,50 @@ function cancelReasonModal(){
   undoApplying=false;
 }
 
+// Når en aktivitets datoer endres slik at den ikke lenger overlapper en
+// ukeplan, fjernes ukeplan-rader som peker til aktiviteten - MEN bare hvis
+// raden er tom (ingen X-allokeringer, ingen J/N-status). Rader med data beholdes
+// fordi de representerer faktisk arbeid som ble utført, og brukeren skal ikke
+// miste denne historikken bare fordi de justerte datoer.
+//
+// Hvis aktiviteten kun har én av datoene satt (vanlig under utfylling i ukeplan),
+// gjøres ingen opprydding - vi venter til begge er satt før vi vurderer overlap.
+// Dette unngår at en rad fjernes prematurt mens brukeren er i ferd med å fylle
+// ut datoer.
+function cleanupOrphanedWeekplanRows(actId){
+  const a=DATA.find(x=>x.id===actId);
+  if(!a) return;
+  // Krev BEGGE datoer satt før vi vurderer cleanup. Hvis kun en er satt, har
+  // brukeren sannsynligvis ikke fullført utfylling og vi skal ikke rydde noe.
+  if(!a.fromDate||!a.toDate) return;
+  let removed=0;
+  let kept=0;
+  Object.keys(WEEKPLANS).forEach(weekKey=>{
+    const wp=WEEKPLANS[weekKey];
+    if(!wp||!wp.rows) return;
+    const monday=weekKeyToMonday(weekKey);
+    const sat=new Date(monday);sat.setDate(sat.getDate()+5);sat.setHours(23,59,59,999);
+    const overlaps=a.fromDate<=sat&&a.toDate>=monday;
+    if(overlaps) return;
+    wp.rows=wp.rows.filter(r=>{
+      if(r.source!=='faseplan'||r.actId!==actId) return true;
+      const hasData=r.days.some(d=>d.x||d.status);
+      if(hasData){kept++;return true}
+      removed++;
+      return false;
+    });
+  });
+  if(removed>0){
+    const msg=kept>0
+      ? `${removed} tom${removed===1?'':'e'} rad${removed===1?'':'er'} fjernet fra ukeplan(er) (${kept} med data beholdt)`
+      : `${removed} rad${removed===1?'':'er'} fjernet fra ukeplan(er) (ikke lenger i datospenn)`;
+    toast(msg,'success');
+    if(activeWeekKey) refreshAllWp();
+  }else if(kept>0){
+    toast(`Aktiviteten ligger fortsatt i ukeplan(er) med X-allokeringer/status - ble ikke fjernet`,'warn');
+  }
+}
+
 function applyDateChange(id,field,oldDate,newDate,reason,text){
   const a=DATA.find(x=>x.id===id);
   if(!a) return;
@@ -4079,6 +4179,9 @@ function applyDateChange(id,field,oldDate,newDate,reason,text){
     from:fmtDate(oldDate),to:fmtDate(newDate),
     reason,detail:text
   });
+  // Opprydding i ukeplaner: tomme rader (uten X/J/N) som ikke lenger overlapper
+  // den nye datoperioden fjernes automatisk. Rader med data beholdes.
+  cleanupOrphanedWeekplanRows(id);
   if(gridApi){
     const node=gridApi.getRowNode(String(id));
     if(node){
@@ -4344,8 +4447,13 @@ function confirmMultiNewWp(n,area,sub,firma){
   if(!activeWeekKey){toast('Ingen ukeplan aktiv','warn');return}
   const wp=ensureWeekplan(activeWeekKey);
   const newRows=[];
+  const newActs=[];
   for(let i=0;i<n;i++){
-    const r=makeWeekplanRow('weekplan',{area,sub,firma,name:'(ny aktivitet)',kommentar:''});
+    // Lag DATA-aktivitet (synces til hovedsiden som Faseplan med ukens datoer)
+    const a=createDataActivityFromWeekplan({area,sub,firma,name:'(ny aktivitet)',kommentar:'',weekKey:activeWeekKey});
+    newActs.push(a);
+    // Lag ukeplan-rad som peker til den
+    const r=makeWeekplanRow('faseplan',{actId:a.id});
     wp.rows.unshift(r);
     newRows.push(r);
   }
@@ -4356,17 +4464,19 @@ function confirmMultiNewWp(n,area,sub,firma){
   }
   closeModal('multiNewModal');
   refreshAllWp();
-  toast(`${n} tomme rader klargjort øverst`,'success');
+  toast(`${n} tomme rader klargjort øverst (synces til Faseplan)`,'success');
   recordCommand({
     label:`${n} nye rader (multi, ukeplan)`,
     undo:()=>{
-      const ids=new Set(newRows.map(r=>r.id));
-      const w=WEEKPLANS[activeWeekKey];if(!w)return;
-      w.rows=w.rows.filter(r=>!ids.has(r.id));
+      const rowIds=new Set(newRows.map(r=>r.id));
+      const actIds=new Set(newActs.map(a=>a.id));
+      const w=WEEKPLANS[activeWeekKey];if(w) w.rows=w.rows.filter(r=>!rowIds.has(r.id));
+      DATA=DATA.filter(x=>!actIds.has(x.id));
       refreshAllWp();
     },
     redo:()=>{
       const w=WEEKPLANS[activeWeekKey];if(!w)return;
+      newActs.forEach(a=>DATA.unshift(a));
       newRows.forEach(r=>w.rows.unshift(r));
       refreshAllWp();
     }
@@ -4788,6 +4898,13 @@ function exitWeekplanMode(){
     gridApi.setGridOption('columnDefs',savedColumnDefs);
     gridApi.setGridOption('rowData',DATA);
     gridApi.setGridOption('rowDragManaged',false);
+    // Tøm søk og filter slik at ukeplan-state ikke arves til hovedsiden.
+    // Uten dette ble ag-grids interne filter-state hengende ved siden av,
+    // og rader som ikke matchet et tidligere ukeplan-filter ble usynlige
+    // på hovedsiden uten at filterikoner viste det.
+    document.getElementById('searchInput').value='';
+    gridApi.setGridOption('quickFilterText','');
+    gridApi.setFilterModel(null);
     savedColumnDefs=null;
   }
   toast('Tilbake til Fremdriftsplan','success');
@@ -4868,20 +4985,22 @@ function getWeekplanColumnDefs(){
       valueGetter:()=>''
     },
     {field:'area',headerName:'Område',width:110,filter:'agSetColumnFilter',pinned:'left',
-      editable:p=>p.data?._wpSource==='weekplan',
-      cellEditor:'agSelectCellEditor',
+      editable:true, // Begge sources: weekplan-rad skriver til r.area, faseplan-rad til DATA[actId].area
+      cellEditor:CommitOnChangeSelectEditor,
       cellEditorParams:{values:['',...AREAS]}
     },
     {field:'sub',headerName:'Subområde',width:120,filter:'agSetColumnFilter',pinned:'left',
-      editable:p=>p.data?._wpSource==='weekplan'
-      // Bruker default text-editor for enkelhet; sub valideres mot område i onCellValueChanged
+      editable:true,
+      cellEditor:CommitOnChangeSelectEditor,
+      cellEditorParams:p=>({values:['',...(SUB_BY_AREA[p.data?.area]||[])]})
     },
     {field:'firma',headerName:'Firma',width:140,filter:'agSetColumnFilter',
-      editable:p=>p.data?._wpSource==='weekplan'
-      // Default text-editor; firma er fritekst med forslag fra datalist i hovedsiden
+      editable:true,
+      cellEditor:CommitOnChangeSelectEditor,
+      cellEditorParams:{values:['',...FIRMAS]}
     },
     {field:'name',headerName:'Aktivitet',width:280,filter:true,
-      editable:p=>p.data?._wpSource==='weekplan',
+      editable:true,
       tooltipValueGetter:p=>{
         if(!p.data) return '';
         if(p.data._wpSource==='weekplan') return p.data.kommentar||'';
@@ -4924,15 +5043,43 @@ function getWeekplanColumnDefs(){
       filter:'agNumberColumnFilter'
     },
     {field:'kommentar',headerName:'Kommentar',width:200,
-      editable:p=>p.data?._wpSource==='weekplan'
+      editable:true
     },
     {
       headerName:'',width:48,sortable:false,filter:false,resizable:false,
       cellRenderer:WpLoggButtonRenderer,
       cellStyle:{padding:'0',display:'flex',alignItems:'center',justifyContent:'center'}
     },
-    {field:'fromDate',headerName:'Fra (faseplan)',width:120,valueFormatter:p=>fmtDate(p.value),hide:false},
-    {field:'toDate',headerName:'Til (faseplan)',width:120,valueFormatter:p=>fmtDate(p.value),hide:false}
+    // Datoer kan settes også i ukeplan, men begrenses til den aktive ukens spenn.
+    // Synker tilbake til DATA[actId] slik at endringen reflekteres på hovedsiden.
+    // For weekplan-source rader (legacy) er feltene ikke editerbare.
+    {field:'fromDate',headerName:'Fra dato',width:120,
+      valueFormatter:p=>fmtDate(p.value),
+      editable:p=>p.data?._wpSource==='faseplan',
+      cellEditor:CommitOnChangeDateEditor,
+      cellEditorParams:p=>{
+        const range=getActiveWeekDateRange();
+        // toDate må respekteres som øvre grense hvis satt
+        const upperFromToDate=p.data.toDate?fmtDateInput(p.data.toDate):null;
+        return {
+          min:range.min,
+          max:upperFromToDate&&upperFromToDate<range.max?upperFromToDate:range.max
+        };
+      }
+    },
+    {field:'toDate',headerName:'Til dato',width:120,
+      valueFormatter:p=>fmtDate(p.value),
+      editable:p=>p.data?._wpSource==='faseplan',
+      cellEditor:CommitOnChangeDateEditor,
+      cellEditorParams:p=>{
+        const range=getActiveWeekDateRange();
+        const lowerFromFromDate=p.data.fromDate?fmtDateInput(p.data.fromDate):null;
+        return {
+          min:lowerFromFromDate&&lowerFromFromDate>range.min?lowerFromFromDate:range.min,
+          max:range.max
+        };
+      }
+    }
   ];
   // Tre subkolonner per dag, gruppert
   for(let i=0;i<6;i++){
@@ -5258,10 +5405,13 @@ function openAddWeekplanRow(){
 }
 
 // Inline tom-rad - samme prinsipp som newActivity() på hovedsiden.
+// Oppretter en DATA-aktivitet (Faseplan, ukens datoer) og en ukeplan-rad
+// som peker til den. Synkroniseres dermed med hovedsiden umiddelbart.
 function newWeekplanActivity(){
   if(!activeWeekKey){toast('Ingen ukeplan aktiv','warn');return}
   const wp=ensureWeekplan(activeWeekKey);
-  const r=makeWeekplanRow('weekplan',{area:'',sub:'',firma:'',name:'(ny aktivitet)',kommentar:''});
+  const a=createDataActivityFromWeekplan({weekKey:activeWeekKey});
+  const r=makeWeekplanRow('faseplan',{actId:a.id});
   wp.rows.unshift(r);
 
   let filtersCleared=false;
@@ -5275,7 +5425,7 @@ function newWeekplanActivity(){
 
   refreshAllWp();
 
-  toast(filtersCleared?'Ny aktivitet lagt til (filtre nullstilt)':'Ny aktivitet lagt til øverst','success');
+  toast(filtersCleared?'Ny aktivitet lagt til (filtre nullstilt)':'Ny aktivitet lagt til øverst (synces til Faseplan)','success');
 
   if(gridApi){
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
@@ -5294,12 +5444,13 @@ function newWeekplanActivity(){
     label:`Ny aktivitet`,
     loggInfo:{weekKey:activeWeekKey,rowId:r.id,detail:'Ny aktivitet'},
     undo:()=>{
-      const w=WEEKPLANS[activeWeekKey];if(!w)return;
-      w.rows=w.rows.filter(x=>x.id!==r.id);
+      const w=WEEKPLANS[activeWeekKey];if(w) w.rows=w.rows.filter(x=>x.id!==r.id);
+      DATA=DATA.filter(x=>x.id!==a.id);
       refreshAllWp();
     },
     redo:()=>{
       const w=WEEKPLANS[activeWeekKey];if(!w)return;
+      DATA.unshift(a);
       w.rows.unshift(r);
       refreshAllWp();
     }
@@ -5320,45 +5471,23 @@ function confirmAddWpRow(){
   const kommentar=document.getElementById('newWpKommentar').value.trim();
   if(!name){toast('Aktivitetsnavn er påkrevd','warn');return}
   const wp=WEEKPLANS[activeWeekKey];if(!wp) return;
-  const r=makeWeekplanRow('weekplan',{area,sub,firma,name,kommentar});
+  // Lag DATA-aktivitet (synces til hovedsiden som Faseplan med ukens datoer)
+  const a=createDataActivityFromWeekplan({area,sub,firma,name,kommentar,weekKey:activeWeekKey});
+  const r=makeWeekplanRow('faseplan',{actId:a.id});
   wp.rows.push(r);
   closeModal('addWpRowModal');
   refreshAllWp();
-  toast(`"${name}" lagt til`,'success');
+  toast(`"${name}" lagt til (synces til Faseplan)`,'success');
   recordCommand({
     label:`Ny aktivitet: ${name}`,
     undo:()=>{
       wp.rows=wp.rows.filter(x=>x.id!==r.id);
+      DATA=DATA.filter(x=>x.id!==a.id);
       refreshAllWp();
     },
     redo:()=>{
+      DATA.unshift(a);
       wp.rows.push(r);
-      refreshAllWp();
-    }
-  });
-}
-
-function deleteWeekplanRows(){
-  if(!gridApi) return;
-  const sel=gridApi.getSelectedRows();
-  if(!sel.length){toast('Velg minst én rad å fjerne','warn');return}
-  if(!confirm(`Fjern ${sel.length} aktivitet(er) fra ukeplanen? (Forblir i Faseplan)`)) return;
-  const wp=WEEKPLANS[activeWeekKey];if(!wp) return;
-  const ids=new Set(sel.map(r=>r._wpId));
-  const removed=wp.rows.filter(r=>ids.has(r.id));
-  const positions=removed.map(r=>({r,idx:wp.rows.indexOf(r)}));
-  wp.rows=wp.rows.filter(r=>!ids.has(r.id));
-  refreshAllWp();
-  toast(`${removed.length} fjernet fra uke`,'success');
-  recordCommand({
-    label:`Fjernet ${removed.length} fra uke`,
-    undo:()=>{
-      positions.sort((a,b)=>a.idx-b.idx).forEach(p=>wp.rows.splice(Math.min(p.idx,wp.rows.length),0,p.r));
-      refreshAllWp();
-    },
-    redo:()=>{
-      const idsR=new Set(removed.map(r=>r.id));
-      wp.rows=wp.rows.filter(r=>!idsR.has(r.id));
       refreshAllWp();
     }
   });
@@ -5579,65 +5708,6 @@ function confirmRestNei(reasonN){
 }
 
 // ===== UKEPLAN: FULLFØR I FASEPLAN (fra toolbar) =====
-let pendingCompleteActId=null;
-
-function completeInFaseplanFromToolbar(){
-  if(!gridApi||!activeWeekKey){toast('Ingen ukeplan aktiv','warn');return}
-  const sel=gridApi.getSelectedRows();
-  if(sel.length===0){
-    toast('Velg én rad i tabellen først','warn');return;
-  }
-  if(sel.length>1){
-    toast('Kun én rad kan fullføres om gangen','warn');return;
-  }
-  const row=sel[0];
-  if(row._wpSource!=='faseplan'){
-    toast('Aktiviteten er ikke arvet fra Faseplan og kan ikke fullføres der. Manuelt opprettede aktiviteter finnes kun i ukeplanen.','warn');
-    return;
-  }
-  const a=DATA.find(x=>x.id===row.actId);
-  if(!a){
-    toast('Faseplan-aktiviteten finnes ikke lenger','warn');return;
-  }
-  if(a.fremdrift>=100){
-    toast('Aktiviteten er allerede 100% fullført','warn');return;
-  }
-  // Vis bekreftelsesmodal
-  document.getElementById('completeFaseplanName').textContent=a.name;
-  document.getElementById('completeFaseplanCurrent').textContent=a.fremdrift+'%';
-  pendingCompleteActId=a.id;
-  openModal('completeInFaseplanModal');
-}
-
-function confirmCompleteInFaseplan(){
-  if(pendingCompleteActId!=null){
-    completeInFaseplan(pendingCompleteActId);
-    pendingCompleteActId=null;
-  }
-  closeModal('completeInFaseplanModal');
-}
-
-function completeInFaseplan(actId){
-  const a=DATA.find(x=>x.id===actId);if(!a) return;
-  if(a.fremdrift>=100) return;
-  const before=a.fremdrift;
-  a.fremdrift=100;
-  a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:'Markert som fullført fra ukeplan',from:before+'%',to:'100%'});
-  if(gridApi) gridApi.refreshCells({force:true});
-  toast(`"${a.name}" markert fullført i Faseplan`,'success');
-  recordCommand({
-    label:`Fullfør i Faseplan: ${a.name}`,
-    undo:()=>{
-      const aa=DATA.find(x=>x.id===actId);if(aa) aa.fremdrift=before;
-      if(gridApi) gridApi.refreshCells({force:true});
-    },
-    redo:()=>{
-      const aa=DATA.find(x=>x.id===actId);if(aa) aa.fremdrift=100;
-      if(gridApi) gridApi.refreshCells({force:true});
-    }
-  });
-}
-
 // ===== UKEPLAN: DANGERZONE SLETT =====
 function openDangerzone(){
   if(!activeWeekKey) return;
