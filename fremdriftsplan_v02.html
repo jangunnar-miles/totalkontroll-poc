@@ -439,6 +439,27 @@ body.weekplan-active .toggle-bar{display:none}
 /* Subtil zebra på dag-cellene for å forsterke */
 .ag-theme-quartz .ag-row .ag-cell.wp-day-cell{background:#fcfdff}
 .ag-theme-quartz .ag-row-odd .ag-cell.wp-day-cell{background:#f8fafc}
+/* Fridag-styling: rødlig bakgrunn for å gjøre det visuelt tydelig at dagen
+   er en fridag og ikke skal allokeres. */
+.ag-theme-quartz .ag-cell.wp-day-holiday-cell{
+  background:#fee2e2 !important;
+}
+.ag-theme-quartz .ag-row-odd .ag-cell.wp-day-holiday-cell{
+  background:#fecaca !important;
+}
+.wp-day-header.wp-day-holiday .ppu{
+  color:#b91c1c;font-weight:700;
+}
+
+/* Område- og subområde-skiller i ukeplan. Tykk linje øverst på rader som
+   starter et nytt område, tynnere linje for nytt subområde innenfor samme
+   område. Hjelper visuelt navigere store ukeplaner i fremdriftsmøter. */
+body.weekplan-active .ag-theme-quartz .ag-row.wp-area-break{
+  border-top:2px solid var(--navy);
+}
+body.weekplan-active .ag-theme-quartz .ag-row.wp-sub-break{
+  border-top:1px solid #94a3b8;
+}
 
 /* Reason popover (inline ved klikk på N-celle) */
 .reason-popover{
@@ -666,9 +687,26 @@ body.weekplan-active .toggle-bar{display:none}
 }
 .weekplans-dropdown-create:hover{background:#fef5e6}
 
+/* Disablet "Opprett ukeplan"-tilstand når brukeren står på en annen tab enn
+   Faseplan. Vis informasjon + en lenke for å bytte tab raskt. */
+.weekplans-dropdown-create-disabled{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:9px 12px;border-radius:5px;background:#f8fafc;border:1px dashed var(--border);
+}
+.wp-dd-disabled-text{
+  font-size:11px;color:var(--text-2);font-style:italic;line-height:1.3;
+}
+.wp-dd-switch-btn{
+  background:var(--navy);color:white;border:none;
+  padding:5px 10px;border-radius:4px;font-size:11px;font-weight:600;
+  cursor:pointer;font-family:inherit;white-space:nowrap;
+  transition:background .12s;
+}
+.wp-dd-switch-btn:hover{background:#243152}
+
 /* ===== ACTION BARS ===== */
 .toolbar{
-  background:white;padding:10px 24px;border-bottom:1px solid var(--border);
+  background:white;padding:7px 24px;border-bottom:1px solid var(--border);
   display:flex;flex-wrap:wrap;gap:8px;align-items:center;
 }
 .tool-group{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#fafbfc}
@@ -692,10 +730,10 @@ body.weekplan-active .toggle-bar{display:none}
 .btn.danger{color:var(--red);border:1px solid var(--red)}
 .btn.danger:hover:not(:disabled){background:var(--red-soft);color:var(--red);border-color:var(--red)}
 
-.toolbar-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.toolbar-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-shrink:0}
 .search{
   padding:6px 10px 6px 30px;border:1px solid var(--border);border-radius:var(--radius);
-  font-size:12px;width:200px;background:white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="%238a8f9e" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>') 9px center/14px no-repeat;
+  font-size:12px;width:170px;background:white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="%238a8f9e" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>') 9px center/14px no-repeat;
 }
 .search:focus{outline:none;border-color:var(--orange)}
 
@@ -706,7 +744,7 @@ body.weekplan-active .toggle-bar{display:none}
 .filter-select:focus{outline:none;border-color:var(--orange)}
 
 .toggle-bar{
-  background:#fafbfc;padding:7px 24px;border-bottom:1px solid var(--border);
+  background:#fafbfc;padding:4px 24px;border-bottom:1px solid var(--border);
   display:flex;gap:18px;align-items:center;font-size:12px;
 }
 .toggle{display:flex;align-items:center;gap:7px;cursor:pointer;color:var(--text-2)}
@@ -838,7 +876,18 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
 }
 .fp-sf-clear:hover{text-decoration:underline}
 .ag-theme-quartz .ag-row.row-highlighted .ag-cell:not(.cell-rag-wrap){color:var(--red);font-weight:600}
-.ag-theme-quartz .ag-row.row-missing{background:#fef5e6}
+/* Sjekk mangler-modal: liste over aktiviteter som mangler påkrevde felt */
+.missing-list{display:flex;flex-direction:column;gap:6px}
+.missing-item{
+  text-align:left;background:#fafbfc;border:1px solid var(--border);
+  border-radius:6px;padding:10px 12px;cursor:pointer;font-family:inherit;
+  transition:background .12s,border-color .12s;
+}
+.missing-item:hover{background:#f0f4f8;border-color:#94a3b8}
+.missing-item-name{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px}
+.missing-item-meta{display:flex;gap:12px;font-size:11px;flex-wrap:wrap}
+.missing-item-area{color:var(--text-2);font-weight:500}
+.missing-item-fields{color:var(--red);font-weight:500}
 
 /* Cell renderers */
 .fp-firma-pill{
@@ -849,6 +898,9 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
   background:#f1f3f5;color:var(--text-2);border:1px solid #e6e8eb;
 }
 .fp-kritisk-mark{color:var(--red);font-weight:700;margin-right:4px}
+/* Milepæl-prefiks. Diamant-symbolet markerer aktiviteten som en milepæl
+   med null varighet. Brukes også i Gantt-visning (TODO) som diamant-form. */
+.fp-milepael-mark{color:#7c3aed;font-weight:700;margin-right:4px;font-size:14px}
 .fp-aktivitet-cell{font-weight:500}
 
 .fp-fremdrift-wrap{
@@ -1024,6 +1076,19 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
 .gantt-bar.completed{background:var(--green)}
 .gantt-bar.future{background:var(--blue);opacity:.6}
 .gantt-bar.kritisk{outline:1.5px solid var(--red);outline-offset:1px}
+/* Milepæl-diamant i Gantt: erstatter søyle for milepæl-aktiviteter (varighet 0).
+   14×14px lilla rotert kvadrat. Plassert på fra-dato. Subtil skygge for dybde. */
+.gantt-milepael{
+  position:absolute;top:50%;
+  width:12px;height:12px;
+  background:#7c3aed;
+  transform:translate(-50%,-50%) rotate(45deg);
+  box-shadow:0 1px 2px rgba(0,0,0,.2);
+  border:1px solid #5b21b6;
+}
+.gantt-row.selected .gantt-milepael{
+  outline:2px solid var(--navy);outline-offset:2px;
+}
 .gantt-row[data-act-id]{cursor:pointer}
 .gantt-row.selected{background:rgba(230,126,34,.14)}
 .gantt-row.selected .gantt-bar{outline:2px solid var(--navy);outline-offset:1px}
@@ -1435,6 +1500,10 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
           <button class="wp-tb-btn" onclick="openMultiNewWp()" title="Klargjør flere rader med pre-populert område, subområde og firma">
             ++ Nye aktiviteter
           </button>
+          <button class="wp-tb-btn danger" onclick="deleteWeekplanActivities()" title="Slett valgte aktiviteter fra både ukeplan og hovedplan">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/></svg>
+            Slett aktivitet
+          </button>
         </div>
         <span class="wp-tb-divider"></span>
 
@@ -1460,6 +1529,34 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
         </div>
         <span class="wp-tb-divider"></span>
 
+        <!-- Markeringer (synker til hovedplan) -->
+        <div class="wp-tb-section">
+          <button class="wp-tb-btn" onclick="markCritical()" title="Marker valgte aktiviteter som kritiske (synkes med hovedplan)">
+            ⚠️ Kritisk
+          </button>
+          <button class="wp-tb-btn" onclick="highlightRows()" title="Synliggjør valgte aktiviteter visuelt (synkes med hovedplan)">
+            Synliggjør
+          </button>
+          <button class="wp-tb-btn" onclick="toggleMilepael()" title="Marker som milepæl (synkes med hovedplan)">
+            ♦ Milepæl
+          </button>
+        </div>
+        <span class="wp-tb-divider"></span>
+
+        <span class="wp-tb-divider"></span>
+
+        <!-- Angre-handlinger -->
+        <div class="wp-tb-section">
+          <button class="wp-tb-btn" id="wpUndoBtn" onclick="performUndo()" title="Angre siste handling (Ctrl+Z)">
+            <svg viewBox="0 0 24 24"><path d="M3 7v6h6M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>
+            Angre
+          </button>
+          <button class="wp-tb-btn" id="wpRedoBtn" onclick="performRedo()" title="Gjeninnfør (Ctrl+Y)">
+            <svg viewBox="0 0 24 24"><path d="M21 7v6h-6M3 17a9 9 0 0 1 15-6.7L21 13"/></svg>
+            Gjeninnfør
+          </button>
+        </div>
+
         <!-- Sjeldne handlinger samlet i Mer-meny -->
         <div class="wp-tb-section wp-more-wrap">
           <button class="wp-tb-btn" id="wpMoreBtn" onclick="toggleWpMoreMenu(event)" title="Flere verktøy">
@@ -1479,6 +1576,9 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
             <button class="wp-more-item" onclick="closeWpMoreMenu();startAreaWalkthrough()">
               Område-gjennomgang
             </button>
+            <button class="wp-more-item" onclick="closeWpMoreMenu();openHolidaysModal()">
+              Marker fridager
+            </button>
             <button class="wp-more-item" onclick="closeWpMoreMenu();clearAllDays()" title="Tøm alle dager for valgte rader">
               Fjern alle dager
             </button>
@@ -1495,13 +1595,6 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
               <span class="hint">kun admin</span>
             </button>
           </div>
-        </div>
-      </div>
-
-      <!-- PROJECT HEADER -->
-      <div class="project-header">
-        <div class="project-header-row">
-          <input type="text" class="project-name-input" id="projectName" value="Jåtunparken BT1-3 / KBA1-2">
         </div>
       </div>
 
@@ -1547,6 +1640,9 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
           <button class="btn" onclick="markCritical()" title="Legg til ⚠️ foran aktivitetsnavn">
             ⚠️ Kritisk
           </button>
+          <button class="btn" onclick="toggleMilepael()" title="Marker som milepæl: setter til-dato lik fra-dato, viser ♦ foran navn">
+            ♦ Milepæl
+          </button>
           <button class="btn" onclick="highlightRows()" title="Marker valgte rader visuelt">
             Synliggjør
           </button>
@@ -1574,7 +1670,26 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
         </div>
 
         <div class="tool-group">
+          <span class="tool-group-label">Angre</span>
+          <button class="btn" id="undoBtn" onclick="performUndo()" title="Angre siste handling (Ctrl+Z)">
+            <svg class="ico ico-svg" viewBox="0 0 24 24"><path d="M3 7v6h6M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>
+            Angre
+          </button>
+          <button class="btn" id="redoBtn" onclick="performRedo()" title="Gjeninnfør (Ctrl+Y)">
+            <svg class="ico ico-svg" viewBox="0 0 24 24"><path d="M21 7v6h-6M3 17a9 9 0 0 1 15-6.7L21 13"/></svg>
+            Gjeninnfør
+          </button>
+        </div>
+
+        <div class="tool-group">
           <span class="tool-group-label">Verktøy</span>
+          <button class="btn" id="toggleCompletedBtn" onclick="toggleShowCompleted()" title="Vis/skjul aktiviteter som er 100% fullførte">
+            <svg class="ico ico-svg" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+            Vis fullførte
+          </button>
+          <button class="btn" id="toggleMilepaelOnlyBtn" onclick="toggleMilepaelOnly()" title="Vis kun milepæler">
+            ♦ Kun milepæler
+          </button>
           <button class="btn" onclick="checkMissing()" title="Marker rader med manglende felt">
             Sjekk mangler
           </button>
@@ -1619,16 +1734,12 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
           </div>
           <button class="btn" onclick="openLister()" title="Områder, subområder og underentreprenører (master data)">
             <svg class="ico ico-svg" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
-            Lister
           </button>
-          <button class="btn" onclick="openWorkshop()" title="Last opp bilde av tavle og strukturer aktiviteter med AI">
+          <button class="btn" onclick="openWorkshop()" title="Workshop-import: last opp bilde av tavle og strukturer aktiviteter med AI">
             <svg class="ico ico-svg" viewBox="0 0 24 24"><path d="M3 3h18v14H3zM3 21h18M9 17v4M15 17v4"/></svg>
-            Workshop-import
-            <span style="font-size:9px;background:var(--orange);color:white;padding:1px 4px;border-radius:2px;margin-left:3px">MOCKUP</span>
           </button>
-          <button class="btn" onclick="exportPDF()" title="A3 liggende, kun synlige rader">
+          <button class="btn" onclick="exportPDF()" title="Lag PDF (A3 liggende, kun synlige rader)">
             <svg class="ico ico-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-            Lag PDF
           </button>
         </div>
 
@@ -1926,8 +2037,63 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
   </div>
 </div>
 
+<!-- Sjekk mangler: liste over aktiviteter med manglende påkrevde felt.
+     Klikk på rad navigerer til aktiviteten i hovedgriddet. -->
+<div class="modal-backdrop" id="missingModal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <div class="modal-title">Aktiviteter med manglende felt (<span id="missingCount">0</span>)</div>
+      <div class="modal-close" onclick="closeModal('missingModal')">✕</div>
+    </div>
+    <div class="modal-body" style="max-height:60vh;overflow-y:auto">
+      <p style="font-size:12px;color:var(--text-2);margin:0 0 12px">Klikk på en aktivitet for å hoppe direkte til den.</p>
+      <div id="missingList" class="missing-list"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn primary" onclick="closeModal('missingModal')">Lukk</button>
+    </div>
+  </div>
+</div>
+
 <!-- Bekreft fullføring i Faseplan -->
 <!-- Dangerzone: Slett ukeplan -->
+<!-- Fridager: marker dager i ukeplanen som fridager (helligdag, røde dager osv).
+     Disse vises med rød/grå bakgrunn i grid og X-allokeringer disables. -->
+<div class="modal-backdrop" id="holidaysModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title">Marker fridager</div>
+      <div class="modal-close" onclick="closeModal('holidaysModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:12px;color:var(--text-2);margin:0 0 12px">Velg dager som er fridager (helligdag, ferie). Markerte dager kan ikke allokeres.</p>
+      <div id="holidaysCheckboxes" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('holidaysModal')">Avbryt</button>
+      <button class="btn primary" onclick="applyHolidays()">Lagre</button>
+    </div>
+  </div>
+</div>
+
+<!-- Generisk bekreft-modal som erstatter native browser-confirm. Sentrert
+     på skjermen, konsistent typografi med resten av appen. -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title" id="confirmTitle">Bekreft</div>
+      <div class="modal-close" onclick="closeModal('confirmModal')">✕</div>
+    </div>
+    <div class="modal-body">
+      <p id="confirmMessage" style="font-size:13px;color:var(--text);line-height:1.5;margin:0">—</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('confirmModal')">Avbryt</button>
+      <button class="btn primary" id="confirmOkBtn">Bekreft</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop" id="dangerzoneModal">
   <div class="modal">
     <div class="modal-header dangerzone-header">
@@ -2407,6 +2573,7 @@ function generateData(){
     kommentar:k,
     kritisk:false,
     highlighted:false,
+    milepael:false,
     sunn:emptySunn(),
     history:[
       {time:baseTime,user:'Fredrik Meidell',action:'Opprettet aktivitet',detail:'Importert fra Excel-mal'}
@@ -2417,6 +2584,13 @@ function generateData(){
 // ===== STATE =====
 let DATA=[];
 let activePlanFilter='Faseplan';
+// Skjul aktiviteter som er 100% fullførte fra alle plan-faner som default.
+// Toggleknapp i toolbar lar bruker midlertidig vise dem ved behov. Filteret
+// gjelder alle faner inkludert Alle, men ikke Utkikksplan/Ukeplan som allerede
+// har sin egen <100%-regel innebygd.
+let showCompleted=false;
+// Vis kun milepæler-toggle (orthogonalt til plan-filter). Aktivert via knapp i toolbar.
+let milepaelOnly=false;
 let COL_VISIBILITY={plan:true,dager:true,status:true};
 let pendingDateChange=null;
 let gridApi=null;
@@ -2475,8 +2649,15 @@ function appendLoggForCommand(loggInfo,action){
   }
 }
 function updateUndoButtons(){
-  // Toolbar-knapper er fjernet - Ctrl-Z og Ctrl-Y er eneste interface.
-  // Funksjonen beholdes som no-op fordi mange recordCommand-kall fortsatt kaller den.
+  const undoBtn=document.getElementById('undoBtn');
+  const redoBtn=document.getElementById('redoBtn');
+  if(undoBtn) undoBtn.disabled=UNDO_STACK.length===0;
+  if(redoBtn) redoBtn.disabled=REDO_STACK.length===0;
+  // Tilsvarende for ukeplan-toolbar
+  const wpUndoBtn=document.getElementById('wpUndoBtn');
+  const wpRedoBtn=document.getElementById('wpRedoBtn');
+  if(wpUndoBtn) wpUndoBtn.disabled=UNDO_STACK.length===0;
+  if(wpRedoBtn) wpRedoBtn.disabled=REDO_STACK.length===0;
 }
 // Hjelpere for å re-rendere etter undo/redo
 function rerenderRow(id){
@@ -2555,9 +2736,12 @@ function ensureWeekplan(weekKey){
   if(!WEEKPLANS[weekKey]){
     WEEKPLANS[weekKey]={
       weekStart:weekKeyToMonday(weekKey),
-      rows:[]
+      rows:[],
+      holidays:[] // dagindekser 0-5 (man-lør) som er markert som fridag
     };
   }
+  // Bakoverkompatibilitet: gamle ukeplaner kan mangle holidays-array
+  if(!WEEKPLANS[weekKey].holidays) WEEKPLANS[weekKey].holidays=[];
   return WEEKPLANS[weekKey];
 }
 function makeEmptyDays(){
@@ -2601,6 +2785,7 @@ function createDataActivityFromWeekplan(opts){
     kommentar:opts.kommentar||'',
     kritisk:false,
     highlighted:false,
+    milepael:false,
     sunn:emptySunn(),
     history:[{time:new Date(),user:'Jan Gunnar Helgaland',action:'Opprettet aktivitet',detail:`Fra ukeplan U${opts.weekKey.split('-W')[1]}`}]
   };
@@ -2913,17 +3098,20 @@ function buildWeekplanRowData(weekKey){
         base={
           area:a.area||'',sub:a.sub||'',firma:a.firma||'',name:a.name||'',
           kommentar:a.kommentar||'',fromDate:a.fromDate,toDate:a.toDate,
-          plan:a.plan||'',fremdrift:a.fremdrift||0,kritisk:a.kritisk||false
+          plan:a.plan||'',fremdrift:a.fremdrift||0,
+          kritisk:a.kritisk||false,highlighted:a.highlighted||false,
+          milepael:a.milepael||false
         };
       }else{
         base={area:'',sub:'',firma:'',name:'(slettet aktivitet)',
-              kommentar:'',fromDate:null,toDate:null,plan:'',fremdrift:0,kritisk:false};
+              kommentar:'',fromDate:null,toDate:null,plan:'',fremdrift:0,
+              kritisk:false,highlighted:false,milepael:false};
       }
     }else{
       // 'weekplan' - egne felt
       base={area:r.area||'',sub:r.sub||'',firma:r.firma||'',name:r.name||'',
             kommentar:r.kommentar||'',fromDate:null,toDate:null,
-            plan:'Ukeplan-eget',fremdrift:0,kritisk:false};
+            plan:'Ukeplan-eget',fremdrift:0,kritisk:false,highlighted:false,milepael:false};
     }
     return {
       _wpId:r.id,_wpRow:r,_wpSource:r.source,
@@ -3121,10 +3309,12 @@ class WpDayHeaderComp{
   render(){
     const ppu=activeWeekKey?computeDayPPU(activeWeekKey,this.dayIdx):null;
     const cls=ppuClass(ppu);
-    this.eGui.className='wp-day-header';
+    const wp=activeWeekKey?WEEKPLANS[activeWeekKey]:null;
+    const isHoliday=wp&&wp.holidays&&wp.holidays.includes(this.dayIdx);
+    this.eGui.className='wp-day-header'+(isHoliday?' wp-day-holiday':'');
     this.eGui.innerHTML=`
-      <div class="name">${DAY_NAMES[this.dayIdx]}</div>
-      <div class="ppu ${cls}">${ppu==null?'—':ppu+'%'}</div>
+      <div class="name">${DAY_NAMES[this.dayIdx]}${isHoliday?' 🔴':''}</div>
+      <div class="ppu ${cls}">${isHoliday?'Fridag':(ppu==null?'—':ppu+'%')}</div>
     `;
   }
   refresh(){this.render();return true}
@@ -3155,7 +3345,9 @@ class AktivitetRenderer{
   }
   render(p){
     const d=p.data;
-    this.eGui.innerHTML=`${d.kritisk?'<span class="fp-kritisk-mark">⚠️</span>':''}${escapeHtml(d.name||'')}`;
+    const milepaelIcon=d.milepael?'<span class="fp-milepael-mark">♦</span>':'';
+    const kritiskIcon=d.kritisk?'<span class="fp-kritisk-mark">⚠️</span>':'';
+    this.eGui.innerHTML=`${milepaelIcon}${kritiskIcon}${escapeHtml(d.name||'')}`;
   }
   getGui(){return this.eGui}
   refresh(p){this.render(p);return true}
@@ -3573,7 +3765,16 @@ function getRowClass(p){
   if(!p.data) return null;
   const classes=[];
   if(p.data.highlighted) classes.push('row-highlighted');
-  if(p.data.missing) classes.push('row-missing');
+  // I ukeplan-modus: legg til tykkere skille-linje når område eller subområde
+  // skifter mellom denne raden og forrige (sortert) rad. Gjør det enklere å
+  // se bolker av samme avdeling i fremdriftsmøter.
+  if(activeWeekKey && p.node && p.node.rowIndex!=null && p.api){
+    const prev=p.api.getDisplayedRowAtIndex(p.node.rowIndex-1);
+    if(prev && prev.data){
+      if(prev.data.area!==p.data.area) classes.push('wp-area-break');
+      else if(prev.data.sub!==p.data.sub) classes.push('wp-sub-break');
+    }
+  }
   return classes.join(' ');
 }
 
@@ -3629,6 +3830,9 @@ function init(){
       const newPlan=t.dataset.plan;
       const planChanged=newPlan!==activePlanFilter;
       activePlanFilter=newPlan;
+      // Fjern selektering ved planbytte slik at brukeren ikke kan utløse handlinger
+      // (Kritisk, Synliggjør, +1 dag osv.) på rader som ikke lenger er synlige.
+      if(planChanged && gridApi) gridApi.deselectAll();
       applyExternalFilters();
       updateWalkthroughBtnState();
       updateAvgFremdriftVisibility();
@@ -3774,6 +3978,11 @@ function initDragSelect(gridDiv){
 // ===== EXTERNAL FILTERS =====
 function externalFilterPass(node){
   const a=node.data;
+  // Skjul 100% fullførte aktiviteter med mindre bruker har valgt å vise dem.
+  // Gjelder alle faner. Utkikksplan/Ukeplan har egen <100%-regel som er strengere.
+  if(!showCompleted && a.fremdrift>=100) return false;
+  // Hvis "kun milepæler" er på, filtrer alle ikke-milepæler bort.
+  if(milepaelOnly && !a.milepael) return false;
   if(activePlanFilter==='alle') return true;
   if(activePlanFilter==='Utkikksplan'){
     if(a.plan!=='Faseplan') return false;
@@ -4254,7 +4463,7 @@ function newActivity(){
     id:Math.max(...DATA.map(x=>x.id),0)+1,
     area:'',sub:'',firma:'',name:'Ny aktivitet',plan:targetPlan,
     fromDate:null,toDate:null,
-    fremdrift:0,kommentar:'',kritisk:false,highlighted:false,
+    fremdrift:0,kommentar:'',kritisk:false,highlighted:false,milepael:false,
     sunn:emptySunn(),
     history:[{time:new Date(),user:'Jan Gunnar Helgaland',action:'Opprettet aktivitet',detail:'Manuelt opprettet'}]
   };
@@ -4385,7 +4594,7 @@ function confirmMultiNew(){
     const a={
       id,area,sub,firma,name:'(ny aktivitet)',plan,
       fromDate:null,toDate:null,
-      fremdrift:0,kommentar:'',kritisk:false,highlighted:false,
+      fremdrift:0,kommentar:'',kritisk:false,highlighted:false,milepael:false,
       sunn:emptySunn(),
       history:[{time:new Date(),user:'Jan Gunnar Helgaland',action:'Klargjort tom rad'}]
     };
@@ -4488,13 +4697,42 @@ function duplicateRow(){
   if(!sel.length){toast('Velg minst én rad å duplisere (klikk på rad)','warn');return}
   let id=Math.max(...DATA.map(x=>x.id),0);
   const newRows=[];
+  // Behandle hver valgt rad og plasser duplikatet rett etter originalen i DATA-arrayet.
+  // Dette gir mer forutsigbar UX enn å kaste alle nye rader øverst i listen.
   sel.forEach(a=>{
     id++;
-    const dup={...a,id,name:a.name+' (kopi)',sunn:{...a.sunn},history:[{time:new Date(),user:'Jan Gunnar Helgaland',action:'Duplisert fra rad #'+a.id}]};
-    DATA.unshift(dup);
+    const dup={
+      ...a,id,
+      name:a.name+' (kopi)',
+      sunn:{...a.sunn},
+      history:[{time:new Date(),user:'Jan Gunnar Helgaland',action:`Duplisert fra "${a.name}"`}]
+    };
+    const origIdx=DATA.findIndex(x=>x.id===a.id);
+    if(origIdx>=0){
+      DATA.splice(origIdx+1,0,dup);
+    }else{
+      DATA.unshift(dup);
+    }
     newRows.push(dup);
   });
-  if(gridApi) gridApi.applyTransaction({add:newRows,addIndex:0});
+  // Sett rowData på nytt slik at ag-grid plukker opp rekkefølgen i DATA
+  if(gridApi){
+    gridApi.setGridOption('rowData',DATA);
+    // Selekter duplikatene og sett fokus på første duplikat
+    requestAnimationFrame(()=>{
+      gridApi.deselectAll();
+      newRows.forEach(r=>{
+        const node=gridApi.getRowNode(String(r.id));
+        if(node) node.setSelected(true);
+      });
+      // Scroll til første duplikat så bruker faktisk ser hva som ble laget
+      const firstDup=newRows[0];
+      if(firstDup){
+        const node=gridApi.getRowNode(String(firstDup.id));
+        if(node&&node.rowIndex!=null) gridApi.ensureIndexVisible(node.rowIndex,'middle');
+      }
+    });
+  }
   toast(`${sel.length} rad(er) duplisert`,'success');
   updateStats();
   recordCommand({
@@ -4502,21 +4740,32 @@ function duplicateRow(){
     undo:()=>{
       const ids=new Set(newRows.map(r=>r.id));
       DATA=DATA.filter(x=>!ids.has(x.id));
-      if(gridApi)gridApi.applyTransaction({remove:newRows});
+      if(gridApi) gridApi.setGridOption('rowData',DATA);
       updateStats();
     },
     redo:()=>{
-      newRows.forEach(r=>DATA.unshift(r));
-      if(gridApi)gridApi.applyTransaction({add:newRows,addIndex:0});
+      // Sett tilbake duplikatene rett etter originalene
+      sel.forEach((a,i)=>{
+        const origIdx=DATA.findIndex(x=>x.id===a.id);
+        if(origIdx>=0) DATA.splice(origIdx+1,0,newRows[i]);
+        else DATA.unshift(newRows[i]);
+      });
+      if(gridApi) gridApi.setGridOption('rowData',DATA);
       updateStats();
     }
   });
 }
 
-function deleteRows(){
+async function deleteRows(){
   const sel=getSelected();
   if(!sel.length){toast('Velg minst én rad å slette (klikk på rad)','warn');return}
-  if(!confirm(`Slett ${sel.length} aktivitet(er)?`)) return;
+  const ok=await confirmDialog({
+    title:'Slett aktivitet'+(sel.length>1?'er':''),
+    message:`Er du sikker på at du vil slette ${sel.length} aktivitet${sel.length>1?'er':''}? Du kan angre med Ctrl+Z.`,
+    okText:'Slett',
+    danger:true
+  });
+  if(!ok) return;
   const removed=sel.slice(); // kopi for closure
   const ids=new Set(removed.map(a=>a.id));
   // Lagre original posisjon for redo
@@ -4544,35 +4793,113 @@ function deleteRows(){
   });
 }
 
+// Marker valgte aktiviteter som milepæl. En milepæl har samme fra-/til-dato
+// (varighet 0 dager) og vises med diamantsymbol foran navnet. Toggle-funksjon:
+// hvis allerede milepæl, fjernes flagget men datoer beholdes (bruker setter
+// selv evt. ny til-dato).
+function toggleMilepael(){
+  const sel=getSelected();
+  if(!sel.length){toast('Velg minst én rad','warn');return}
+  // Map til DATA (samme mønster som markCritical)
+  const acts=sel.map(r=>{
+    if(r._wpSource==='faseplan'&&r.actId!=null) return DATA.find(x=>x.id===r.actId);
+    if(r._wpSource==='weekplan') return null;
+    return r;
+  }).filter(Boolean);
+  if(!acts.length){toast('Valgte rader kan ikke markeres','warn');return}
+  const ids=acts.map(a=>a.id);
+  // Lagre original-tilstand for undo
+  const before=acts.map(a=>({
+    id:a.id,
+    milepael:a.milepael,
+    fromDate:a.fromDate?new Date(a.fromDate):null,
+    toDate:a.toDate?new Date(a.toDate):null
+  }));
+  acts.forEach(a=>{
+    a.milepael=!a.milepael;
+    if(a.milepael){
+      // Når milepæl aktiveres: kollaps til-dato til fra-dato (0 dager varighet)
+      // Hvis fra-dato mangler, bruker vi til-dato. Hvis begge mangler, lar vi datoene være.
+      if(a.fromDate){
+        a.toDate=new Date(a.fromDate);
+      }else if(a.toDate){
+        a.fromDate=new Date(a.toDate);
+      }
+      a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:'Markert som milepæl',detail:'Til-dato satt lik fra-dato'});
+    }else{
+      a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:'Fjernet milepæl-markering'});
+    }
+  });
+  if(activeWeekKey) refreshAllWp(); else rerenderRows(ids);
+  toast(acts[0].milepael?`${acts.length} aktivitet(er) markert som milepæl`:`Milepæl-markering fjernet`,'success');
+  recordCommand({
+    label:`Milepæl-toggle (${ids.length})`,
+    undo:()=>{
+      before.forEach(b=>{
+        const a=DATA.find(x=>x.id===b.id);
+        if(a){a.milepael=b.milepael;a.fromDate=b.fromDate;a.toDate=b.toDate;}
+      });
+      if(activeWeekKey) refreshAllWp(); else rerenderRows(ids);
+    },
+    redo:()=>{
+      before.forEach(b=>{
+        const a=DATA.find(x=>x.id===b.id);
+        if(a){
+          a.milepael=!b.milepael;
+          if(a.milepael){
+            if(b.fromDate){a.toDate=new Date(b.fromDate)}
+            else if(b.toDate){a.fromDate=new Date(b.toDate)}
+          }
+        }
+      });
+      if(activeWeekKey) refreshAllWp(); else rerenderRows(ids);
+    }
+  });
+}
+
 function markCritical(){
   const sel=getSelected();
   if(!sel.length){toast('Velg minst én rad','warn');return}
-  const ids=sel.map(a=>a.id);
-  const before=sel.map(a=>({id:a.id,kritisk:a.kritisk}));
-  sel.forEach(a=>{
+  // Map til DATA-aktiviteter: i ukeplan-modus er sel ukeplan-rader med actId,
+  // i hovedplan-modus er sel selve DATA-objektene. Begge løses opp her.
+  const acts=sel.map(r=>{
+    if(r._wpSource==='faseplan'&&r.actId!=null) return DATA.find(x=>x.id===r.actId);
+    if(r._wpSource==='weekplan') return null; // legacy weekplan-rader har ingen kritisk-flagg
+    return r; // hovedplan-rad
+  }).filter(Boolean);
+  if(!acts.length){toast('Valgte rader kan ikke markeres (legacy ukeplan-rader uten DATA-kobling)','warn');return}
+  const ids=acts.map(a=>a.id);
+  const before=acts.map(a=>({id:a.id,kritisk:a.kritisk}));
+  acts.forEach(a=>{
     a.kritisk=!a.kritisk;
     a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:a.kritisk?'Markert som kritisk':'Fjernet kritisk-markering'});
   });
-  rerenderRows(ids);
+  if(activeWeekKey) refreshAllWp(); else rerenderRows(ids);
   toast('Kritisk-markering oppdatert','success');
   recordCommand({
     label:`Kritisk-markering (${ids.length})`,
-    undo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a)a.kritisk=b.kritisk});rerenderRows(ids);},
-    redo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a)a.kritisk=!b.kritisk});rerenderRows(ids);}
+    undo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a)a.kritisk=b.kritisk});if(activeWeekKey) refreshAllWp(); else rerenderRows(ids);},
+    redo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a)a.kritisk=!b.kritisk});if(activeWeekKey) refreshAllWp(); else rerenderRows(ids);}
   });
 }
 
 function highlightRows(){
   const sel=getSelected();
   if(!sel.length){toast('Velg minst én rad','warn');return}
-  const ids=sel.map(a=>a.id);
-  const before=sel.map(a=>({id:a.id,highlighted:a.highlighted}));
-  sel.forEach(a=>{a.highlighted=!a.highlighted});
-  rerenderRows(ids);
+  const acts=sel.map(r=>{
+    if(r._wpSource==='faseplan'&&r.actId!=null) return DATA.find(x=>x.id===r.actId);
+    if(r._wpSource==='weekplan') return null;
+    return r;
+  }).filter(Boolean);
+  if(!acts.length){toast('Valgte rader kan ikke markeres','warn');return}
+  const ids=acts.map(a=>a.id);
+  const before=acts.map(a=>({id:a.id,highlighted:a.highlighted}));
+  acts.forEach(a=>{a.highlighted=!a.highlighted});
+  if(activeWeekKey) refreshAllWp(); else rerenderRows(ids);
   recordCommand({
     label:`Synliggjør rader (${ids.length})`,
-    undo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a)a.highlighted=b.highlighted});rerenderRows(ids);},
-    redo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a)a.highlighted=!b.highlighted});rerenderRows(ids);}
+    undo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a)a.highlighted=b.highlighted});if(activeWeekKey) refreshAllWp(); else rerenderRows(ids);},
+    redo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a)a.highlighted=!b.highlighted});if(activeWeekKey) refreshAllWp(); else rerenderRows(ids);}
   });
 }
 
@@ -4597,15 +4924,25 @@ function markCompleted(){
 function shiftDays(n){
   const sel=getSelected();
   if(!sel.length){toast('Velg minst én rad','warn');return}
-  const ids=sel.map(a=>a.id);
-  const before=sel.map(a=>({id:a.id,fromDate:new Date(a.fromDate),toDate:new Date(a.toDate)}));
-  sel.forEach(a=>{
+  // Filtrer ut rader uten datoer - +1 dag/uke gir bare mening når begge datoer er satt
+  const skipped=sel.filter(a=>!a.fromDate||!a.toDate);
+  const valid=sel.filter(a=>a.fromDate&&a.toDate);
+  if(!valid.length){
+    toast('Velg rader som har både fra- og til-dato satt. Bruk datovelgeren for å sette første dato.','warn');
+    return;
+  }
+  const ids=valid.map(a=>a.id);
+  const before=valid.map(a=>({id:a.id,fromDate:new Date(a.fromDate),toDate:new Date(a.toDate)}));
+  valid.forEach(a=>{
     a.fromDate=addDays(a.fromDate,n);
     a.toDate=addDays(a.toDate,n);
     a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:`Flyttet ${n} dag(er)`,detail:'Begge datoer'});
   });
   rerenderRows(ids);
-  toast(`${sel.length} aktivitet(er) flyttet ${n} dag(er)`,'success');
+  const msg=skipped.length>0
+    ? `${valid.length} aktivitet(er) flyttet ${n} dag(er). ${skipped.length} hoppet over (manglet datoer)`
+    : `${sel.length} aktivitet(er) flyttet ${n} dag(er)`;
+  toast(msg,'success');
   recordCommand({
     label:`Flyttet ${n} dag(er) (${ids.length} rad${ids.length===1?'':'er'})`,
     undo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a){a.fromDate=new Date(b.fromDate);a.toDate=new Date(b.toDate);}});rerenderRows(ids);},
@@ -4617,9 +4954,15 @@ function startToday(){
   const sel=getSelected();
   if(!sel.length){toast('Velg minst én rad','warn');return}
   const ids=sel.map(a=>a.id);
-  const before=sel.map(a=>({id:a.id,fromDate:new Date(a.fromDate),toDate:new Date(a.toDate)}));
+  const before=sel.map(a=>({id:a.id,fromDate:a.fromDate?new Date(a.fromDate):null,toDate:a.toDate?new Date(a.toDate):null}));
+  // Start idag fungerer også for tomme rader: setter fra=idag og til=idag (1 dag varighet).
+  // Hvis begge datoer er satt fra før, bevares varigheten.
   sel.forEach(a=>{
-    const dur=Math.round((a.toDate-a.fromDate)/86400000);
+    let dur=0;
+    if(a.fromDate&&a.toDate){
+      dur=Math.round((a.toDate-a.fromDate)/86400000);
+      if(isNaN(dur)||dur<0) dur=0;
+    }
     a.fromDate=new Date(TODAY);
     a.toDate=addDays(TODAY,dur);
     a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:'Satt til å starte idag'});
@@ -4628,8 +4971,8 @@ function startToday(){
   toast(`${sel.length} aktivitet(er) satt til å starte idag`,'success');
   recordCommand({
     label:`Start idag (${ids.length})`,
-    undo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a){a.fromDate=new Date(b.fromDate);a.toDate=new Date(b.toDate);}});rerenderRows(ids);},
-    redo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a){const dur=Math.round((b.toDate-b.fromDate)/86400000);a.fromDate=new Date(TODAY);a.toDate=addDays(TODAY,dur);}});rerenderRows(ids);}
+    undo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a){a.fromDate=b.fromDate?new Date(b.fromDate):null;a.toDate=b.toDate?new Date(b.toDate):null;}});rerenderRows(ids);},
+    redo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a){let dur=0;if(b.fromDate&&b.toDate){dur=Math.round((b.toDate-b.fromDate)/86400000);if(isNaN(dur)||dur<0) dur=0;}a.fromDate=new Date(TODAY);a.toDate=addDays(TODAY,dur);}});rerenderRows(ids);}
   });
 }
 
@@ -4639,6 +4982,21 @@ function recomputeAll(){
 }
 
 // ===== UKEPLAN: ENTER/EXIT MODUS =====
+// Hjelper kalt fra dropdown når brukeren ikke er på Faseplan-tab.
+// Bytter til Faseplan og åpner deretter dropdownen igjen så bruker kan
+// fortsette uten ekstra klikk.
+function switchToFaseplanTab(){
+  const tab=document.querySelector('.plan-tab[data-plan="Faseplan"]');
+  if(tab){
+    tab.click();
+    // Åpne dropdownen umiddelbart etter tab-bytte slik at brukeren kommer rett til formålet
+    setTimeout(()=>{
+      const btn=document.getElementById('weekplansDropdownBtn');
+      if(btn) btn.click();
+    },50);
+  }
+}
+
 function openWeekplanFlow(){
   // Kalles fra "Opprett ukeplan"-knappen i fremdriftsplan-toolbar
   const today=new Date();
@@ -4759,9 +5117,18 @@ function renderWeekplansDropdown(){
     });
   }
   html+='</div>';
-  // Sticky bunn: opprett ny - alltid tilgjengelig
+  // Sticky bunn: opprett ny - kun aktiv når brukeren er på Faseplan-tab.
+  // Ukeplaner er semantisk knyttet til Faseplan (ikke Hovedfremdriftsplan eller
+  // Prosjekteringsplan), så å lage ukeplan fra annen kontekst gir feil mental modell.
   html+='<div class="wp-dd-sticky-bottom">';
-  html+='<div class="weekplans-dropdown-create" onclick="closeWeekplansDropdown();openWeekplanFlow()"><span style="font-size:14px">+</span> Opprett ukeplan</div>';
+  if(activePlanFilter==='Faseplan'){
+    html+='<div class="weekplans-dropdown-create" onclick="closeWeekplansDropdown();openWeekplanFlow()"><span style="font-size:14px">+</span> Opprett ukeplan</div>';
+  }else{
+    html+='<div class="weekplans-dropdown-create-disabled">';
+    html+='<div class="wp-dd-disabled-text">Ukeplaner opprettes fra Faseplan</div>';
+    html+='<button class="wp-dd-switch-btn" onclick="closeWeekplansDropdown();switchToFaseplanTab()">Bytt til Faseplan →</button>';
+    html+='</div>';
+  }
   html+='</div>';
   dd.innerHTML=html;
 
@@ -4840,7 +5207,14 @@ function confirmOpenWeekplan(){
   const wp=ensureWeekplan(key);
   if(isNew){
     const added=prepopulateWeekplan(wp,key);
-    if(added>0) setTimeout(()=>toast(`Pre-utfylt med ${added} aktivitet${added===1?'':'er'} fra Faseplan`,'success'),300);
+    if(added>0){
+      setTimeout(()=>toast(`Pre-utfylt med ${added} aktivitet${added===1?'':'er'} fra Faseplan`,'success'),300);
+    }else{
+      // Ingen Faseplan-aktiviteter overlapper denne uka. Forklar tydelig så
+      // bruker forstår hvorfor ukeplanen er tom og at den ikke arver fra
+      // Hovedfremdriftsplan eller Prosjekteringsplan.
+      setTimeout(()=>toast('Tom ukeplan: ingen Faseplan-aktiviteter overlapper denne uka. Bruk "Legg til aktivitet" for å fylle inn.','warn'),300);
+    }
   }
   updateWeekplansCount();
   closeModal('openWeekplanModal');
@@ -5001,6 +5375,12 @@ function getWeekplanColumnDefs(){
     },
     {field:'name',headerName:'Aktivitet',width:280,filter:true,
       editable:true,
+      cellRenderer:p=>{
+        const txt=escapeHtml(p.value||'');
+        const milepael=p.data?.milepael?'<span class="fp-milepael-mark">♦</span>':'';
+        const kritisk=p.data?.kritisk?'<span class="fp-kritisk-mark">⚠️</span>':'';
+        return `${milepael}${kritisk}${txt}`;
+      },
       tooltipValueGetter:p=>{
         if(!p.data) return '';
         if(p.data._wpSource==='weekplan') return p.data.kommentar||'';
@@ -5091,20 +5471,27 @@ function getWeekplanColumnDefs(){
       children:[
         {headerName:'👷',width:38,sortable:false,resizable:false,
          cellRenderer:WpWorkerRenderer,cellRendererParams:{dayIdx:i},
-         cellClass:'wp-day-cell wp-day-start',
+         cellClass:p=>'wp-day-cell wp-day-start'+(isHolidayDay(i)?' wp-day-holiday-cell':''),
          valueGetter:p=>p.data?.days?.[i]?.x?'X':''},
         {headerName:'✓',width:38,sortable:false,resizable:false,
          cellRenderer:WpStatusRenderer,cellRendererParams:{dayIdx:i},
-         cellClass:'wp-day-cell',
+         cellClass:p=>'wp-day-cell'+(isHolidayDay(i)?' wp-day-holiday-cell':''),
          valueGetter:p=>p.data?.days?.[i]?.status||''},
         {headerName:'!',width:38,sortable:false,resizable:false,
          cellRenderer:WpReasonRenderer,cellRendererParams:{dayIdx:i},
-         cellClass:'wp-day-cell wp-day-end',
+         cellClass:p=>'wp-day-cell wp-day-end'+(isHolidayDay(i)?' wp-day-holiday-cell':''),
          valueGetter:p=>p.data?.days?.[i]?.reason??''}
       ]
     });
   }
   return cols;
+}
+
+// Hjelper: er denne dagindeksen markert som fridag i aktiv ukeplan?
+function isHolidayDay(dayIdx){
+  if(!activeWeekKey) return false;
+  const wp=WEEKPLANS[activeWeekKey];
+  return wp&&wp.holidays&&wp.holidays.includes(dayIdx);
 }
 
 function toggleFaseplanCols(){
@@ -5139,10 +5526,23 @@ function refreshAllWp(){
   // Tving ag-grid til å re-evaluere display-pipeline. Uten dette kan nye rader
   // sitte med rowIndex:null / displayed:false etter setRowData. Kjent kvirk i v31.
   gridApi.onFilterChanged();
+  // Tving full redraw så cellRenderer-funksjoner (kritisk-prefiks, fremdrift-bar
+  // osv.) kjøres på nytt med oppdatert data. setRowData reuser noen ganger DOM-
+  // noder uten å re-kjøre renderere.
+  gridApi.redrawRows();
   refreshWeekplanBanner();
 }
 
 function toggleX(rowId,dayIdx){
+  // Blokker allokering på fridager. Eksisterende X-er kan fortsatt fjernes
+  // (i tilfelle bruker satte fridag etter at allokering allerede var gjort).
+  if(isHolidayDay(dayIdx)){
+    const r=getWpRow(rowId);if(!r) return;
+    if(!r.days[dayIdx].x){
+      toast(`${DAY_NAMES[dayIdx]} er markert som fridag`,'warn');
+      return;
+    }
+  }
   const r=getWpRow(rowId);if(!r) return;
   const d=r.days[dayIdx];
   const before={x:d.x,status:d.status,reason:d.reason};
@@ -5494,6 +5894,96 @@ function confirmAddWpRow(){
 }
 
 // ===== UKEPLAN: BULK DAGS-OPERASJONER =====
+// Slett aktivitet helt (fra både hovedplan og alle ukeplaner). Dette er IKKE
+// "Fjern fra uke" - det er en permanent sletting. Bruker advares tydelig om
+// konsekvensen. Toveis-sync-modellen gjør dette enklere: vi sletter DATA-objektet,
+// så fjernes ukeplan-radene som peker til det automatisk via cleanup.
+async function deleteWeekplanActivities(){
+  if(!gridApi||!activeWeekKey){toast('Ingen ukeplan aktiv','warn');return}
+  const sel=gridApi.getSelectedRows();
+  if(!sel.length){toast('Velg minst én rad å slette (klikk på rad)','warn');return}
+  const ok=await confirmDialog({
+    title:'Slett aktivitet'+(sel.length>1?'er':''),
+    message:`Sletter ${sel.length} aktivitet${sel.length>1?'er':''} permanent fra både ukeplan og hovedplan. Du kan angre med Ctrl+Z.`,
+    okText:'Slett',
+    danger:true
+  });
+  if(!ok) return;
+
+  // Samle DATA-aktiviteter som skal slettes (faseplan-source) og legacy weekplan-rader
+  const actIdsToDelete=new Set();
+  const wpRowsToDelete=[];
+  sel.forEach(r=>{
+    if(r._wpSource==='faseplan'&&r.actId!=null) actIdsToDelete.add(r.actId);
+    else if(r._wpSource==='weekplan') wpRowsToDelete.push(r._wpId);
+  });
+
+  // Lagre originaltilstand for undo
+  const removedActs=DATA.filter(a=>actIdsToDelete.has(a.id));
+  const removedActPositions=removedActs.map(a=>({a,idx:DATA.indexOf(a)}));
+  // Snapshot ukeplan-rader på tvers av alle uker (fordi cleanup vil fjerne dem)
+  const removedWpRowsByWeek={};
+  Object.keys(WEEKPLANS).forEach(wk=>{
+    const wp=WEEKPLANS[wk];
+    if(!wp||!wp.rows) return;
+    const removedHere=[];
+    wp.rows.forEach((r,idx)=>{
+      if(r.source==='faseplan'&&actIdsToDelete.has(r.actId)){
+        removedHere.push({r,idx});
+      }else if(wk===activeWeekKey&&wpRowsToDelete.includes(r.id)){
+        removedHere.push({r,idx});
+      }
+    });
+    if(removedHere.length) removedWpRowsByWeek[wk]=removedHere;
+  });
+
+  // Slett: først DATA-aktiviteter, deretter alle ukeplan-rader som peker til dem,
+  // pluss legacy weekplan-rader i aktiv uke.
+  DATA=DATA.filter(a=>!actIdsToDelete.has(a.id));
+  Object.keys(WEEKPLANS).forEach(wk=>{
+    const wp=WEEKPLANS[wk];
+    if(!wp||!wp.rows) return;
+    wp.rows=wp.rows.filter(r=>{
+      if(r.source==='faseplan'&&actIdsToDelete.has(r.actId)) return false;
+      if(wk===activeWeekKey&&wpRowsToDelete.includes(r.id)) return false;
+      return true;
+    });
+  });
+
+  refreshAllWp();
+  toast(`${sel.length} aktivitet${sel.length>1?'er':''} slettet`,'success');
+
+  recordCommand({
+    label:`Slettet ${sel.length} aktivitet${sel.length>1?'er':''}`,
+    undo:()=>{
+      // Sett tilbake DATA-aktiviteter på riktig posisjon
+      removedActPositions.sort((a,b)=>a.idx-b.idx).forEach(p=>{
+        DATA.splice(Math.min(p.idx,DATA.length),0,p.a);
+      });
+      // Sett tilbake ukeplan-rader
+      Object.keys(removedWpRowsByWeek).forEach(wk=>{
+        const wp=WEEKPLANS[wk];if(!wp)return;
+        removedWpRowsByWeek[wk].sort((a,b)=>a.idx-b.idx).forEach(p=>{
+          wp.rows.splice(Math.min(p.idx,wp.rows.length),0,p.r);
+        });
+      });
+      refreshAllWp();
+    },
+    redo:()=>{
+      DATA=DATA.filter(a=>!actIdsToDelete.has(a.id));
+      Object.keys(WEEKPLANS).forEach(wk=>{
+        const wp=WEEKPLANS[wk];if(!wp||!wp.rows)return;
+        wp.rows=wp.rows.filter(r=>{
+          if(r.source==='faseplan'&&actIdsToDelete.has(r.actId)) return false;
+          if(wk===activeWeekKey&&wpRowsToDelete.includes(r.id)) return false;
+          return true;
+        });
+      });
+      refreshAllWp();
+    }
+  });
+}
+
 function getSelectedWpRowIds(){
   if(!gridApi) return [];
   const sel=gridApi.getSelectedRows();
@@ -5557,6 +6047,44 @@ function bulkSetX(days,label){
       });
       refreshAllWp();
     }
+  });
+}
+
+// Fridager-modal: viser checkboks per dag, lagrer på wp.holidays.
+// Når en dag er fridag, vises hele kolonnen med rød bakgrunn og X-allokering
+// disables (sjekkes i toggleX). Eksisterende X-er på fridag beholdes som
+// historikk men kan fjernes manuelt.
+function openHolidaysModal(){
+  if(!activeWeekKey){toast('Ingen ukeplan aktiv','warn');return}
+  const wp=ensureWeekplan(activeWeekKey);
+  const monday=weekKeyToMonday(activeWeekKey);
+  const container=document.getElementById('holidaysCheckboxes');
+  container.innerHTML=DAY_NAMES.map((dn,i)=>{
+    const date=new Date(monday);date.setDate(date.getDate()+i);
+    const dateStr=`${String(date.getDate()).padStart(2,'0')}.${String(date.getMonth()+1).padStart(2,'0')}`;
+    const checked=wp.holidays.includes(i);
+    return `<label style="display:flex;align-items:center;gap:8px;padding:8px;background:#fafbfc;border:1px solid var(--border);border-radius:4px;cursor:pointer">
+      <input type="checkbox" data-day="${i}" ${checked?'checked':''}>
+      <span style="font-weight:500">${dn}</span>
+      <span style="color:var(--text-3);font-size:11px">${dateStr}</span>
+    </label>`;
+  }).join('');
+  openModal('holidaysModal');
+}
+
+function applyHolidays(){
+  if(!activeWeekKey) return;
+  const wp=ensureWeekplan(activeWeekKey);
+  const before=wp.holidays.slice();
+  const checked=document.querySelectorAll('#holidaysCheckboxes input[type="checkbox"]:checked');
+  wp.holidays=Array.from(checked).map(c=>parseInt(c.dataset.day));
+  closeModal('holidaysModal');
+  refreshAllWp();
+  toast(wp.holidays.length>0?`${wp.holidays.length} fridag${wp.holidays.length===1?'':'er'} markert`:'Alle fridager fjernet','success');
+  recordCommand({
+    label:'Endret fridager',
+    undo:()=>{wp.holidays=before;refreshAllWp();},
+    redo:()=>{wp.holidays=Array.from(checked).map(c=>parseInt(c.dataset.day));refreshAllWp();}
   });
 }
 
@@ -6170,19 +6698,151 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='Escape'){e.preventDefault();exitAreaWalkthrough();}
 });
 
+function toggleShowCompleted(){
+  showCompleted=!showCompleted;
+  const btn=document.getElementById('toggleCompletedBtn');
+  if(btn){
+    if(showCompleted){
+      btn.style.background='var(--orange)';
+      btn.style.color='white';
+      btn.style.borderColor='var(--orange)';
+      btn.title='Skjul aktiviteter som er 100% fullførte';
+    }else{
+      btn.style.background='';
+      btn.style.color='';
+      btn.style.borderColor='';
+      btn.title='Vis aktiviteter som er 100% fullførte';
+    }
+  }
+  applyExternalFilters();
+  toast(showCompleted?'Viser også fullførte aktiviteter':'Skjuler 100% fullførte','success');
+}
+
+function toggleMilepaelOnly(){
+  milepaelOnly=!milepaelOnly;
+  const btn=document.getElementById('toggleMilepaelOnlyBtn');
+  if(btn){
+    if(milepaelOnly){
+      btn.style.background='#7c3aed';
+      btn.style.color='white';
+      btn.style.borderColor='#7c3aed';
+    }else{
+      btn.style.background='';
+      btn.style.color='';
+      btn.style.borderColor='';
+    }
+  }
+  applyExternalFilters();
+  toast(milepaelOnly?'Viser kun milepæler':'Viser alle aktiviteter','success');
+}
+
 function checkMissing(){
-  let count=0;
+  // Bygg liste over rader med mangler. Tidligere markerte vi alle rader med
+  // rød ramme, men det forstyrret andre rader i visningen og var vanskelig å
+  // fjerne. Bedre å vise dem i en egen modal med klikk-til-rad-navigasjon.
+  const missing=[];
   DATA.forEach(a=>{
-    a.missing=(!a.area||!a.sub||!a.firma||!a.name||a.name==='(ny aktivitet)');
-    if(a.missing) count++;
+    const missingFields=[];
+    if(!a.area) missingFields.push('Område');
+    if(!a.sub) missingFields.push('Subområde');
+    if(!a.firma) missingFields.push('Firma');
+    if(!a.name||a.name==='(ny aktivitet)') missingFields.push('Aktivitetsnavn');
+    if(!a.fromDate) missingFields.push('Fra-dato');
+    if(!a.toDate) missingFields.push('Til-dato');
+    if(missingFields.length>0){
+      missing.push({id:a.id,name:a.name||'(uten navn)',area:a.area||'(uten område)',missingFields});
+    }
   });
-  if(gridApi) gridApi.redrawRows();
-  if(count) toast(`${count} rad(er) har manglende felt – uthevet`,'warn');
-  else toast('Alle rader er komplette','success');
+  if(missing.length===0){
+    toast('Alle aktiviteter har alle påkrevde felt fylt ut','success');
+    return;
+  }
+  // Bygg innhold i modal
+  const list=document.getElementById('missingList');
+  list.innerHTML=missing.map(m=>`
+    <button class="missing-item" onclick="goToActivity(${m.id})">
+      <div class="missing-item-name">${escapeHtml(m.name)}</div>
+      <div class="missing-item-meta">
+        <span class="missing-item-area">${escapeHtml(m.area)}</span>
+        <span class="missing-item-fields">Mangler: ${m.missingFields.map(f=>escapeHtml(f)).join(', ')}</span>
+      </div>
+    </button>
+  `).join('');
+  document.getElementById('missingCount').textContent=missing.length;
+  openModal('missingModal');
+}
+
+// Naviger til en spesifikk aktivitet og selekter raden. Brukes fra "Sjekk mangler"-modalen.
+// Naviger til en spesifikk aktivitet og selekter raden. Brukes fra "Sjekk mangler"-modalen.
+// Bytter til Alle-tab og slår av "Skjul fullførte" hvis nødvendig, slik at aktiviteten
+// alltid er synlig uavhengig av nåværende filter.
+function goToActivity(id){
+  closeModal('missingModal');
+  if(!gridApi) return;
+  const a=DATA.find(x=>x.id===id);
+  if(!a){toast('Aktiviteten finnes ikke','warn');return}
+
+  // Slå av filter som kan skjule raden
+  let filtersChanged=false;
+  if(activePlanFilter!=='alle'){
+    activePlanFilter='alle';
+    document.querySelectorAll('.plan-tab').forEach(x=>x.classList.remove('active'));
+    const alleTab=document.querySelector('.plan-tab[data-plan="alle"]');
+    if(alleTab) alleTab.classList.add('active');
+    filtersChanged=true;
+  }
+  if(a.fremdrift>=100&&!showCompleted){
+    showCompleted=true;
+    const btn=document.getElementById('toggleCompletedBtn');
+    if(btn){
+      btn.style.background='var(--orange)';
+      btn.style.color='white';
+      btn.style.borderColor='var(--orange)';
+    }
+    filtersChanged=true;
+  }
+  // Tøm søk og kolonne-filter (kan også skjule raden)
+  const searchInput=document.getElementById('searchInput');
+  if(searchInput&&searchInput.value){
+    searchInput.value='';
+    gridApi.setGridOption('quickFilterText','');
+    filtersChanged=true;
+  }
+  if(Object.keys(gridApi.getFilterModel()||{}).length>0){
+    gridApi.setFilterModel(null);
+    filtersChanged=true;
+  }
+  if(filtersChanged){
+    applyExternalFilters();
+    updateAvgFremdriftVisibility();
+    updateWalkthroughBtnState();
+  }
+
+  // Vent til ag-grid har oppdatert display-pipeline før vi finner noden
+  requestAnimationFrame(()=>{
+    const node=gridApi.getRowNode(String(id));
+    if(!node){
+      toast('Aktiviteten kunne ikke finnes i griddet','warn');
+      return;
+    }
+    gridApi.deselectAll();
+    node.setSelected(true);
+    if(node.rowIndex!=null) gridApi.ensureIndexVisible(node.rowIndex,'middle');
+    // Flash-effekt for å trekke oppmerksomhet til den valgte raden
+    setTimeout(()=>{
+      const rowEl=document.querySelector(`.ag-row[row-id="${id}"]`);
+      if(rowEl){
+        rowEl.style.transition='background .3s';
+        const orig=rowEl.style.backgroundColor;
+        rowEl.style.backgroundColor='#fef0d9';
+        setTimeout(()=>{rowEl.style.backgroundColor=orig;setTimeout(()=>rowEl.style.transition='',300);},800);
+      }
+    },50);
+  });
 }
 
 function exportPDF(){
-  toast('Genererer PDF (A3 liggende)... – mockup','warn');
+  toast('PDF-eksport leveres i produksjon via AG Grid Enterprise sin innebygde eksport-funksjon, ikke i prototypen','warn');
 }
 
 function refreshAfterListChange(){
@@ -6313,11 +6973,17 @@ function renderGantt(filtered){
     const left=offset*32;
     const width=Math.max(span*32,8);
     const cls=a.fremdrift>=100?'completed':(a.fromDate>TODAY?'future':'');
+    // Milepæl rendres som diamant i stedet for søyle. Plassering ved fra-dato
+    // (left+offset). Til-dato er lik fra-dato for milepæler så span er 0.
+    const labelPrefix=a.milepael?'♦ ':(a.kritisk?'⚠️ ':'');
+    const barHtml=a.milepael
+      ? `<div class="gantt-milepael" style="left:${left}px"></div>`
+      : `<div class="gantt-bar ${cls} ${a.kritisk?'kritisk':''}" style="left:${left}px;width:${width}px"></div>`;
     row.innerHTML=`
-      <div class="gantt-label" title="${escapeHtml(a.name)}">${a.kritisk?'⚠️ ':''}${escapeHtml(a.name)}</div>
+      <div class="gantt-label" title="${escapeHtml(a.name)}">${labelPrefix}${escapeHtml(a.name)}</div>
       <div class="gantt-track">
         ${Array.from({length:totalWeeks}).map(()=>'<div class="gantt-week"></div>').join('')}
-        <div class="gantt-bar ${cls} ${a.kritisk?'kritisk':''}" style="left:${left}px;width:${width}px"></div>
+        ${barHtml}
       </div>
     `;
     row.addEventListener('click',()=>{
@@ -6350,6 +7016,28 @@ function syncGanttSelection(){
 // ===== MODALS =====
 function openModal(id){document.getElementById(id).classList.add('visible')}
 function closeModal(id){document.getElementById(id).classList.remove('visible')}
+
+// Sentrert, applikasjonsstilet bekreft-modal som erstatter browserens
+// innebygde confirm(). Returnerer en Promise som resolves med true/false.
+function confirmDialog(opts){
+  return new Promise(resolve=>{
+    document.getElementById('confirmTitle').textContent=opts.title||'Bekreft';
+    document.getElementById('confirmMessage').textContent=opts.message||'';
+    const okBtn=document.getElementById('confirmOkBtn');
+    okBtn.textContent=opts.okText||'Bekreft';
+    okBtn.className='btn '+(opts.danger?'danger':'primary');
+    const onOk=()=>{cleanup();closeModal('confirmModal');resolve(true);};
+    const onCancel=()=>{cleanup();closeModal('confirmModal');resolve(false);};
+    const closeBtn=document.querySelector('#confirmModal .modal-close');
+    function cleanup(){
+      okBtn.removeEventListener('click',onOk);
+      closeBtn.removeEventListener('click',onCancel);
+    }
+    okBtn.addEventListener('click',onOk,{once:true});
+    closeBtn.addEventListener('click',onCancel,{once:true});
+    openModal('confirmModal');
+  });
+}
 
 function openLogg(id){
   const a=DATA.find(x=>x.id===id);
@@ -6480,7 +7168,7 @@ function confirmWorkshop(){
     DATA.unshift({
       id,area:e.area,sub:e.sub,firma:e.firma==='?'?'':e.firma,name:e.name,plan:'Hovedfremdriftsplan',
       fromDate:addDays(TODAY,7),toDate:addDays(TODAY,7+wks*7),
-      fremdrift:0,kommentar:'',kritisk:false,highlighted:false,
+      fremdrift:0,kommentar:'',kritisk:false,highlighted:false,milepael:false,
       sunn:emptySunn(),
       history:[{time:new Date(),user:'Jan Gunnar Helgaland',action:'Importert fra workshop',detail:'AI-strukturert fra tavlebilde'}]
     });
