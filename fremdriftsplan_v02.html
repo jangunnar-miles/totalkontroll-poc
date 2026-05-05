@@ -1653,10 +1653,10 @@ body.weekplan-active .ag-theme-quartz .ag-pinned-left-cols-container .ag-row-sel
 
         <div class="tool-group">
           <span class="tool-group-label">Datoer</span>
-          <button class="btn" onclick="shiftDays(1)" title="Behold varighet, flytt 1 dag">
+          <button class="btn" onclick="shiftDays(1)" title="Flytt 1 arbeidsdag (hopper over fridager basert på Man-Fre/Lør/Søn-velgeren)">
             +1 dag
           </button>
-          <button class="btn" onclick="shiftDays(7)" title="Behold varighet, flytt 1 uke">
+          <button class="btn" onclick="shiftDays(7)" title="Flytt 7 arbeidsdager (hopper over fridager basert på Man-Fre/Lør/Søn-velgeren)">
             +1 uke
           </button>
           <button class="btn" onclick="startToday()" title="Sett startdato til idag, behold varighet">
@@ -2326,6 +2326,28 @@ function weeksBetween(from,to){
   return Math.ceil((to-TODAY)/(86400000*7));
 }
 function addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r}
+
+// Forskyv dato med n arbeidsdager basert på dayCalc-velgeren.
+// dayCalc=5 (Man-Fre): hopp over lørdag (6) og søndag (0)
+// dayCalc=6 (Man-Lør): hopp over søndag (0)
+// dayCalc=7 (Man-Søn): ingen hopp, samme som addDays
+// Bruker getDay() der 0=søndag, 1=mandag, ..., 6=lørdag.
+function addWorkDays(d,n){
+  const dayCalc=parseInt(document.getElementById('dayCalc')?.value||'6');
+  if(dayCalc>=7) return addDays(d,n); // Man-Søn = ingen helgedager
+  const result=new Date(d);
+  const step=n>=0?1:-1;
+  let remaining=Math.abs(n);
+  while(remaining>0){
+    result.setDate(result.getDate()+step);
+    const dow=result.getDay();
+    // Hopp over fridager (men tell ikke som arbeidsdag)
+    const isHoliday=(dayCalc===5 && (dow===0||dow===6)) ||
+                     (dayCalc===6 && dow===0);
+    if(!isHoliday) remaining--;
+  }
+  return result;
+}
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 
 // Kuratert palett av distinkte, lyse pastellfarger - 14 stk for å sikre at
@@ -4467,11 +4489,22 @@ function newActivity(){
     sunn:emptySunn(),
     history:[{time:new Date(),user:'Jan Gunnar Helgaland',action:'Opprettet aktivitet',detail:'Manuelt opprettet'}]
   };
-  DATA.unshift(a);
+
+  // Bestem plassering: hvis en rad er valgt, plasser rett under den. Ellers øverst.
+  // Dette bevarer brukerens visuelle kontekst når de jobber seg gjennom listen i
+  // en gjennomgang og legger til aktiviteter etter hvert.
+  const sel=getSelected();
+  const anchor=sel.length>0?sel[0]:null;
+  let dataIndex=0; // default: øverst
+  if(anchor){
+    const idx=DATA.findIndex(x=>x.id===anchor.id);
+    if(idx>=0) dataIndex=idx+1;
+  }
+  DATA.splice(dataIndex,0,a);
 
   if(gridApi){
-    // Tøm aktive kolonnefiltre, søk og sortering så raden garantert havner øverst.
-    // Excel-lignende oppførsel: ny rad er alltid synlig på topp uavhengig av tilstand.
+    // Tøm aktive kolonnefiltre og søk så raden garantert havner synlig.
+    // Sortering tømmes også fordi den ellers vil overstyre vår plassering.
     const hadFilters=Object.keys(gridApi.getFilterModel()||{}).length>0
                    ||(document.getElementById('searchInput').value||'').length>0;
     const sortState=gridApi.getColumnState().filter(c=>c.sort);
@@ -4485,26 +4518,26 @@ function newActivity(){
       gridApi.applyColumnState({defaultState:{sort:null}});
     }
 
-    gridApi.applyTransaction({add:[a],addIndex:0});
+    // Bruk addIndex som matcher dataIndex så ag-grid setter raden riktig sted.
+    gridApi.applyTransaction({add:[a],addIndex:dataIndex});
 
-    // Velg den nye raden + scroll til toppen.
-    // Vi auto-åpner IKKE edit-modus - hvis brukeren hopper direkte til dato-cellen
-    // mens område er i edit-modus, kan ag-grid sitte fast med flere "in-flight"
-    // celler. Bruker klikker selv hvor hen vil starte. Excel-lignende: rad er
-    // tom og synlig, klikk hvor du vil begynne.
+    // Velg den nye raden og sørg for at den vises i visningen.
+    // Bruker 'middle' i stedet for 'top' så vi ikke scroller bort fra konteksten
+    // når brukeren jobber seg gjennom midt i listen.
     requestAnimationFrame(()=>{
       const node=gridApi.getRowNode(String(a.id));
       if(node){
         gridApi.deselectAll();
         node.setSelected(true);
-        gridApi.ensureIndexVisible(node.rowIndex,'top');
+        gridApi.ensureIndexVisible(node.rowIndex,anchor?'middle':'top');
       }
     });
 
     const msgs=[];
     if(hadFilters) msgs.push('filtre nullstilt');
     if(hadSort) msgs.push('sortering nullstilt');
-    toast(msgs.length?`Ny aktivitet lagt til (${msgs.join(', ')})`:'Ny aktivitet lagt til øverst','success');
+    const placement=anchor?'rett under valgt aktivitet':'øverst';
+    toast(msgs.length?`Ny aktivitet lagt til ${placement} (${msgs.join(', ')})`:`Ny aktivitet lagt til ${placement}`,'success');
   }
   updateStats();
   recordCommand({
@@ -4516,8 +4549,8 @@ function newActivity(){
       updateStats();
     },
     redo:()=>{
-      DATA.unshift(a);
-      if(gridApi)gridApi.applyTransaction({add:[a],addIndex:0});
+      DATA.splice(dataIndex,0,a);
+      if(gridApi)gridApi.applyTransaction({add:[a],addIndex:dataIndex});
       updateStats();
     }
   });
@@ -4598,10 +4631,20 @@ function confirmMultiNew(){
       sunn:emptySunn(),
       history:[{time:new Date(),user:'Jan Gunnar Helgaland',action:'Klargjort tom rad'}]
     };
-    DATA.unshift(a);
     newRows.push(a);
   }
-  // Tøm filtre og sortering så de nye radene havner på topp
+  // Plassering: rett under valgt aktivitet, ellers øverst.
+  // Multi-rader plasseres i samme rekkefølge fra valgt rad og nedover.
+  const sel=getSelected();
+  const anchor=sel.length>0?sel[0]:null;
+  let dataIndex=0;
+  if(anchor){
+    const idx=DATA.findIndex(x=>x.id===anchor.id);
+    if(idx>=0) dataIndex=idx+1;
+  }
+  DATA.splice(dataIndex,0,...newRows);
+
+  // Tøm filtre og sortering så de nye radene havner riktig sted
   if(gridApi){
     if(Object.keys(gridApi.getFilterModel()||{}).length>0){
       gridApi.setFilterModel(null);
@@ -4609,10 +4652,11 @@ function confirmMultiNew(){
     if(gridApi.getColumnState().some(c=>c.sort)){
       gridApi.applyColumnState({defaultState:{sort:null}});
     }
-    gridApi.applyTransaction({add:newRows,addIndex:0});
+    gridApi.applyTransaction({add:newRows,addIndex:dataIndex});
   }
   closeModal('multiNewModal');
-  toast(`${n} tomme rader klargjort øverst`,'success');
+  const placement=anchor?'rett under valgt aktivitet':'øverst';
+  toast(`${n} tomme rader klargjort ${placement}`,'success');
   updateStats();
   recordCommand({
     label:`${n} nye rader (multi)`,
@@ -4623,8 +4667,8 @@ function confirmMultiNew(){
       updateStats();
     },
     redo:()=>{
-      newRows.forEach(r=>DATA.unshift(r));
-      if(gridApi)gridApi.applyTransaction({add:newRows,addIndex:0});
+      DATA.splice(dataIndex,0,...newRows);
+      if(gridApi)gridApi.applyTransaction({add:newRows,addIndex:dataIndex});
       updateStats();
     }
   });
@@ -4663,9 +4707,18 @@ function confirmMultiNewWp(n,area,sub,firma){
     newActs.push(a);
     // Lag ukeplan-rad som peker til den
     const r=makeWeekplanRow('faseplan',{actId:a.id});
-    wp.rows.unshift(r);
     newRows.push(r);
   }
+  // Plassering: rett under valgt ukeplan-rad, ellers øverst.
+  const sel=getSelected();
+  const anchor=sel.length>0?sel[0]:null;
+  let rowIndex=0;
+  if(anchor && anchor._wpId!=null){
+    const idx=wp.rows.findIndex(x=>x.id===anchor._wpId);
+    if(idx>=0) rowIndex=idx+1;
+  }
+  wp.rows.splice(rowIndex,0,...newRows);
+
   if(gridApi){
     if(Object.keys(gridApi.getFilterModel()||{}).length>0){
       gridApi.setFilterModel(null);
@@ -4673,7 +4726,8 @@ function confirmMultiNewWp(n,area,sub,firma){
   }
   closeModal('multiNewModal');
   refreshAllWp();
-  toast(`${n} tomme rader klargjort øverst (synces til Faseplan)`,'success');
+  const placement=anchor?'rett under valgt aktivitet':'øverst';
+  toast(`${n} tomme rader klargjort ${placement} (synces til Faseplan)`,'success');
   recordCommand({
     label:`${n} nye rader (multi, ukeplan)`,
     undo:()=>{
@@ -4686,7 +4740,7 @@ function confirmMultiNewWp(n,area,sub,firma){
     redo:()=>{
       const w=WEEKPLANS[activeWeekKey];if(!w)return;
       newActs.forEach(a=>DATA.unshift(a));
-      newRows.forEach(r=>w.rows.unshift(r));
+      w.rows.splice(rowIndex,0,...newRows);
       refreshAllWp();
     }
   });
@@ -4933,20 +4987,22 @@ function shiftDays(n){
   }
   const ids=valid.map(a=>a.id);
   const before=valid.map(a=>({id:a.id,fromDate:new Date(a.fromDate),toDate:new Date(a.toDate)}));
+  // Bruker addWorkDays slik at lørdag/søndag hoppes over basert på Man-Fre/Lør/Søn-velgeren.
+  // For "+1 uke" sender vi 7 dager - addWorkDays teller 7 arbeidsdager, ikke 7 kalenderdager.
   valid.forEach(a=>{
-    a.fromDate=addDays(a.fromDate,n);
-    a.toDate=addDays(a.toDate,n);
-    a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:`Flyttet ${n} dag(er)`,detail:'Begge datoer'});
+    a.fromDate=addWorkDays(a.fromDate,n);
+    a.toDate=addWorkDays(a.toDate,n);
+    a.history.push({time:new Date(),user:'Jan Gunnar Helgaland',action:`Flyttet ${n} arbeidsdag(er)`,detail:'Begge datoer'});
   });
   rerenderRows(ids);
   const msg=skipped.length>0
-    ? `${valid.length} aktivitet(er) flyttet ${n} dag(er). ${skipped.length} hoppet over (manglet datoer)`
-    : `${sel.length} aktivitet(er) flyttet ${n} dag(er)`;
+    ? `${valid.length} aktivitet(er) flyttet ${n} arbeidsdag(er). ${skipped.length} hoppet over (manglet datoer)`
+    : `${sel.length} aktivitet(er) flyttet ${n} arbeidsdag(er)`;
   toast(msg,'success');
   recordCommand({
-    label:`Flyttet ${n} dag(er) (${ids.length} rad${ids.length===1?'':'er'})`,
+    label:`Flyttet ${n} arbeidsdag(er) (${ids.length} rad${ids.length===1?'':'er'})`,
     undo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a){a.fromDate=new Date(b.fromDate);a.toDate=new Date(b.toDate);}});rerenderRows(ids);},
-    redo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a){a.fromDate=addDays(b.fromDate,n);a.toDate=addDays(b.toDate,n);}});rerenderRows(ids);}
+    redo:()=>{before.forEach(b=>{const a=DATA.find(x=>x.id===b.id);if(a){a.fromDate=addWorkDays(b.fromDate,n);a.toDate=addWorkDays(b.toDate,n);}});rerenderRows(ids);}
   });
 }
 
@@ -5812,7 +5868,17 @@ function newWeekplanActivity(){
   const wp=ensureWeekplan(activeWeekKey);
   const a=createDataActivityFromWeekplan({weekKey:activeWeekKey});
   const r=makeWeekplanRow('faseplan',{actId:a.id});
-  wp.rows.unshift(r);
+
+  // Bestem plassering: rett under valgt ukeplan-rad hvis noe er valgt, ellers øverst.
+  // Bevarer brukerens visuelle kontekst i fremdriftsmøter.
+  const sel=getSelected();
+  const anchor=sel.length>0?sel[0]:null;
+  let rowIndex=0; // default: øverst
+  if(anchor && anchor._wpId!=null){
+    const idx=wp.rows.findIndex(x=>x.id===anchor._wpId);
+    if(idx>=0) rowIndex=idx+1;
+  }
+  wp.rows.splice(rowIndex,0,r);
 
   let filtersCleared=false;
   if(gridApi){
@@ -5825,7 +5891,8 @@ function newWeekplanActivity(){
 
   refreshAllWp();
 
-  toast(filtersCleared?'Ny aktivitet lagt til (filtre nullstilt)':'Ny aktivitet lagt til øverst (synces til Faseplan)','success');
+  const placement=anchor?'rett under valgt aktivitet':'øverst';
+  toast(filtersCleared?`Ny aktivitet lagt til ${placement} (filtre nullstilt)`:`Ny aktivitet lagt til ${placement} (synces til Faseplan)`,'success');
 
   if(gridApi){
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
@@ -5834,7 +5901,7 @@ function newWeekplanActivity(){
       gridApi.deselectAll();
       node.setSelected(true);
       if(node.rowIndex!=null){
-        gridApi.ensureIndexVisible(node.rowIndex,'top');
+        gridApi.ensureIndexVisible(node.rowIndex,anchor?'middle':'top');
         try{gridApi.startEditingCell({rowIndex:node.rowIndex,colKey:'name'});}catch(e){}
       }
     }));
@@ -5851,7 +5918,7 @@ function newWeekplanActivity(){
     redo:()=>{
       const w=WEEKPLANS[activeWeekKey];if(!w)return;
       DATA.unshift(a);
-      w.rows.unshift(r);
+      w.rows.splice(rowIndex,0,r);
       refreshAllWp();
     }
   });
