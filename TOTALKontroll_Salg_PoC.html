@@ -4,14 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TOTALKontroll — Salg</title>
-<script src="tk-nav.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
   *{margin:0;padding:0;box-sizing:border-box}
-  :root{--navy:#1a2744;--orange:#e67e22;--orange-faded:rgba(230,126,34,0.08);--white:#fff;--g50:#f8f9fa;--g100:#f1f3f5;--g200:#e9ecef;--g300:#dee2e6;--g400:#ced4da;--g500:#adb5bd;--g600:#868e96;--g700:#495057;--g800:#343a40;--red:#e74c3c;--red-bg:rgba(231,76,60,0.06);--red-border:rgba(231,76,60,0.25);--green:#27ae60;--green-bg:rgba(39,174,96,0.1)}
+  :root{--navy:#1a2744;--orange:#e67e22;--orange-faded:rgba(230,126,34,0.08);--white:#fff;--g50:#f8f9fa;--g100:#f1f3f5;--g200:#e9ecef;--g300:#dee2e6;--g400:#ced4da;--g500:#adb5bd;--g600:#868e96;--g700:#495057;--g800:#343a40;--red:#e74c3c;--red-bg:rgba(231,76,60,0.06);--red-border:rgba(231,76,60,0.25);--green:#27ae60;--green-bg:rgba(39,174,96,0.1);--sidebar-w:220px}
   body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--g50);color:var(--g800);min-height:100vh;display:flex}
-  .main{flex:1;display:flex;flex-direction:column;min-height:100vh}
+  .sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--navy);color:var(--white);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+  .sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px 20px 28px;border-bottom:1px solid rgba(255,255,255,0.06)}
+  .logo-icon{width:34px;height:34px;background:var(--orange);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:var(--white)}
+  .logo-text{font-size:14px;font-weight:600;letter-spacing:.5px}.logo-text span{color:var(--orange)}
+  .sidebar-nav{padding:16px 0;flex:1}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:11px 24px;font-size:14px;font-weight:500;color:rgba(255,255,255,0.5);cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+  .nav-item:hover{color:rgba(255,255,255,0.8);background:rgba(255,255,255,0.04)}
+  .nav-item.active{color:var(--white);background:rgba(230,126,34,0.12);border-left-color:var(--orange)}
+  .nav-icon{font-size:18px;width:22px;text-align:center}
+  .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
   .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 32px;background:var(--white);border-bottom:1px solid var(--g200);gap:16px}
   .topbar-user{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;color:var(--g700)}
   .role-selector{display:flex;align-items:center}
@@ -39,6 +48,9 @@
   .chart-expand-inner{padding:0 24px 24px}
   .chart-tease{height:40px;background:linear-gradient(to bottom,rgba(255,255,255,0),var(--white));pointer-events:none;margin-top:-40px;position:relative;z-index:1;transition:opacity .3s}
   .chart-section.expanded .chart-tease{opacity:0;height:0;margin:0}
+  .gantt-legend{display:flex;flex-wrap:wrap;gap:14px;margin:12px 0 16px;padding:10px 12px;background:var(--g50);border-radius:8px}
+  .gantt-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--g700)}
+  .gantt-legend-swatch{width:14px;height:10px;border-radius:2px;border:1px solid rgba(0,0,0,0.1)}
   .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;padding-top:4px;border-top:1px solid var(--g100)}
   .chart-title{font-size:15px;font-weight:600;color:var(--navy)}.chart-subtitle{font-size:12px;color:var(--g500);margin-top:2px}
   .chart-kpis{display:flex;gap:24px}.kpi{text-align:right}
@@ -195,6 +207,9 @@
   .note-save{padding:6px 14px;background:var(--navy);color:var(--white);border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}.note-save:hover{background:#2d3f63}
   .note-cancel{padding:6px 14px;background:var(--white);color:var(--g600);border:1px solid var(--g300);border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}.note-cancel:hover{background:var(--g50)}
   .note-textarea{width:100%;min-height:80px;padding:10px 12px;border:1px solid var(--g300);border-radius:8px;font-size:13px;font-family:inherit;color:var(--g800);resize:vertical;outline:none;line-height:1.5;transition:border-color .15s}.note-textarea:focus{border-color:var(--orange);box-shadow:0 0 0 2px rgba(230,126,34,0.1)}
+  @media(max-width:1200px){
+    .sidebar{width:60px}.sidebar .logo-text,.sidebar .nav-label,.nav-sub{display:none}.sidebar-logo{padding:16px;justify-content:center}.nav-item{padding:12px;justify-content:center}.main{margin-left:60px}
+  }
   @media(max-width:1400px){
     .content{padding:20px 20px}
     .topbar{padding:10px 20px}
@@ -251,9 +266,47 @@
     .chart-expand-inner{padding:0 14px 14px}
     .chart-header{margin-bottom:10px}
   }
+  /* LOGIN */
+  .login-overlay{position:fixed;inset:0;background:var(--navy);z-index:9999;display:flex;align-items:center;justify-content:center}
+  .login-overlay.hidden{display:none}
+  .login-box{background:var(--white);border-radius:16px;padding:40px;width:360px;max-width:90vw;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+  .login-logo{width:50px;height:50px;background:var(--orange);border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;color:var(--white);margin-bottom:16px}
+  .login-title{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:4px}
+  .login-sub{font-size:13px;color:var(--g500);margin-bottom:24px}
+  .login-input{width:100%;padding:12px 16px;border:1px solid var(--g300);border-radius:10px;font-size:14px;font-family:inherit;outline:none;text-align:center;transition:border-color .15s;letter-spacing:2px}.login-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(230,126,34,0.1)}
+  .login-input.err{border-color:var(--red);animation:shake .3s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .login-btn{width:100%;padding:12px;background:var(--orange);color:var(--white);border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:12px;transition:background .15s}.login-btn:hover{background:#d35400}
+  .login-err{font-size:12px;color:var(--red);margin-top:8px;min-height:18px}
 </style>
 </head>
 <body>
+<!-- LOGIN -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div style="margin-bottom:16px"><svg viewBox="0 0 100 90" style="width:50px;height:50px"><rect x="8" y="4" width="84" height="18" rx="2" fill="#E87722"/><rect x="8" y="30" width="36" height="56" rx="2" fill="#E87722"/><rect x="56" y="30" width="36" height="56" rx="2" fill="#E87722"/></svg></div>
+    <div class="login-title"><span style="color:#E87722">TOTAL</span>Kontroll</div>
+    <div class="login-sub">Ledelsessystem — DEMO</div>
+    <input class="login-input" id="loginPw" type="password" placeholder="Passord" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Logg inn</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+</div>
+<svg style="display:none"><symbol id="tb-logo" viewBox="0 0 100 90"><rect x="8" y="4" width="84" height="18" rx="2" fill="#E87722"/><rect x="8" y="30" width="36" height="56" rx="2" fill="#E87722"/><rect x="56" y="30" width="36" height="56" rx="2" fill="#E87722"/></symbol></svg>
+<aside class="sidebar">
+  <div class="sidebar-logo"><svg style="width:30px;height:30px" viewBox="0 0 100 90"><use href="#tb-logo"/></svg><div class="logo-text"><span>TOTAL</span>KONTROLL</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="nav-label">Min side</span></div>
+    <a class="nav-item active" href="TOTALKontroll_Salg_PoC.html" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span class="nav-label">Salg</span></a>
+    <a class="nav-item" href="TOTALKontroll_Muligheter.html" style="text-decoration:none;padding-left:32px;font-size:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span class="nav-label">Muligheter</span></a>
+    <a class="nav-item" href="TOTALKontroll_Markedsanalyse.html" style="text-decoration:none;padding-left:32px;font-size:12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><span class="nav-label">Markedsanalyse</span></a>
+    <a class="nav-item" href="prosjekt_poc_light.html" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span class="nav-label">Prosjekt</span></a>
+    <div class="nav-sub"><a class="nav-item" href="TOTALKontroll_Fremdriftsplan.html" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Fremdriftsplan</a></div>
+    <a class="nav-item" href="#" style="text-decoration:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:17px;height:17px"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="nav-label">Håndbok</span></a>
+  </nav>
+  <div style="padding:14px 18px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:rgba(255,255,255,0.4);font-weight:500">Konseptvisning, kun demo data</div>
+</aside>
 <div class="main">
   <div class="topbar">
     <div></div>
@@ -294,6 +347,42 @@
           <div class="chart-container"><canvas id="prognosisChart"></canvas></div>
         </div>
         <div class="chart-tease" id="chartTease"></div>
+      </div>
+    </div>
+    <!-- GANTT TIMELINE SECTION -->
+    <div class="chart-section" id="ganttSection">
+      <div class="chart-bar" onclick="toggleGantt()">
+        <div class="chart-bar-left">
+          <div class="chart-bar-title">Tidslinje</div>
+          <div class="chart-kpis">
+            <div class="kpi"><div class="kpi-value" id="kpi-active">—</div><div class="kpi-label">Aktive prosjekter</div></div>
+            <div class="kpi"><div class="kpi-value" id="kpi-overlap">—</div><div class="kpi-label">Maks samtidig</div></div>
+          </div>
+          <button class="chart-expand-btn" id="ganttExpandBtn">Vis tidslinje <span class="chevron" id="ganttChevron">&#9660;</span></button>
+        </div>
+      </div>
+      <div class="chart-expandable" id="ganttExpandable" onclick="event.stopPropagation()">
+        <div class="chart-expand-inner">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Ordreserve over tid</div>
+              <div class="chart-subtitle">Oppstart og varighet per prosjekt. Farge = prosjekttype. Lavere opacitet = lavere sannsynlighet. Tapt ekskludert.</div>
+              <div style="display:flex;gap:4px;margin-top:8px;align-items:center;flex-wrap:wrap">
+                <span style="font-size:11px;color:var(--g500);margin-right:4px">Periode:</span>
+                <button class="chart-lock-tab active" data-gp="24" onclick="setGanttPeriod(24)">24 mnd</button>
+                <button class="chart-lock-tab" data-gp="36" onclick="setGanttPeriod(36)">36 mnd</button>
+                <button class="chart-lock-tab" data-gp="48" onclick="setGanttPeriod(48)">48 mnd</button>
+                <span style="font-size:11px;color:var(--g500);margin:0 4px 0 12px">Vis:</span>
+                <button class="chart-lock-tab active" data-gf="all" onclick="setGanttFilter('all')">Alle</button>
+                <button class="chart-lock-tab" data-gf="locked" onclick="setGanttFilter('locked')">&#128274; Låst</button>
+                <button class="chart-lock-tab" data-gf="open" onclick="setGanttFilter('open')">&#128275; Åpne</button>
+              </div>
+            </div>
+          </div>
+          <div class="gantt-legend" id="ganttLegend"></div>
+          <div class="chart-container" style="height:auto;min-height:200px;cursor:default"><canvas id="ganttChart"></canvas></div>
+        </div>
+        <div class="chart-tease" id="ganttTease"></div>
       </div>
     </div>
     <div class="tabs" id="statusTabs">
@@ -385,6 +474,18 @@
   </div>
 </div>
 <script>
+// ═══ LOGIN ═══
+function doLogin(){const pw=document.getElementById('loginPw').value;if(pw==='DF2026'){document.getElementById('loginOverlay').classList.add('hidden');sessionStorage.setItem('tk_auth','1');}else{document.getElementById('loginPw').classList.add('err');document.getElementById('loginErr').textContent='Feil passord';setTimeout(()=>{document.getElementById('loginPw').classList.remove('err');},300);}}
+if(sessionStorage.getItem('tk_auth')==='1')document.getElementById('loginOverlay').classList.add('hidden');
+
+// ═══ FEATURE FLAGS ═══
+// FEATURE_DALUX_INTEGRATION: Toggles the Dalux Box column and "create project" modal.
+// Currently disabled (false) because Dalux API access is not yet provisioned.
+// When set to true: the Dalux column appears in the table, the "+" button on rows
+// without daluxLink becomes visible, and the openDlxCreate flow works as specified.
+// All Dalux-related code (column definition, cell renderer, modal, dlxCreate function,
+// data field daluxLink) remains intact regardless of flag value.
+const FEATURE_DALUX_INTEGRATION=false;
 const STATUS_OPTIONS=['Lead','Gi pris','Tilbud sendt','Ikke sendt tilbud','Vunnet','Tapt'];
 const AVDELINGER=['Bryne','Stavanger','Bodø','Oslo'];
 const PROSJEKTTYPER=['Totalentreprise Næring','Totalentreprise Bolig','Totalentreprise Fisk','Betongentreprise'];
@@ -462,7 +563,7 @@ function getFiltered(){
   });}return d;
 }
 
-function getVisCols(){return colOrder.filter(id=>{const c=gc(id);if(!c)return false;if(id==='warning'||id==='delete')return true;return visibleCols.has(id);});}
+function getVisCols(){return colOrder.filter(id=>{const c=gc(id);if(!c)return false;if(id==='dalux'&&!FEATURE_DALUX_INTEGRATION)return false;if(id==='warning'||id==='delete')return true;return visibleCols.has(id);});}
 function renderHeader(){
   const cols=getVisCols();
   document.getElementById('headerRow').innerHTML=cols.map(id=>{const c=gc(id);if(!c)return'';
@@ -521,7 +622,7 @@ function renderTable(){
     }
     return rowHtml;
   }).join('');
-  updateCounts();updateKPIs();updateChart();
+  updateCounts();updateKPIs();updateChart();renderGantt();
   // Footer sums
   const sumStr=rows.reduce((s,r)=>s+(r.storrelse||0),0);
   const sumWt=rows.reduce((s,r)=>{if(r.status==='Tapt')return s;if(r.status==='Vunnet')return s+(r.storrelse||0);const p=getPW(r.pvekt);return s+(r.storrelse||0)*(p?p.weight:0);},0);
@@ -578,7 +679,7 @@ function addNewRow(){data.unshift({id:nextId++,status:'Lead',prosjektnavn:'',avd
 function toggleColMenu(){document.getElementById('colMenu').classList.toggle('open');}
 document.addEventListener('click',e=>{const m=document.getElementById('colMenu');if(m&&m.classList.contains('open')&&!e.target.closest('.col-menu')&&!e.target.closest('.col-toggle-btn'))m.classList.remove('open');});
 function renderColMenu(){
-  const toggleable=COLS.filter(c=>c.id!=='warning'&&c.id!=='delete');
+  const toggleable=COLS.filter(c=>c.id!=='warning'&&c.id!=='delete'&&!(c.id==='dalux'&&!FEATURE_DALUX_INTEGRATION));
   document.getElementById('colMenu').innerHTML=toggleable.map(c=>{
     const checked=visibleCols.has(c.id)?'checked':'';
     return`<label><input type="checkbox" ${checked} onchange="toggleCol('${c.id}',this.checked)"> ${c.label||c.id}</label>`;
@@ -791,14 +892,116 @@ function updateChart(){
   renderYearCards();
 }
 function ccf(){chartFilter=null;renderTable();}
-function setLockFilter(v){chartLockFilter=v;document.querySelectorAll('.chart-lock-tab').forEach(b=>b.classList.toggle('active',b.dataset.lf===v));updateKPIs();updateChart();}
+function setLockFilter(v){chartLockFilter=v;document.querySelectorAll('.chart-section:not(#ganttSection) .chart-lock-tab[data-lf]').forEach(b=>b.classList.toggle('active',b.dataset.lf===v));updateKPIs();updateChart();renderGantt();}
 let chartExpanded=false;
 function toggleChart(){
   chartExpanded=!chartExpanded;
-  document.querySelector('.chart-section').classList.toggle('expanded',chartExpanded);
+  document.querySelector('.chart-section:not(#ganttSection)').classList.toggle('expanded',chartExpanded);
   const btn=document.getElementById('chartExpandBtn');
   btn.childNodes[0].textContent=chartExpanded?'Skjul graf ':'Vis graf ';
   if(chartExpanded&&chart)chart.resize();
+}
+
+// ═══ GANTT ═══
+let ganttChart=null;
+let ganttExpanded=false;
+let ganttPeriodMonths=24;
+let ganttFilter='all';
+function toggleGantt(){
+  ganttExpanded=!ganttExpanded;
+  document.getElementById('ganttSection').classList.toggle('expanded',ganttExpanded);
+  const btn=document.getElementById('ganttExpandBtn');
+  btn.childNodes[0].textContent=ganttExpanded?'Skjul tidslinje ':'Vis tidslinje ';
+  if(ganttExpanded){setTimeout(()=>{if(ganttChart)ganttChart.resize();else renderGantt();},50);}
+}
+function setGanttPeriod(m){ganttPeriodMonths=m;document.querySelectorAll('#ganttSection .chart-lock-tab[data-gp]').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.gp)===m));renderGantt();}
+function setGanttFilter(v){ganttFilter=v;document.querySelectorAll('#ganttSection .chart-lock-tab[data-gf]').forEach(b=>b.classList.toggle('active',b.dataset.gf===v));renderGantt();}
+function getGanttRows(){
+  let rows=data.filter(r=>r.status!=='Tapt'&&r.oppstart&&r.lengde);
+  if(ganttFilter==='locked')rows=rows.filter(r=>r.locked);
+  else if(ganttFilter==='open')rows=rows.filter(r=>!r.locked);
+  return rows.sort((a,b)=>new Date(a.oppstart)-new Date(b.oppstart));
+}
+function statusOpacity(s){if(s==='Vunnet')return 1;if(s==='Tilbud sendt')return .75;if(s==='Gi pris')return .55;if(s==='Lead'||s==='Ikke sendt tilbud')return .35;return .5;}
+function renderGantt(){
+  const rows=getGanttRows();
+  // KPIs: active + max overlap
+  document.getElementById('kpi-active').textContent=rows.length;
+  // Max overlap calc: for each month, count active projects, find max
+  if(rows.length){
+    const today=new Date();const start=new Date(today.getFullYear(),today.getMonth(),1);
+    let maxOv=0;
+    for(let m=0;m<ganttPeriodMonths;m++){
+      const mDate=new Date(start.getFullYear(),start.getMonth()+m,15);
+      const count=rows.filter(r=>{const s=new Date(r.oppstart);const e=new Date(s.getFullYear(),s.getMonth()+r.lengde,1);return mDate>=s&&mDate<e;}).length;
+      if(count>maxOv)maxOv=count;
+    }
+    document.getElementById('kpi-overlap').textContent=maxOv;
+  } else {document.getElementById('kpi-overlap').textContent='0';}
+  // Legend
+  const types=['Totalentreprise Næring','Totalentreprise Bolig','Totalentreprise Fisk','Betongentreprise'];
+  document.getElementById('ganttLegend').innerHTML=
+    types.map(t=>`<div class="gantt-legend-item"><span class="gantt-legend-swatch" style="background:${TC[t].border}"></span>${t}</div>`).join('')+
+    '<div style="width:1px;background:var(--g300);margin:0 4px"></div>'+
+    '<div class="gantt-legend-item"><span class="gantt-legend-swatch" style="background:var(--navy);opacity:1"></span>Vunnet (100%)</div>'+
+    '<div class="gantt-legend-item"><span class="gantt-legend-swatch" style="background:var(--navy);opacity:.75"></span>Tilbud sendt</div>'+
+    '<div class="gantt-legend-item"><span class="gantt-legend-swatch" style="background:var(--navy);opacity:.55"></span>Gi pris</div>'+
+    '<div class="gantt-legend-item"><span class="gantt-legend-swatch" style="background:var(--navy);opacity:.35"></span>Lead</div>';
+
+  if(!rows.length){
+    if(ganttChart){ganttChart.destroy();ganttChart=null;}
+    const cv=document.getElementById('ganttChart');const ctx=cv.getContext('2d');cv.height=120;ctx.clearRect(0,0,cv.width,cv.height);ctx.font='13px DM Sans';ctx.fillStyle='#adb5bd';ctx.textAlign='center';ctx.fillText('Ingen prosjekter med oppstart og lengde å vise',cv.width/2,60);
+    return;
+  }
+  const today=new Date();
+  const startDate=new Date(today.getFullYear(),today.getMonth(),1);
+  const endDate=new Date(startDate.getFullYear(),startDate.getMonth()+ganttPeriodMonths,1);
+  // Adjust canvas height to fit rows
+  const cv=document.getElementById('ganttChart');
+  cv.parentElement.style.height=Math.max(200,40+rows.length*32)+'px';
+
+  const labels=rows.map(r=>(r.prosjektnavn||'(uten navn)').length>32?(r.prosjektnavn||'(uten navn)').substring(0,30)+'…':(r.prosjektnavn||'(uten navn)'));
+  const barData=rows.map(r=>{
+    const s=new Date(r.oppstart);
+    const e=new Date(s.getFullYear(),s.getMonth()+r.lengde,1);
+    return [s.getTime(),e.getTime()];
+  });
+  const bgColors=rows.map(r=>{
+    const tc=TC[r.prosjekttype];if(!tc)return 'rgba(108,117,125,'+statusOpacity(r.status)+')';
+    const m=tc.border.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);if(!m)return tc.border;
+    const rr=parseInt(m[1],16),gg=parseInt(m[2],16),bb=parseInt(m[3],16);
+    return `rgba(${rr},${gg},${bb},${statusOpacity(r.status)})`;
+  });
+  const borderColors=rows.map(r=>{
+    const tc=TC[r.prosjekttype];if(!tc)return `rgba(108,117,125,${statusOpacity(r.status)})`;
+    const m=tc.border.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);if(!m)return tc.border;
+    const rr=parseInt(m[1],16),gg=parseInt(m[2],16),bb=parseInt(m[3],16);
+    // Lead: full-opacity border to make dashed outline visible. Others: match fill opacity.
+    const op=r.status==='Lead'?1:statusOpacity(r.status);
+    return`rgba(${rr},${gg},${bb},${op})`;
+  });
+  const borderDash=rows.map(r=>r.status==='Lead'?[4,3]:[]);
+
+  const cfg={
+    type:'bar',
+    data:{labels,datasets:[{
+      label:'Prosjekt',data:barData,backgroundColor:bgColors,borderColor:borderColors,borderWidth:rows.map(r=>r.status==='Lead'?2:0),borderSkipped:false,borderRadius:4,barPercentage:.75,
+      _meta:rows
+    }]},
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(26,39,68,0.95)',titleFont:{family:'DM Sans',size:12},bodyFont:{family:'DM Sans',size:11},padding:10,cornerRadius:6,callbacks:{
+        title:items=>{const r=rows[items[0].dataIndex];return r.prosjektnavn||'(uten navn)';},
+        label:item=>{const r=rows[item.dataIndex];const s=new Date(r.oppstart);const e=new Date(s.getFullYear(),s.getMonth()+r.lengde,1);return [r.status+(r.locked?' 🔒':''),'Periode: '+s.toLocaleDateString('nb-NO',{month:'short',year:'numeric'})+' → '+e.toLocaleDateString('nb-NO',{month:'short',year:'numeric'}),'Varighet: '+r.lengde+' mnd','Verdi: '+(r.storrelse||0).toFixed(1)+' MNOK',r.prosjekttype||''];}
+      }}},
+      scales:{
+        x:{type:'time',min:startDate.getTime(),max:endDate.getTime(),time:{unit:ganttPeriodMonths<=24?'month':'quarter'},grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'DM Sans',size:10},maxRotation:0,callback:(v)=>{const d=new Date(v);if(ganttPeriodMonths<=24)return d.toLocaleDateString('nb-NO',{month:'short',year:'2-digit'}).replace('.','');return'Kv'+(Math.floor(d.getMonth()/3)+1)+' '+String(d.getFullYear()).slice(-2);}}},
+        y:{grid:{display:false},ticks:{font:{family:'DM Sans',size:11},autoSkip:false}}
+      }
+    }
+  };
+  if(ganttChart){ganttChart.destroy();}
+  ganttChart=new Chart(document.getElementById('ganttChart'),cfg);
 }
 
 // ═══ LUKKEMØTE MODAL ═══
