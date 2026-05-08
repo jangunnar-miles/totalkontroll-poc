@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOTALKontroll Dev Arena</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #1a2744;
+    --navy-deep: #0f1a30;
+    --navy-light: #2a3a5c;
+    --orange: #e67e22;
+    --orange-deep: #ba6017;
+    --blue-corner: #185FA5;
+    --blue-corner-light: #378ADD;
+    --blue-corner-glow: rgba(55, 138, 221, 0.4);
+    --orange-corner: #BA7517;
+    --orange-corner-light: #EF9F27;
+    --orange-corner-glow: rgba(239, 159, 39, 0.4);
+    --rope-red: #c1272d;
+    --gold: #d4a017;
+    --bg: #f5f3ee;
+    --bg-card: #ffffff;
+    --border: #e0ddd4;
+    --text: #1a1a1a;
+    --text-muted: #6a6a6a;
+    --text-dim: #999;
+    --success: #2d7a4f;
+    --warning: #c97817;
+    --danger: #b3261e;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ========== LOGIN ========== */
+  #login-screen {
+    position: fixed; inset: 0;
+    background: linear-gradient(135deg, var(--navy-deep), var(--navy));
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+  }
+  .login-card {
+    background: var(--bg-card);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    width: 360px;
+  }
+  .login-card h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: var(--navy); }
+  .login-card .subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+  .login-card input {
+    width: 100%; padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: inherit; font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .login-card input:focus { outline: 2px solid var(--orange); outline-offset: -1px; }
+  .login-card button {
+    width: 100%; padding: 10px;
+    background: var(--navy); color: white;
+    border: none; border-radius: 6px;
+    font-family: inherit; font-size: 14px; font-weight: 500;
+    cursor: pointer;
+  }
+  .login-card button:hover { background: var(--navy-light); }
+  .login-error { color: var(--danger); font-size: 13px; margin-top: 8px; min-height: 18px; }
+
+  /* ========== LAYOUT ========== */
+  #app { display: none; }
+  #app.active { display: flex; min-height: 100vh; }
+
+  aside.sidebar {
+    width: 228px;
+    background: var(--navy);
+    color: rgba(255,255,255,0.9);
+    padding: 24px 0;
+    flex-shrink: 0;
+    position: sticky; top: 0;
+    height: 100vh;
+  }
+  .sidebar-brand { padding: 0 24px 24px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .sidebar-brand .logo { font-weight: 700; font-size: 18px; color: white; }
+  .sidebar-brand .tagline { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .sidebar-section-title {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: rgba(255,255,255,0.4);
+    padding: 20px 24px 8px;
+  }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 24px;
+    color: rgba(255,255,255,0.75);
+    text-decoration: none; font-size: 14px;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+  }
+  .sidebar-link:hover { background: rgba(255,255,255,0.05); color: white; }
+  .sidebar-link.active {
+    background: rgba(230,126,34,0.1);
+    color: white;
+    border-left-color: var(--orange);
+    font-weight: 500;
+  }
+  .sidebar-link .icon-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+  .sidebar-link.active .icon-dot { background: var(--orange); }
+
+  main { flex: 1; padding: 32px 40px; }
+
+  /* ========== HEADER ========== */
+  .page-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-header h1 { font-size: 24px; font-weight: 700; color: var(--navy); }
+  .page-header .breadcrumb { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .badge {
+    font-size: 11px; padding: 4px 10px; border-radius: 4px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+  .badge.live { background: #fee; color: var(--danger); border-color: #f8c5c5; font-weight: 500; }
+  .badge.live::before {
+    content: '●'; margin-right: 4px;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ========== VIEWS ========== */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ========== SETUP VIEW ========== */
+  .setup-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+  .setup-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+  }
+  .setup-card h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--navy); }
+
+  .scenario-list { display: flex; flex-direction: column; gap: 8px; }
+  .scenario-item {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .scenario-item:hover { border-color: var(--navy); background: #fafaf7; }
+  .scenario-item.selected {
+    border-color: var(--orange);
+    background: #fff8f0;
+    border-width: 2px;
+    padding: 13px 15px;
+  }
+  .scenario-item .label-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 4px;
+  }
+  .scenario-item .id { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--orange); font-weight: 500; }
+  .scenario-item .type {
+    font-size: 10px; padding: 2px 6px; border-radius: 3px;
+    background: var(--navy); color: white;
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .scenario-item .type.feil { background: var(--danger); }
+  .scenario-item .type.endre { background: var(--text-muted); }
+  .scenario-item .title { font-size: 14px; font-weight: 500; color: var(--navy); margin-bottom: 4px; }
+  .scenario-item .desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+  .config-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .config-row:last-child { border: 0; }
+  .config-row .label { color: var(--text-muted); }
+  .config-row .value { font-weight: 500; }
+
+  .btn-primary {
+    background: var(--orange); color: white;
+    border: none; border-radius: 6px;
+    padding: 12px 20px;
+    font-family: inherit; font-size: 14px; font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 16px;
+  }
+  .btn-primary:hover { background: var(--orange-deep); }
+  .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+
+  /* ========== TALE OF THE TAPE ========== */
+  .tape {
+    background: linear-gradient(135deg, var(--navy-deep), var(--navy));
+    color: white;
+    border-radius: 12px;
+    padding: 24px 32px;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 32px;
+    align-items: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+  .tape .corner-info { text-align: center; }
+  .tape .corner-info.left { text-align: right; }
+  .tape .corner-info.right { text-align: left; }
+  .tape .corner-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; margin-bottom: 4px; }
+  .tape .fighter-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .tape .fighter-handler { font-size: 13px; opacity: 0.8; }
+  .tape .vs {
+    font-size: 36px; font-weight: 700;
+    color: var(--orange);
+    text-shadow: 0 0 20px rgba(230,126,34,0.5);
+  }
+  .tape .tale-stats {
+    grid-column: 1 / -1;
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px; margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+  }
+  .tape .stat-block .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.5; }
+  .tape .stat-block .stat-value { font-size: 14px; font-weight: 500; margin-top: 4px; }
+
+  /* ========== ARENA ========== */
+  .arena-grid {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .ring-container {
+    background: linear-gradient(180deg, #0a0e1c 0%, #1a2744 100%);
+    border-radius: 12px;
+    padding: 32px 16px 16px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+
+  .arena-bg {
+    position: absolute; inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .doc-spectator {
+    position: absolute;
+    width: 14px; height: 18px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 1px;
+    border: 0.5px solid rgba(255,255,255,0.06);
+  }
+  .spotlight {
+    position: absolute;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.25;
+    pointer-events: none;
+  }
+  .spotlight.left { background: var(--blue-corner-light); top: -60px; left: 80px; }
+  .spotlight.right { background: var(--orange-corner-light); top: -60px; right: 80px; }
+
+  .ring-svg {
+    width: 100%;
+    height: 360px;
+    display: block;
+    position: relative;
+    z-index: 1;
+  }
+
+  .round-banner {
+    position: absolute;
+    top: 12px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--rope-red);
+    color: white;
+    padding: 6px 18px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    z-index: 2;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .round-banner.flash { animation: roundFlash 0.6s; }
+  @keyframes roundFlash {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.4); background: var(--gold); color: var(--navy); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+
+  .health-bar-row {
+    display: flex; justify-content: space-between;
+    padding: 0 24px;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .health-bar-side { flex: 1; }
+  .health-bar-side.right { text-align: right; }
+  .health-bar-side .name {
+    color: white; font-size: 13px; font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .health-bar-side .name.blue { color: var(--blue-corner-light); }
+  .health-bar-side .name.orange { color: var(--orange-corner-light); }
+  .health-bar {
+    height: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.2);
+    max-width: 280px;
+  }
+  .health-bar-side.right .health-bar { margin-left: auto; }
+  .health-fill {
+    height: 100%;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .health-fill.blue { background: linear-gradient(90deg, var(--blue-corner), var(--blue-corner-light)); }
+  .health-fill.orange { background: linear-gradient(270deg, var(--orange-corner), var(--orange-corner-light)); }
+
+  .impact-flash {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.5) 0%, transparent 70%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .impact-flash.active { animation: flashImpact 0.4s; }
+  @keyframes flashImpact {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* ========== COMMENTARY ========== */
+  .commentary {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+  }
+  .commentary h3 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-muted); margin-bottom: 12px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .commentary-feed {
+    flex: 1; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 10px;
+    padding-right: 4px;
+  }
+  .commentary-feed::-webkit-scrollbar { width: 4px; }
+  .commentary-feed::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .comment {
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: #fafaf7;
+    border-left: 3px solid var(--border);
+    animation: slideIn 0.3s;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .comment .speaker {
+    font-weight: 500; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.05em; margin-bottom: 4px;
+    display: flex; justify-content: space-between;
+  }
+  .comment.blue { border-left-color: var(--blue-corner); }
+  .comment.blue .speaker { color: var(--blue-corner); }
+  .comment.orange { border-left-color: var(--orange-corner); }
+  .comment.orange .speaker { color: var(--orange-corner); }
+  .comment.referee { border-left-color: var(--text-muted); background: #f0eee8; }
+  .comment.referee .speaker { color: var(--text-muted); }
+  .comment .time { color: var(--text-dim); font-weight: 400; }
+  .comment .body { color: var(--text); }
+
+  /* ========== CORNERS ========== */
+  .corners-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+  .corner-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .corner-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .corner-panel.blue::before { background: var(--blue-corner); }
+  .corner-panel.orange::before { background: var(--orange-corner); }
+
+  .corner-header { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+  .corner-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: white;
+  }
+  .corner-avatar.blue { background: var(--blue-corner); }
+  .corner-avatar.orange { background: var(--orange-corner); }
+  .corner-meta .role {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-muted);
+  }
+  .corner-meta .name { font-size: 15px; font-weight: 500; color: var(--navy); }
+  .corner-status {
+    margin-left: auto;
+    font-size: 11px; padding: 4px 10px; border-radius: 4px;
+    background: #f0eee8; color: var(--text-muted);
+  }
+  .corner-status.ready { background: #e6f4ec; color: var(--success); font-weight: 500; }
+  .corner-status.thinking { background: #fef4e0; color: var(--warning); font-weight: 500; }
+
+  .corner-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    resize: vertical;
+    background: #fdfcfa;
+  }
+  .corner-textarea:focus { outline: 2px solid var(--orange); outline-offset: -1px; }
+
+  .corner-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .corner-actions button {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    border-radius: 6px;
+    font-family: inherit; font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    color: var(--navy);
+  }
+  .corner-actions button:hover:not(:disabled) { background: #f5f3ee; border-color: var(--navy); }
+  .corner-actions button:disabled { color: var(--text-dim); cursor: not-allowed; }
+  .corner-actions button.primary { background: var(--navy); color: white; border-color: var(--navy); }
+  .corner-actions button.primary:hover:not(:disabled) { background: var(--navy-light); }
+
+  .special-moves {
+    display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;
+  }
+  .special-move {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: #f5f3ee;
+    color: var(--text-muted);
+    cursor: pointer;
+    border: 1px solid var(--border);
+    user-select: none;
+  }
+  .special-move:hover { background: var(--orange); color: white; border-color: var(--orange); }
+  .special-move.used { opacity: 0.4; pointer-events: none; }
+
+  /* ========== ROUND CONTROLS ========== */
+  .round-controls {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .round-info { display: flex; gap: 24px; align-items: center; }
+  .round-info .stat-block { text-align: center; }
+  .round-info .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+  .round-info .stat-value { font-size: 18px; font-weight: 700; color: var(--navy); }
+  .round-controls button {
+    padding: 10px 24px;
+    background: var(--rope-red);
+    color: white;
+    border: none; border-radius: 6px;
+    font-family: inherit; font-size: 14px; font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .round-controls button:hover:not(:disabled) { background: #a01f24; }
+  .round-controls button:disabled { background: #ccc; cursor: not-allowed; }
+  .round-controls button.bell {
+    background: var(--gold);
+    color: var(--navy);
+  }
+  .round-controls button.bell:hover:not(:disabled) { background: #b88810; }
+
+  /* ========== SCORECARD ========== */
+  .scorecard-overlay {
+    position: fixed; inset: 0;
+    background: rgba(15,26,48,0.85);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+  }
+  .scorecard-overlay.active { display: flex; animation: fadeIn 0.4s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .scorecard-modal {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+    animation: slideUp 0.4s;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .scorecard-header { text-align: center; margin-bottom: 24px; }
+  .scorecard-header .verdict {
+    font-size: 32px; font-weight: 700; color: var(--navy);
+    text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .scorecard-header .verdict.ko { color: var(--success); }
+  .scorecard-header .verdict.tie { color: var(--warning); }
+  .scorecard-header .verdict.no-contest { color: var(--text-muted); }
+  .scorecard-header .subtitle { font-size: 14px; color: var(--text-muted); margin-top: 8px; }
+
+  .scorecard-grid {
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr;
+    gap: 12px;
+    align-items: center;
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+  }
+  .scorecard-grid .corner-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .scorecard-grid .corner-label.left { text-align: right; color: var(--blue-corner); }
+  .scorecard-grid .corner-label.right { text-align: left; color: var(--orange-corner); }
+  .scorecard-grid .dim-label { text-align: center; font-size: 11px; color: var(--text-muted); }
+  .scorecard-grid .score {
+    font-size: 22px; font-weight: 700;
+  }
+  .scorecard-grid .score.left { text-align: right; color: var(--blue-corner); }
+  .scorecard-grid .score.right { text-align: left; color: var(--orange-corner); }
+  .scorecard-grid .total-row { font-size: 28px; font-weight: 700; }
+
+  .scorecard-summary {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .scorecard-summary h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; }
+
+  .scorecard-actions { display: flex; gap: 8px; }
+  .scorecard-actions button {
+    flex: 1; padding: 10px 16px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    border-radius: 6px;
+    font-family: inherit; font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    color: var(--navy);
+  }
+  .scorecard-actions button.primary {
+    background: var(--navy); color: white; border-color: var(--navy);
+  }
+  .scorecard-actions button.primary:hover { background: var(--navy-light); }
+  .scorecard-actions button:hover:not(.primary) { background: var(--bg); border-color: var(--navy); }
+
+  /* ========== HISTORY ========== */
+  .match-history {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .match-history h3 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-muted); margin-bottom: 12px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+  .history-empty { font-size: 13px; color: var(--text-dim); font-style: italic; padding: 16px 0; text-align: center; }
+  .history-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .history-item:last-child { border-bottom: 0; }
+  .history-item .left { display: flex; gap: 12px; align-items: center; }
+  .history-item .id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--orange); }
+  .history-item .summary { color: var(--text); font-size: 13px; }
+  .history-item .verdict-pill {
+    font-size: 10px; padding: 3px 8px; border-radius: 3px;
+    text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500;
+  }
+  .history-item .verdict-pill.ko { background: #e6f4ec; color: var(--success); }
+  .history-item .verdict-pill.points { background: #e6f1fb; color: var(--blue-corner); }
+  .history-item .verdict-pill.tie { background: #fef4e0; color: var(--warning); }
+
+  /* ========== UTILITY ========== */
+  .hidden { display: none !important; }
+  .text-blue { color: var(--blue-corner); }
+  .text-orange { color: var(--orange-corner); }
+  .typing-cursor { display: inline-block; width: 6px; height: 12px; background: currentColor; margin-left: 2px; animation: blink 1s infinite; }
+  @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+
+  /* boxer animation states */
+  .boxer { transition: transform 0.3s cubic-bezier(0.5, 0, 0.5, 1); }
+  .boxer.idle { animation: bob 2s ease-in-out infinite; transform-origin: center bottom; }
+  .boxer.left.advance { transform: translateX(20px); }
+  .boxer.right.advance { transform: translateX(-20px); }
+  .boxer.hit-left { animation: hitLeft 0.4s; }
+  .boxer.hit-right { animation: hitRight 0.4s; }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  @keyframes hitLeft {
+    0% { transform: translateX(0) rotate(0); }
+    50% { transform: translateX(-12px) rotate(-3deg); }
+    100% { transform: translateX(0) rotate(0); }
+  }
+  @keyframes hitRight {
+    0% { transform: translateX(0) rotate(0); }
+    50% { transform: translateX(12px) rotate(3deg); }
+    100% { transform: translateX(0) rotate(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN ========== -->
+<div id="login-screen">
+  <div class="login-card">
+    <h1>Dev Arena</h1>
+    <div class="subtitle">TOTALKontroll, prototype</div>
+    <input type="password" id="password-input" placeholder="Passord" autofocus>
+    <button onclick="tryLogin()">Logg inn</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ========== APP ========== -->
+<div id="app">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo">TOTALKontroll</div>
+      <div class="tagline">DF26, prototype</div>
+    </div>
+    <div class="sidebar-section-title">Moduler</div>
+    <a class="sidebar-link"><span class="icon-dot"></span>Min side</a>
+    <a class="sidebar-link"><span class="icon-dot"></span>Prosjekt</a>
+    <a class="sidebar-link"><span class="icon-dot"></span>Salg</a>
+    <a class="sidebar-link"><span class="icon-dot"></span>Fremdriftsplan</a>
+    <a class="sidebar-link"><span class="icon-dot"></span>Endringsordre</a>
+    <div class="sidebar-section-title">Verktøy</div>
+    <a class="sidebar-link active"><span class="icon-dot"></span>Dev Arena</a>
+    <a class="sidebar-link"><span class="icon-dot"></span>Admin</a>
+  </aside>
+
+  <main>
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb">Verktøy / Dev Arena</div>
+        <h1>Dev Arena</h1>
+      </div>
+      <div class="header-actions">
+        <span class="badge" id="status-badge">Forberedelse</span>
+      </div>
+    </div>
+
+    <!-- ========== SETUP VIEW ========== -->
+    <div class="view active" id="setup-view">
+      <div class="setup-grid">
+        <div class="setup-card">
+          <h2>Velg sak</h2>
+          <div class="scenario-list" id="scenario-list"></div>
+        </div>
+        <div class="setup-card">
+          <h2>Konfigurasjon</h2>
+          <div class="config-row">
+            <span class="label">Antall runder</span>
+            <span class="value">3</span>
+          </div>
+          <div class="config-row">
+            <span class="label">Dommere</span>
+            <span class="value">3</span>
+          </div>
+          <div class="config-row">
+            <span class="label">Modell</span>
+            <span class="value">Claude Sonnet 4.7</span>
+          </div>
+          <div class="config-row">
+            <span class="label">Blå hjørne</span>
+            <span class="value text-blue">Jan Gunnar, Produkteier</span>
+          </div>
+          <div class="config-row">
+            <span class="label">Oransje hjørne</span>
+            <span class="value text-orange">David, Utvikler</span>
+          </div>
+          <button class="btn-primary" onclick="goToArena()" disabled id="enter-arena-btn">Gå til ringen</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <div class="match-history">
+          <h3>Tidligere kamper</h3>
+          <div id="history-list">
+            <div class="history-empty">Ingen kamper kjørt ennå</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== ARENA VIEW ========== -->
+    <div class="view" id="arena-view">
+
+      <div class="tape" id="tape">
+        <div class="corner-info left">
+          <div class="corner-name">Blå hjørne</div>
+          <div class="fighter-name">Produkteier-Claude</div>
+          <div class="fighter-handler">Coach: Jan Gunnar</div>
+        </div>
+        <div class="vs">VS</div>
+        <div class="corner-info right">
+          <div class="corner-name">Oransje hjørne</div>
+          <div class="fighter-name">Utvikler-Claude</div>
+          <div class="fighter-handler">Coach: David</div>
+        </div>
+        <div class="tale-stats">
+          <div class="stat-block">
+            <div class="stat-label">Sak</div>
+            <div class="stat-value" id="tape-id">EO-008</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-label">Stridsspørsmål</div>
+            <div class="stat-value" id="tape-question">Resource scoping</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-label">Akseptansekriterier</div>
+            <div class="stat-value" id="tape-ak-count">12</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="arena-grid">
+        <div class="ring-container">
+          <div class="arena-bg" id="arena-bg"></div>
+          <div class="spotlight left"></div>
+          <div class="spotlight right"></div>
+          <div class="round-banner" id="round-banner">Runde 1, åpning</div>
+          <div class="health-bar-row">
+            <div class="health-bar-side">
+              <div class="name blue" id="hp-name-blue">Produkteier-Claude</div>
+              <div class="health-bar"><div class="health-fill blue" id="hp-blue" style="width: 100%;"></div></div>
+            </div>
+            <div class="health-bar-side right">
+              <div class="name orange" id="hp-name-orange">Utvikler-Claude</div>
+              <div class="health-bar"><div class="health-fill orange" id="hp-orange" style="width: 100%;"></div></div>
+            </div>
+          </div>
+          <svg class="ring-svg" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+            <!-- Ring floor with perspective -->
+            <defs>
+              <linearGradient id="floor-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#3a4a6f"/>
+                <stop offset="100%" stop-color="#1f2a47"/>
+              </linearGradient>
+              <radialGradient id="canvas-light" cx="50%" cy="40%" r="50%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+                <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+              </radialGradient>
+            </defs>
+
+            <!-- Ring perspective trapezoid -->
+            <polygon points="60,360 740,360 660,180 140,180" fill="url(#floor-grad)" stroke="#0a0e1c" stroke-width="2"/>
+            <polygon points="60,360 740,360 660,180 140,180" fill="url(#canvas-light)"/>
+
+            <!-- Logo on canvas -->
+            <text x="400" y="290" text-anchor="middle" fill="rgba(255,255,255,0.06)" font-size="60" font-weight="700" font-family="DM Sans">TK</text>
+
+            <!-- Posts -->
+            <rect x="135" y="170" width="6" height="200" fill="#5a6478"/>
+            <rect x="659" y="170" width="6" height="200" fill="#5a6478"/>
+            <rect x="55" y="350" width="10" height="20" fill="#5a6478"/>
+            <rect x="735" y="350" width="10" height="20" fill="#5a6478"/>
+
+            <!-- Front ropes (3 levels) -->
+            <line x1="60" y1="290" x2="740" y2="290" stroke="#c1272d" stroke-width="3"/>
+            <line x1="60" y1="320" x2="740" y2="320" stroke="#c1272d" stroke-width="3"/>
+            <line x1="60" y1="350" x2="740" y2="350" stroke="#c1272d" stroke-width="3"/>
+
+            <!-- Back ropes (3 levels, perspective) -->
+            <line x1="140" y1="190" x2="660" y2="190" stroke="#a01f24" stroke-width="2" opacity="0.8"/>
+            <line x1="138" y1="210" x2="662" y2="210" stroke="#a01f24" stroke-width="2" opacity="0.8"/>
+            <line x1="136" y1="230" x2="664" y2="230" stroke="#a01f24" stroke-width="2" opacity="0.8"/>
+
+            <!-- Side ropes -->
+            <line x1="138" y1="190" x2="60" y2="290" stroke="#a01f24" stroke-width="2" opacity="0.6"/>
+            <line x1="136" y1="210" x2="60" y2="320" stroke="#a01f24" stroke-width="2" opacity="0.6"/>
+            <line x1="135" y1="230" x2="60" y2="350" stroke="#a01f24" stroke-width="2" opacity="0.6"/>
+            <line x1="662" y1="190" x2="740" y2="290" stroke="#a01f24" stroke-width="2" opacity="0.6"/>
+            <line x1="664" y1="210" x2="740" y2="320" stroke="#a01f24" stroke-width="2" opacity="0.6"/>
+            <line x1="665" y1="230" x2="740" y2="350" stroke="#a01f24" stroke-width="2" opacity="0.6"/>
+
+            <!-- Corner stools -->
+            <g transform="translate(95, 360)">
+              <rect x="-15" y="-20" width="30" height="20" fill="#185FA5" rx="2"/>
+              <rect x="-12" y="-2" width="24" height="6" fill="#0c447c"/>
+            </g>
+            <g transform="translate(705, 360)">
+              <rect x="-15" y="-20" width="30" height="20" fill="#BA7517" rx="2"/>
+              <rect x="-12" y="-2" width="24" height="6" fill="#854f0b"/>
+            </g>
+
+            <!-- Coach left (Jan Gunnar) -->
+            <g transform="translate(95, 340)" id="coach-left">
+              <ellipse cx="0" cy="0" rx="14" ry="3" fill="rgba(0,0,0,0.3)"/>
+              <rect x="-8" y="-30" width="16" height="22" fill="#2a3a5c" rx="2"/>
+              <circle cx="0" cy="-36" r="6" fill="#e8c4a0"/>
+              <rect x="-3" y="-40" width="6" height="3" fill="#3a2e20"/>
+            </g>
+
+            <!-- Coach right (David) -->
+            <g transform="translate(705, 340)" id="coach-right">
+              <ellipse cx="0" cy="0" rx="14" ry="3" fill="rgba(0,0,0,0.3)"/>
+              <rect x="-8" y="-30" width="16" height="22" fill="#5a4a3a" rx="2"/>
+              <circle cx="0" cy="-36" r="6" fill="#e8c4a0"/>
+              <rect x="-4" y="-42" width="8" height="3" fill="#5a4a3a"/>
+            </g>
+
+            <!-- Boxer left (blue, Produkteier-Claude) -->
+            <g class="boxer left idle" id="boxer-left" transform="translate(320, 290)">
+              <!-- shadow -->
+              <ellipse cx="0" cy="60" rx="35" ry="6" fill="rgba(0,0,0,0.4)"/>
+              <!-- glow aura -->
+              <circle cx="0" cy="0" r="48" fill="#378ADD" opacity="0.15"/>
+              <circle cx="0" cy="0" r="36" fill="#185FA5" opacity="0.25"/>
+              <!-- legs -->
+              <rect x="-12" y="20" width="9" height="38" fill="#0c447c" rx="2"/>
+              <rect x="3" y="20" width="9" height="38" fill="#0c447c" rx="2"/>
+              <!-- shorts -->
+              <rect x="-18" y="5" width="36" height="22" fill="#185FA5" rx="3"/>
+              <text x="0" y="20" text-anchor="middle" fill="#E6F1FB" font-size="9" font-weight="700" font-family="DM Sans">PE</text>
+              <!-- torso -->
+              <rect x="-16" y="-22" width="32" height="32" fill="#378ADD" rx="6"/>
+              <!-- head -->
+              <circle cx="0" cy="-32" r="13" fill="#185FA5"/>
+              <text x="0" y="-28" text-anchor="middle" fill="#E6F1FB" font-size="10" font-weight="700" font-family="DM Sans">C</text>
+              <!-- gloves: idle -->
+              <g id="glove-left-l">
+                <circle cx="-22" cy="0" r="9" fill="#c1272d" stroke="#7a1418" stroke-width="1"/>
+              </g>
+              <g id="glove-left-r">
+                <circle cx="22" cy="0" r="9" fill="#c1272d" stroke="#7a1418" stroke-width="1"/>
+              </g>
+            </g>
+
+            <!-- Boxer right (orange, Utvikler-Claude) -->
+            <g class="boxer right idle" id="boxer-right" transform="translate(480, 290)">
+              <ellipse cx="0" cy="60" rx="35" ry="6" fill="rgba(0,0,0,0.4)"/>
+              <circle cx="0" cy="0" r="48" fill="#EF9F27" opacity="0.15"/>
+              <circle cx="0" cy="0" r="36" fill="#BA7517" opacity="0.25"/>
+              <rect x="-12" y="20" width="9" height="38" fill="#854f0b" rx="2"/>
+              <rect x="3" y="20" width="9" height="38" fill="#854f0b" rx="2"/>
+              <rect x="-18" y="5" width="36" height="22" fill="#BA7517" rx="3"/>
+              <text x="0" y="20" text-anchor="middle" fill="#FAEEDA" font-size="9" font-weight="700" font-family="DM Sans">UT</text>
+              <rect x="-16" y="-22" width="32" height="32" fill="#EF9F27" rx="6"/>
+              <circle cx="0" cy="-32" r="13" fill="#BA7517"/>
+              <text x="0" y="-28" text-anchor="middle" fill="#FAEEDA" font-size="10" font-weight="700" font-family="DM Sans">C</text>
+              <g id="glove-right-l">
+                <circle cx="-22" cy="0" r="9" fill="#c1272d" stroke="#7a1418" stroke-width="1"/>
+              </g>
+              <g id="glove-right-r">
+                <circle cx="22" cy="0" r="9" fill="#c1272d" stroke="#7a1418" stroke-width="1"/>
+              </g>
+            </g>
+
+            <!-- Referee (referee in middle, smaller) -->
+            <g id="referee" transform="translate(400, 320)" opacity="0.7">
+              <ellipse cx="0" cy="20" rx="10" ry="2" fill="rgba(0,0,0,0.3)"/>
+              <rect x="-5" y="-12" width="10" height="14" fill="white" stroke="#000" stroke-width="0.5" rx="1"/>
+              <rect x="-5" y="-12" width="10" height="14" fill="url(#stripes)"/>
+              <circle cx="0" cy="-18" r="4" fill="#e8c4a0"/>
+            </g>
+            <pattern id="stripes" patternUnits="userSpaceOnUse" width="3" height="14">
+              <rect width="1.5" height="14" fill="#222"/>
+            </pattern>
+
+            <!-- Impact effects layer -->
+            <g id="impact-layer"></g>
+          </svg>
+
+          <div class="impact-flash" id="impact-flash"></div>
+        </div>
+
+        <div class="commentary">
+          <h3>
+            <span>Live commentary</span>
+            <span style="font-size: 10px; color: var(--danger); font-weight: 500;" id="live-indicator">●</span>
+          </h3>
+          <div class="commentary-feed" id="commentary-feed"></div>
+        </div>
+      </div>
+
+      <div class="round-controls">
+        <div class="round-info">
+          <div class="stat-block">
+            <div class="stat-label">Runde</div>
+            <div class="stat-value"><span id="current-round">1</span> / 3</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-label">Tid</div>
+            <div class="stat-value" id="round-timer">0:00</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-label">Slag</div>
+            <div class="stat-value" id="punch-count">0</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="bell" id="bell-btn" onclick="ringBell()">Ring i bjellen</button>
+          <button onclick="exitArena()" style="background: transparent; color: var(--text-muted); border: 1px solid var(--border);">Avbryt</button>
+        </div>
+      </div>
+
+      <div class="corners-grid">
+        <div class="corner-panel blue">
+          <div class="corner-header">
+            <div class="corner-avatar blue">JG</div>
+            <div class="corner-meta">
+              <div class="role">Blå hjørne, coach</div>
+              <div class="name">Jan Gunnar</div>
+            </div>
+            <span class="corner-status" id="status-blue">Tom</span>
+          </div>
+          <textarea class="corner-textarea" id="input-blue" placeholder="Lim inn EO-tekst, akseptansekriterier, prototype-spec, eller åpne spørsmål..."></textarea>
+          <div class="special-moves">
+            <span class="special-move" data-corner="blue" data-move="ak">AK Smash</span>
+            <span class="special-move" data-corner="blue" data-move="scope">Scope Cross</span>
+            <span class="special-move" data-corner="blue" data-move="value">Verdi-jab</span>
+          </div>
+          <div class="corner-actions">
+            <button onclick="loadCorner('blue')">Lever til hjørnet</button>
+            <button class="primary" onclick="commitCorner('blue')" id="commit-blue" disabled>Klar til runde</button>
+          </div>
+        </div>
+
+        <div class="corner-panel orange">
+          <div class="corner-header">
+            <div class="corner-avatar orange">DS</div>
+            <div class="corner-meta">
+              <div class="role">Oransje hjørne, coach</div>
+              <div class="name">David</div>
+            </div>
+            <span class="corner-status" id="status-orange">Tom</span>
+          </div>
+          <textarea class="corner-textarea" id="input-orange" placeholder="Lim inn implementasjonsforslag, arkitekturhensyn, tekniske spørsmål..."></textarea>
+          <div class="special-moves">
+            <span class="special-move" data-corner="orange" data-move="arch">Arkitektur-blokk</span>
+            <span class="special-move" data-corner="orange" data-move="debt">Teknisk gjeld-jab</span>
+            <span class="special-move" data-corner="orange" data-move="catalog">Funksjonskatalog-cross</span>
+          </div>
+          <div class="corner-actions">
+            <button onclick="loadCorner('orange')">Lever til hjørnet</button>
+            <button class="primary" onclick="commitCorner('orange')" id="commit-orange" disabled>Klar til runde</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<!-- ========== SCORECARD MODAL ========== -->
+<div class="scorecard-overlay" id="scorecard-overlay">
+  <div class="scorecard-modal">
+    <div class="scorecard-header">
+      <div class="verdict" id="verdict-text">DECISION</div>
+      <div class="subtitle" id="verdict-subtitle">Begge AIer hadde gyldige poeng</div>
+    </div>
+
+    <div class="scorecard-grid">
+      <div class="corner-label left">Blå</div>
+      <div class="dim-label">Teknisk korrekthet</div>
+      <div class="corner-label right">Oransje</div>
+
+      <div class="score left" id="score-blue-tech">28</div>
+      <div></div>
+      <div class="score right" id="score-orange-tech">29</div>
+
+      <div></div>
+      <div class="dim-label">Forretningsverdi</div>
+      <div></div>
+
+      <div class="score left" id="score-blue-value">30</div>
+      <div></div>
+      <div class="score right" id="score-orange-value">26</div>
+
+      <div></div>
+      <div class="dim-label">Scope-disiplin</div>
+      <div></div>
+
+      <div class="score left" id="score-blue-scope">29</div>
+      <div></div>
+      <div class="score right" id="score-orange-scope">27</div>
+
+      <div style="border-top: 1px solid var(--border); margin: 8px 0; grid-column: 1 / -1;"></div>
+
+      <div></div>
+      <div class="dim-label" style="font-weight: 500; color: var(--navy);">Total</div>
+      <div></div>
+
+      <div class="score left total-row" id="total-blue">87</div>
+      <div></div>
+      <div class="score right total-row" id="total-orange">82</div>
+    </div>
+
+    <div class="scorecard-summary" id="scorecard-summary">
+      <h4>Dommerens kommentar</h4>
+      <p id="judge-comment">Produkteier-Claude vant runden ved å holde fokuset på akseptansekriteriene. Utvikler-Claudes arkitekturpoeng var gyldige men løste et problem som ikke er en del av denne EOen.</p>
+    </div>
+
+    <div class="scorecard-actions">
+      <button onclick="closeScorecard()">Tilbake til arena</button>
+      <button class="primary" onclick="acceptVerdictAndExit()">Aksepter, tilbake til oversikt</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== AUTH ==========
+function djb2(str) {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) hash = ((hash << 5) + hash) + str.charCodeAt(i);
+  return hash >>> 0;
+}
+const PASSWORD_HASH = djb2('DF2026');
+
+function tryLogin() {
+  const input = document.getElementById('password-input').value;
+  const error = document.getElementById('login-error');
+  if (djb2(input) === PASSWORD_HASH) {
+    sessionStorage.setItem('tk-arena-auth', '1');
+    showApp();
+  } else {
+    error.textContent = 'Feil passord';
+    setTimeout(() => error.textContent = '', 2500);
+  }
+}
+
+document.getElementById('password-input').addEventListener('keypress', e => {
+  if (e.key === 'Enter') tryLogin();
+});
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+  initApp();
+}
+
+if (sessionStorage.getItem('tk-arena-auth') === '1') {
+  document.addEventListener('DOMContentLoaded', showApp);
+}
+
+// ========== STATE ==========
+const state = {
+  selectedScenario: null,
+  blue: { content: '', committed: false, hp: 100, moves: { ak: false, scope: false, value: false } },
+  orange: { content: '', committed: false, hp: 100, moves: { arch: false, debt: false, catalog: false } },
+  round: 1,
+  punchCount: 0,
+  timerInterval: null,
+  startTime: null,
+  inMatch: false,
+  history: JSON.parse(localStorage.getItem('tk-arena-history') || '[]')
+};
+
+// ========== SCENARIOS ==========
+const scenarios = [
+  {
+    id: 'EO-008',
+    type: 'EO',
+    title: 'RBAC rolle- og tilgangsstyring',
+    desc: 'Grunnleggende rolledefinisjoner og tilgangsmatrise. Ressurs-scoping ikke i scope.',
+    question: 'Resource scoping nå eller senere?',
+    akCount: 12,
+    rounds: [
+      {
+        title: 'Åpning',
+        commentary: [
+          { speaker: 'referee', body: 'Saken er EO-008 RBAC. Stridsspørsmålet er om ressurs-scoping skal med i denne EOen, eller utsettes som beskrevet i bestillingen.' },
+          { speaker: 'blue', body: 'Bestillingen er tydelig: ressurs-scoping er eksplisitt utenfor scope. Akseptansekriterium 11 sier "PL kan se alle prosjekter" som default. Hvis vi legger til scoping nå, endrer vi semantikken på en kritisk akseptansekriterium midt i implementasjon.' },
+          { speaker: 'orange', body: 'Forstått, men hvis vi bygger rolle-tabellen uten et felt for resource_scope, må hele tabellen migreres senere. Da er det enklere å legge på et nullable felt nå selv om vi ikke bruker det.' },
+          { speaker: 'blue', body: 'Et nullable felt som ikke brukes er teknisk gjeld i form av et signal til fremtidige utviklere om at funksjonalitet finnes. David må forholde seg til det. Det kommer sikkert spørsmål fra brukere som ser feltet i admin.' },
+        ]
+      },
+      {
+        title: 'Krysseksaminasjon',
+        commentary: [
+          { speaker: 'orange', body: 'Migrering av rolle-tabellen i prod krever ned-tid eller blue-green deploy. Vi har ikke etablert blue-green ennå. Et nullable felt unngår fremtidig downtime.' },
+          { speaker: 'blue', body: 'Riktig observasjon, men problemet er ikke EO-008. Det er at vi mangler blue-green. Det bør være en separat EO. Å løse infrastrukturproblemer ved å snike inn datafelt i forretnings-EOer er en antipattern.' },
+          { speaker: 'referee', body: 'Begge AIer holder seg innenfor god teknisk debatt så langt. Klart definerte uenighetspunkter.' },
+          { speaker: 'orange', body: 'Greit, jeg foreslår en mellomløsning: bygg EO-008 som spesifisert, men dokumenter migrasjonsstien for resource_scope eksplisitt i arkitekturdokumentet.' },
+          { speaker: 'blue', body: 'Det er akseptabelt og innenfor scope. Det er teknisk dokumentasjon, ikke datafelt-tillegg.' }
+        ]
+      },
+      {
+        title: 'Avslutning',
+        commentary: [
+          { speaker: 'blue', body: 'Konsensus: implementer EO-008 som spesifisert. Dokumenter migrasjonssti for fremtidig resource_scope i arkitekturnotat. Skap separat EO for blue-green deploy.' },
+          { speaker: 'orange', body: 'Enig. Tilleggsanbefaling: når resource_scope-EO kommer, gjør den til en standalone PR slik at migreringen er sporbar.' },
+          { speaker: 'referee', body: 'Begge AIer landet på samme posisjon. Konsensus med konkrete handlingspunkter til Produkteier.' }
+        ]
+      }
+    ],
+    verdict: { type: 'consensus', winner: 'tie' },
+    scores: { blue: { tech: 29, value: 30, scope: 30 }, orange: { tech: 30, value: 27, scope: 28 } },
+    summary: 'Konsensus etter åpen teknisk debatt. Begge AIer endte på samme implementeringsanbefaling. Arkitekturnotat skal oppdateres med migrasjonssti for resource_scope. Separat EO opprettes for blue-green deploy.'
+  },
+  {
+    id: 'FEIL-006',
+    type: 'FEIL',
+    title: 'AI-vurdering trigges ikke ved innliming',
+    desc: 'Bug i EO-modul. Når bruker limer inn tekst i registreringsfeltet, kjøres ikke AI-vurdering automatisk slik som ved skriving.',
+    question: 'Event-handling eller debounce-bug?',
+    akCount: 4,
+    rounds: [
+      {
+        title: 'Åpning',
+        commentary: [
+          { speaker: 'referee', body: 'FEIL-006: AI-vurdering trigges ikke ved innliming. Steg for å reprodusere er klart. Spørsmålet er hva som er rotårsaken.' },
+          { speaker: 'orange', body: 'Mest sannsynlig årsak: vi lytter på onChange-event som ikke fyrer ved paste. Vi bør legge til onPaste-handler eller bytte til onInput.' },
+          { speaker: 'blue', body: 'Akseptansekriterium 2 sier "AI-vurdering skal trigges ved alle endringer i tekstfeltet, uavhengig av input-metode". Bytte til onInput er korrekt fix.' },
+          { speaker: 'orange', body: 'Men vi har debounce på 800ms. Hvis vi bruker onInput og bruker limer inn 2000 tegn, kommer vurderingen umiddelbart fordi paste-eventen genererer kun ett input-event. Det er ikke nødvendigvis ønskelig.' },
+          { speaker: 'blue', body: 'Hvorfor ikke? Bruker har akkurat limt inn ferdig tekst. De forventer respons.' }
+        ]
+      },
+      {
+        title: 'Krysseksaminasjon',
+        commentary: [
+          { speaker: 'orange', body: 'Fordi paste kan komme fra clipboard som er midt i en handling. Hvis bruker kopierer tekst del for del og limer inn iterativt, får de en API-kostnad per paste.' },
+          { speaker: 'blue', body: 'Det er en gyldig kostnadsbekymring. Men løsningen er ikke å droppe responsen, det er å beholde debouncen. 800ms er nok til at iterativ paste fanges som én vurdering.' },
+          { speaker: 'orange', body: 'Stemmer. Da blir fixen: bytt onChange til onInput, behold eksisterende debounce på 800ms. Veldig enkelt.' },
+          { speaker: 'blue', body: 'Enig. To linjer kode, dekker AK 2 og 3. Ingen scope-kryp.' },
+          { speaker: 'referee', body: 'Tidlig konsensus. Begge AIer har valgt samme implementasjon.' }
+        ]
+      },
+      {
+        title: 'Avslutning',
+        commentary: [
+          { speaker: 'orange', body: 'Foreslår kort PR med kun event-handler endring. Tester på desktop Chrome/Firefox/Safari og mobil Safari.' },
+          { speaker: 'blue', body: 'Enig. Anbefaler at vi legger til en E2E-test som verifiserer paste→AI-vurdering for å unngå regresjon.' },
+          { speaker: 'orange', body: 'God idé. Tar det med i samme PR.' },
+          { speaker: 'referee', body: 'Konsensus, klar implementasjonsplan, ingen åpne spørsmål til Produkteier.' }
+        ]
+      }
+    ],
+    verdict: { type: 'consensus', winner: 'tie' },
+    scores: { blue: { tech: 28, value: 29, scope: 30 }, orange: { tech: 30, value: 28, scope: 30 } },
+    summary: 'Klar konsensus. Bytt onChange til onInput, behold debounce, legg til E2E-test. Implementeres som én liten PR.'
+  },
+  {
+    id: 'EO-011',
+    type: 'EO',
+    title: 'Språkvelger og polsk oversettelse',
+    desc: 'Implementer i18n med tre språk. Polsk er viktig for arbeidsstyrkesammensetningen.',
+    question: 'Eget oversettelses-flow eller bake inn i EO?',
+    akCount: 8,
+    rounds: [
+      {
+        title: 'Åpning',
+        commentary: [
+          { speaker: 'referee', body: 'EO-011: i18n med norsk, engelsk, polsk. Stridsspørsmålet er hvordan oversettelser skal vedlikeholdes når nye EOer kommer.' },
+          { speaker: 'orange', body: 'Forslag: alle nye EOer som introduserer brukersynlig tekst skal levere oversettelser som del av PR. Implementeres som en lint-regel som feiler bygget hvis nye nøkler i nb mangler ekvivalent i en og pl.' },
+          { speaker: 'blue', body: 'Det er det enkleste, men det skifter ansvaret for kvaliteten på polsk over til David. Han snakker ikke polsk. AI-oversettelse må inn et eller annet sted.' },
+          { speaker: 'orange', body: 'Riktig. Da må PR-en kjøre AI-oversettelse automatisk når nye nb-nøkler legges til. Bygges som GitHub Action eller pre-commit hook.' },
+          { speaker: 'blue', body: 'OK. Men polsk QA må fortsatt gjøres av polsktalende medarbeider, det er ikke David. Når kommer det inn i flyten?' }
+        ]
+      },
+      {
+        title: 'Krysseksaminasjon',
+        commentary: [
+          { speaker: 'orange', body: 'Foreslår tre-trinns flyt: 1) AI oversetter ved PR. 2) PR merges med "needs-pl-qa" label. 3) Polsktalende medarbeider gjennomgår batchvis ukentlig og fjerner labelen.' },
+          { speaker: 'blue', body: 'Det fungerer hvis labelen blokkerer prod-deploy. Hvis ikke, blir QA aldri gjort. Hvem definerer hvem den polske medarbeideren er?' },
+          { speaker: 'orange', body: 'Det er et organisasjonsspørsmål, ikke teknisk. Produkteier må eskalere til Daniel.' },
+          { speaker: 'blue', body: 'Akseptabelt, men jeg flagger det som åpent spørsmål til menneskelig produkteier i scorecard.' },
+          { speaker: 'referee', body: 'Begge AIer er enige om teknisk løsning, men har identifisert et organisatorisk åpent spørsmål.' }
+        ]
+      },
+      {
+        title: 'Avslutning',
+        commentary: [
+          { speaker: 'blue', body: 'Anbefaling til menneskelig produkteier: tekniske mekanismer er enige om. Trenger avklaring fra Daniel om hvem som er polsk QA-ansvarlig før PR-mal kan settes opp.' },
+          { speaker: 'orange', body: 'Enig. Implementer mekanikken (lint, AI-oversetter, label) i denne EOen. QA-rollen tildeles før første polske oversettelse går til prod.' },
+          { speaker: 'referee', body: 'Konsensus om teknisk implementasjon. Åpent spørsmål til Produkteier flagget for eskalering.' }
+        ]
+      }
+    ],
+    verdict: { type: 'consensus', winner: 'tie', escalation: true },
+    scores: { blue: { tech: 28, value: 29, scope: 28 }, orange: { tech: 29, value: 28, scope: 27 } },
+    summary: 'Konsensus om teknisk implementasjon: lint-regel, AI-oversettelse i CI, polsk QA-label. Åpent spørsmål til menneskelig Produkteier: hvem tildeles polsk QA-ansvar.'
+  }
+];
+
+// ========== INIT ==========
+function initApp() {
+  renderScenarios();
+  renderHistory();
+  generateAudience();
+  setupSpecialMoves();
+}
+
+function renderScenarios() {
+  const list = document.getElementById('scenario-list');
+  list.innerHTML = scenarios.map(s => `
+    <div class="scenario-item" onclick="selectScenario('${s.id}')" data-id="${s.id}">
+      <div class="label-row">
+        <span class="id">${s.id}</span>
+        <span class="type ${s.type.toLowerCase()}">${s.type}</span>
+      </div>
+      <div class="title">${s.title}</div>
+      <div class="desc">${s.desc}</div>
+    </div>
+  `).join('');
+}
+
+function selectScenario(id) {
+  state.selectedScenario = scenarios.find(s => s.id === id);
+  document.querySelectorAll('.scenario-item').forEach(el => {
+    el.classList.toggle('selected', el.dataset.id === id);
+  });
+  document.getElementById('enter-arena-btn').disabled = false;
+}
+
+function generateAudience() {
+  const bg = document.getElementById('arena-bg');
+  let html = '';
+  for (let i = 0; i < 40; i++) {
+    const x = Math.random() * 100;
+    const y = 60 + Math.random() * 40;
+    const opacity = 0.3 + Math.random() * 0.5;
+    html += `<div class="doc-spectator" style="left: ${x}%; top: ${y}%; opacity: ${opacity};"></div>`;
+  }
+  bg.innerHTML = html;
+}
+
+function setupSpecialMoves() {
+  document.querySelectorAll('.special-move').forEach(el => {
+    el.addEventListener('click', () => {
+      if (el.classList.contains('used')) return;
+      const corner = el.dataset.corner;
+      const move = el.dataset.move;
+      const ta = document.getElementById('input-' + corner);
+      const moveTexts = {
+        ak: 'Akseptansekriterium ',
+        scope: 'Dette er utenfor scope fordi ',
+        value: 'Forretningsverdien ligger i ',
+        arch: 'Arkitekturmessig vil dette ',
+        debt: 'Dette skaper teknisk gjeld i form av ',
+        catalog: 'Funksjonskatalogen viser at '
+      };
+      ta.value += (ta.value ? '\n' : '') + moveTexts[move];
+      ta.focus();
+      el.classList.add('used');
+    });
+  });
+}
+
+// ========== ARENA NAVIGATION ==========
+function goToArena() {
+  if (!state.selectedScenario) return;
+  document.getElementById('setup-view').classList.remove('active');
+  document.getElementById('arena-view').classList.add('active');
+
+  const s = state.selectedScenario;
+  document.getElementById('tape-id').textContent = s.id;
+  document.getElementById('tape-question').textContent = s.question;
+  document.getElementById('tape-ak-count').textContent = s.akCount;
+
+  state.inMatch = true;
+  state.round = 1;
+  state.punchCount = 0;
+  state.blue = { content: '', committed: false, hp: 100, moves: { ak: false, scope: false, value: false } };
+  state.orange = { content: '', committed: false, hp: 100, moves: { arch: false, debt: false, catalog: false } };
+
+  document.getElementById('current-round').textContent = '1';
+  document.getElementById('round-banner').textContent = 'Runde 1, åpning';
+  document.getElementById('hp-blue').style.width = '100%';
+  document.getElementById('hp-orange').style.width = '100%';
+  document.getElementById('punch-count').textContent = '0';
+  document.getElementById('round-timer').textContent = '0:00';
+  document.getElementById('commentary-feed').innerHTML = '';
+  document.getElementById('input-blue').value = '';
+  document.getElementById('input-orange').value = '';
+  document.querySelectorAll('.special-move').forEach(el => el.classList.remove('used'));
+  resetCornerStatuses();
+  updateStatusBadge('Forberedelse');
+
+  startTimer();
+  addCommentary('referee', 'Velkommen til Dev Arena. Saken i kveld: ' + s.id + ', ' + s.title + '. La det rettferdige slag begynne.');
+  setTimeout(() => addCommentary('referee', 'Coachene, gjør klar instruksene til hjørnene deres.'), 1200);
+}
+
+function exitArena() {
+  if (!confirm('Avbryt kampen og gå tilbake til oversikten?')) return;
+  stopTimer();
+  state.inMatch = false;
+  document.getElementById('arena-view').classList.remove('active');
+  document.getElementById('setup-view').classList.add('active');
+  updateStatusBadge('Forberedelse');
+}
+
+function startTimer() {
+  state.startTime = Date.now();
+  state.timerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+    const m = Math.floor(elapsed / 60);
+    const s = elapsed % 60;
+    document.getElementById('round-timer').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  }, 1000);
+}
+
+function stopTimer() {
+  if (state.timerInterval) clearInterval(state.timerInterval);
+}
+
+function updateStatusBadge(text) {
+  const badge = document.getElementById('status-badge');
+  badge.textContent = text;
+  badge.classList.toggle('live', text === 'Kamp pågår' || text === 'Runde aktiv');
+}
+
+// ========== CORNERS ==========
+function loadCorner(corner) {
+  const ta = document.getElementById('input-' + corner);
+  const txt = ta.value.trim();
+  if (!txt) return;
+  state[corner].content = txt;
+  state[corner].committed = false;
+  setStatus(corner, 'thinking', 'Coach gjennomgår');
+  document.getElementById('commit-' + corner).disabled = false;
+
+  const speaker = corner === 'blue' ? 'Jan Gunnar' : 'David';
+  addCommentary('referee', speaker + ' har levert til ' + (corner === 'blue' ? 'blå' : 'oransje') + ' hjørne.');
+}
+
+function commitCorner(corner) {
+  if (!state[corner].content) return;
+  state[corner].committed = true;
+  setStatus(corner, 'ready', 'Klar');
+  document.getElementById('commit-' + corner).disabled = true;
+
+  const otherReady = corner === 'blue' ? state.orange.committed : state.blue.committed;
+  if (otherReady) {
+    addCommentary('referee', 'Begge hjørner er klare. Coachene kan ringe i bjellen for å starte runden.');
+    document.getElementById('bell-btn').disabled = false;
+  }
+}
+
+function resetCornerStatuses() {
+  setStatus('blue', '', 'Tom');
+  setStatus('orange', '', 'Tom');
+  document.getElementById('commit-blue').disabled = true;
+  document.getElementById('commit-orange').disabled = true;
+}
+
+function setStatus(corner, cls, txt) {
+  const el = document.getElementById('status-' + corner);
+  el.className = 'corner-status ' + (cls || '');
+  el.textContent = txt;
+}
+
+// ========== ROUND LOGIC ==========
+async function ringBell() {
+  if (!state.blue.committed || !state.orange.committed) {
+    addCommentary('referee', 'Begge coacher må levere innspill før runden kan starte.');
+    return;
+  }
+
+  document.getElementById('bell-btn').disabled = true;
+  updateStatusBadge('Runde aktiv');
+  flashBanner('Runde ' + state.round);
+
+  const scenario = state.selectedScenario;
+  const roundData = scenario.rounds[state.round - 1];
+
+  document.getElementById('round-banner').textContent = 'Runde ' + state.round + ', ' + roundData.title.toLowerCase();
+
+  await sleep(800);
+  addCommentary('referee', 'Runde ' + state.round + ', ' + roundData.title.toLowerCase() + '. Slåss!');
+  await sleep(600);
+
+  // Play out the round
+  for (let i = 0; i < roundData.commentary.length; i++) {
+    const turn = roundData.commentary[i];
+    addCommentary(turn.speaker, turn.body);
+
+    if (turn.speaker === 'blue') {
+      animatePunch('left');
+    } else if (turn.speaker === 'orange') {
+      animatePunch('right');
+    }
+
+    // Adjust HP slightly based on round outcome
+    if (turn.speaker === 'blue' || turn.speaker === 'orange') {
+      const damage = 4 + Math.random() * 6;
+      const target = turn.speaker === 'blue' ? 'orange' : 'blue';
+      state[target].hp = Math.max(15, state[target].hp - damage);
+      document.getElementById('hp-' + target).style.width = state[target].hp + '%';
+    }
+
+    await sleep(1800 + Math.random() * 800);
+  }
+
+  // End of round
+  await sleep(800);
+  addCommentary('referee', 'Slutt på runde ' + state.round + '.');
+
+  state.round++;
+
+  if (state.round > 3) {
+    setTimeout(showScorecard, 1500);
+  } else {
+    document.getElementById('current-round').textContent = state.round;
+    document.getElementById('round-banner').textContent = 'Runde ' + state.round + ', ' + scenario.rounds[state.round - 1].title.toLowerCase();
+
+    // Reset corners for next round
+    state.blue.committed = false;
+    state.orange.committed = false;
+    document.getElementById('input-blue').value = '';
+    document.getElementById('input-orange').value = '';
+    resetCornerStatuses();
+    updateStatusBadge('Forberedelse');
+    addCommentary('referee', 'Coachene, klar inputene til runde ' + state.round + '.');
+  }
+}
+
+function flashBanner(text) {
+  const banner = document.getElementById('round-banner');
+  banner.textContent = text;
+  banner.classList.add('flash');
+  setTimeout(() => banner.classList.remove('flash'), 600);
+}
+
+function animatePunch(side) {
+  const attacker = document.getElementById('boxer-' + side);
+  const defender = document.getElementById('boxer-' + (side === 'left' ? 'right' : 'left'));
+  const flash = document.getElementById('impact-flash');
+
+  attacker.classList.remove('idle');
+  attacker.classList.add('advance');
+
+  setTimeout(() => {
+    flash.classList.add('active');
+    defender.classList.add(side === 'left' ? 'hit-right' : 'hit-left');
+    state.punchCount++;
+    document.getElementById('punch-count').textContent = state.punchCount;
+    spawnImpactStar();
+  }, 250);
+
+  setTimeout(() => {
+    attacker.classList.remove('advance');
+    attacker.classList.add('idle');
+    defender.classList.remove('hit-left', 'hit-right');
+    flash.classList.remove('active');
+  }, 700);
+}
+
+function spawnImpactStar() {
+  const layer = document.getElementById('impact-layer');
+  const x = 380 + Math.random() * 40;
+  const y = 270 + Math.random() * 20;
+  const star = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  star.innerHTML = `
+    <polygon points="${x},${y-18} ${x+5},${y-5} ${x+18},${y-3} ${x+8},${y+5} ${x+11},${y+18} ${x},${y+10} ${x-11},${y+18} ${x-8},${y+5} ${x-18},${y-3} ${x-5},${y-5}"
+      fill="#ffd700" stroke="#c1272d" stroke-width="2" opacity="1"/>
+    <text x="${x}" y="${y+5}" text-anchor="middle" fill="#c1272d" font-weight="700" font-size="11" font-family="DM Sans">POW!</text>
+  `;
+  layer.appendChild(star);
+  setTimeout(() => {
+    star.style.transition = 'opacity 0.4s, transform 0.4s';
+    star.style.opacity = '0';
+    star.style.transform = 'translateY(-20px) scale(1.3)';
+    setTimeout(() => star.remove(), 400);
+  }, 400);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ========== COMMENTARY ==========
+function addCommentary(speaker, body) {
+  const feed = document.getElementById('commentary-feed');
+  const time = new Date().toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const speakerNames = { blue: 'Produkteier-Claude', orange: 'Utvikler-Claude', referee: 'Dommer' };
+  const div = document.createElement('div');
+  div.className = 'comment ' + speaker;
+  div.innerHTML = `
+    <div class="speaker">
+      <span>${speakerNames[speaker]}</span>
+      <span class="time">${time}</span>
+    </div>
+    <div class="body">${body}</div>
+  `;
+  feed.appendChild(div);
+  feed.scrollTop = feed.scrollHeight;
+}
+
+// ========== SCORECARD ==========
+function showScorecard() {
+  stopTimer();
+  const scenario = state.selectedScenario;
+  const scores = scenario.scores;
+  const totalBlue = scores.blue.tech + scores.blue.value + scores.blue.scope;
+  const totalOrange = scores.orange.tech + scores.orange.value + scores.orange.scope;
+
+  document.getElementById('score-blue-tech').textContent = scores.blue.tech;
+  document.getElementById('score-blue-value').textContent = scores.blue.value;
+  document.getElementById('score-blue-scope').textContent = scores.blue.scope;
+  document.getElementById('score-orange-tech').textContent = scores.orange.tech;
+  document.getElementById('score-orange-value').textContent = scores.orange.value;
+  document.getElementById('score-orange-scope').textContent = scores.orange.scope;
+  document.getElementById('total-blue').textContent = totalBlue;
+  document.getElementById('total-orange').textContent = totalOrange;
+
+  const verdictEl = document.getElementById('verdict-text');
+  const subEl = document.getElementById('verdict-subtitle');
+  verdictEl.className = 'verdict';
+
+  if (scenario.verdict.type === 'consensus') {
+    verdictEl.textContent = 'KONSENSUS';
+    verdictEl.classList.add('ko');
+    subEl.textContent = scenario.verdict.escalation
+      ? 'Begge AIer enige om teknisk løsning. Åpent spørsmål eskaleres til menneskelig Produkteier.'
+      : 'Begge AIer endte på samme implementeringsanbefaling';
+  } else if (Math.abs(totalBlue - totalOrange) <= 3) {
+    verdictEl.textContent = 'UAVGJORT';
+    verdictEl.classList.add('tie');
+    subEl.textContent = 'For nært til å felle dom. Eskaleres til menneskelig produkteier.';
+  } else {
+    verdictEl.textContent = totalBlue > totalOrange ? 'BLÅ TAR RUNDEN' : 'ORANSJE TAR RUNDEN';
+    subEl.textContent = 'Poengseier basert på dommerens vurdering';
+  }
+
+  document.getElementById('judge-comment').textContent = scenario.summary;
+  document.getElementById('scorecard-overlay').classList.add('active');
+  updateStatusBadge('Kamp ferdig');
+}
+
+function closeScorecard() {
+  document.getElementById('scorecard-overlay').classList.remove('active');
+}
+
+function acceptVerdictAndExit() {
+  const scenario = state.selectedScenario;
+  const totalBlue = scenario.scores.blue.tech + scenario.scores.blue.value + scenario.scores.blue.scope;
+  const totalOrange = scenario.scores.orange.tech + scenario.scores.orange.value + scenario.scores.orange.scope;
+
+  let verdict = 'points', verdictText = 'Poengseier';
+  if (scenario.verdict.type === 'consensus') {
+    verdict = 'ko';
+    verdictText = 'Konsensus';
+  } else if (Math.abs(totalBlue - totalOrange) <= 3) {
+    verdict = 'tie';
+    verdictText = 'Uavgjort';
+  }
+
+  state.history.unshift({
+    id: scenario.id,
+    title: scenario.title,
+    verdict,
+    verdictText,
+    scoreBlue: totalBlue,
+    scoreOrange: totalOrange,
+    summary: scenario.summary,
+    timestamp: new Date().toISOString()
+  });
+  if (state.history.length > 10) state.history = state.history.slice(0, 10);
+  localStorage.setItem('tk-arena-history', JSON.stringify(state.history));
+
+  closeScorecard();
+  exitToSetup();
+  renderHistory();
+}
+
+function exitToSetup() {
+  state.inMatch = false;
+  document.getElementById('arena-view').classList.remove('active');
+  document.getElementById('setup-view').classList.add('active');
+  document.querySelectorAll('.scenario-item').forEach(el => el.classList.remove('selected'));
+  state.selectedScenario = null;
+  document.getElementById('enter-arena-btn').disabled = true;
+  updateStatusBadge('Forberedelse');
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (state.history.length === 0) {
+    list.innerHTML = '<div class="history-empty">Ingen kamper kjørt ennå</div>';
+    return;
+  }
+  list.innerHTML = state.history.map(h => {
+    const date = new Date(h.timestamp);
+    const dateStr = date.toLocaleString('nb-NO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    return `
+      <div class="history-item">
+        <div class="left">
+          <span class="id">${h.id}</span>
+          <span class="summary">${h.title}</span>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <span style="font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">${h.scoreBlue}–${h.scoreOrange}</span>
+          <span class="verdict-pill ${h.verdict}">${h.verdictText}</span>
+          <span style="font-size: 11px; color: var(--text-dim);">${dateStr}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+</script>
+
+</body>
+</html>
