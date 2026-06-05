@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DF26 - Avduking (snorklipping)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy-deep: #101a30;
+    --navy: #1a2744;
+    --orange: #e67e22;
+    --tape: #f2c200;
+    --tape-dark: #1b1b1b;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; font-family: 'DM Sans', system-ui, sans-serif; }
+  body { background: var(--navy-deep); }
+
+  /* ============ MOCK LØSNING BAK ============ */
+  .app { position: fixed; inset: 0; background:#f3f4f7; display:flex; filter: blur(2px); transform: scale(1.02); }
+  .app .sidebar { width:230px; background:var(--navy-deep); color:#fff; padding:24px 18px; flex-shrink:0; }
+  .app .sidebar .logo { display:flex; align-items:center; gap:10px; margin-bottom:32px; }
+  .app .sidebar .logo .wm { font-weight:800; font-size:17px; letter-spacing:.5px; }
+  .app .sidebar .logo .wm .k { color:var(--orange); }
+  .app .sidebar .nav div { padding:11px 12px; border-radius:7px; color:#c2c8d6; font-size:14px; margin-bottom:3px; }
+  .app .sidebar .nav div.active { background:rgba(255,255,255,.08); color:#fff; font-weight:600; }
+  .app .main { flex:1; padding:36px 44px; }
+  .app .main h1 { color:var(--navy); font-size:26px; margin-bottom:6px; }
+  .app .main .sub { color:#6b7280; margin-bottom:28px; }
+  .app .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+  .app .card { background:#fff; border-radius:12px; padding:22px; box-shadow:0 1px 3px rgba(0,0,0,.08); height:140px; }
+  .app .card .t { font-weight:600; color:var(--navy); margin-bottom:10px; }
+  .app .card .bar { height:8px; background:#eef0f4; border-radius:4px; margin:7px 0; }
+  .app .card .bar.o { background:var(--orange); width:60%; }
+
+  /* ============ AVDUKINGS-SCENE ============ */
+  .stage {
+    position: fixed; inset: 0; z-index: 50;
+    background:
+      radial-gradient(circle at 50% 30%, rgba(40,55,85,.65), rgba(16,26,48,.96) 70%),
+      var(--navy-deep);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; color:#fff; padding: 24px;
+    cursor: none;
+    transition: opacity 1s ease, visibility 0s linear 1s;
+  }
+  .stage.done { opacity: 0; visibility: hidden; }
+
+  .top-block {
+    position: absolute; left: 50%; top: 27%;
+    transform: translate(-50%, -50%);
+    display: flex; flex-direction: column; align-items: center;
+    width: 90%; z-index: 4;
+  }
+  .logo-big { display:flex; align-items:center; gap:16px; margin-bottom: 22px; }
+  .logo-big .wm { font-weight:800; font-size:30px; letter-spacing:1px; }
+  .logo-big .wm .k { color:var(--orange); }
+  .eyebrow {
+    font-size: 19px; letter-spacing: 6px; text-transform: uppercase;
+    color: var(--tape); font-weight: 800;
+    text-shadow: 0 2px 14px rgba(242,194,0,.35);
+  }
+  .headline { font-size:36px; font-weight:800; line-height:1.15; max-width:680px; margin-bottom:16px; }
+  .headline .o { color:var(--orange); }
+  .blurb { font-size:16px; line-height:1.6; color:#c2c8d6; max-width:540px; margin-bottom:8px; }
+  .intro-text {
+    position: absolute; left:50%; top: 73%;
+    transform: translate(-50%, -50%);
+    width: 92%; max-width: 860px;
+    display: flex; flex-direction: column; align-items: center;
+    z-index: 4;
+  }
+  .intro-text .headline { font-size: 32px; margin-bottom: 0; max-width: none; }
+  .intro-text .line1 { margin-bottom: 18px; }
+  .intro-text .line2 { white-space: nowrap; }
+
+  /* ============ AVSPERRINGSBÅND ============ */
+  .ribbon-wrap {
+    position: absolute; left:0; right:0; top:50%;
+    height: 54px; transform: translateY(-50%) rotate(-2deg);
+    pointer-events: none;
+  }
+  .ribbon {
+    position:absolute; left:-2%; width:104%; height:100%;
+    background: repeating-linear-gradient(45deg,
+      var(--tape) 0 22px, var(--tape-dark) 22px 44px);
+    box-shadow: 0 6px 24px rgba(0,0,0,.45);
+    display:flex; align-items:center; justify-content:space-evenly;
+    transition: transform 1.1s cubic-bezier(.6,0,.3,1), opacity 1.1s;
+    transform-origin: center;
+  }
+  .ribbon .label {
+    background: var(--navy-deep); color:#fff; padding:5px 18px; border-radius:4px;
+    font-weight:700; font-size:13px; letter-spacing:2px; text-transform:uppercase;
+    border:1px solid rgba(255,255,255,.15);
+  }
+  /* to halvdeler som spretter ut når klippet */
+  .ribbon.half { width:54%; }
+  .ribbon.half.l { left:-2%; }
+  .ribbon.half.r { left:48%; }
+  .ribbon.half { display:none; }
+  .stage.cut .ribbon.full { opacity:0; }
+  .stage.cut .ribbon.half { display:flex; }
+  .stage.cut .ribbon.half.l { transform: translateX(-120%) rotate(-14deg); }
+  .stage.cut .ribbon.half.r { transform: translateX(120%) rotate(14deg); }
+
+  /* klipp-sone-hint */
+  .cutzone {
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    z-index: 3; pointer-events:auto; cursor:none;
+    width:130px; height:130px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cutzone .ring {
+    position:absolute; inset:0; border:2px dashed rgba(242,194,0,.7); border-radius:50%;
+    animation: spin 6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .cutzone .klipp {
+    font-size:12px; letter-spacing:1px; color:var(--tape); font-weight:700;
+    background:rgba(16,26,48,.7); padding:5px 10px; border-radius:20px;
+    text-transform:uppercase;
+    transition: opacity .5s ease;
+    white-space: nowrap;
+  }
+  .stage.cut .cutzone { opacity:0; pointer-events:none; transition:opacity .3s; }
+
+  /* egendefinert saks-markør */
+  .scissors {
+    position: fixed; z-index: 80; font-size: 38px; pointer-events:none;
+    transform: translate(-50%,-50%) rotate(-20deg);
+    transition: transform .08s;
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,.5));
+  }
+  .scissors.snip { transform: translate(-50%,-50%) rotate(-20deg) scale(.8); }
+
+  .below { margin-top: 90px; }
+
+  .replay {
+    position: fixed; bottom:18px; right:18px; z-index:90;
+    background:var(--navy); color:#fff; border:1px solid rgba(255,255,255,.2);
+    padding:9px 16px; border-radius:8px; font-family:'DM Sans'; font-size:13px; cursor:pointer;
+    opacity:0; transition:opacity .5s; pointer-events:none;
+  }
+  .stage.done ~ .replay { opacity:.9; pointer-events:auto; }
+
+  @media (max-width:600px){
+    .headline{font-size:25px;} .logo-big .wm{font-size:22px;} .blurb{font-size:14px;}
+    .intro-text .headline{ font-size:22px; }
+    .intro-text .line2{ white-space: normal; }
+    /* vis kun én sentrert b\u00e5ndetikett */
+    .ribbon.full { justify-content: center; }
+    .ribbon.full .label:nth-child(2) { display: none; }
+    .ribbon .label { font-size: 11px; letter-spacing: 1px; padding: 4px 12px; }
+    /* stram inn de vertikale posisjonene p\u00e5 h\u00f8y, smal skjerm */
+    .top-block { top: 22%; }
+    .intro-text { top: 78%; width: 94%; }
+    .eyebrow { font-size: 15px; letter-spacing: 4px; }
+    .cutzone { width: 110px; height: 110px; }
+  }
+
+  /* Touch-enheter uten presis peker: ingen saks, vanlig markør */
+  @media (hover: none) {
+    .stage { cursor: default; }
+    .cutzone { cursor: pointer; }
+    .scissors { display: none !important; }
+  }
+
+  /* ============ FEIRING ETTER KLIPP ============ */
+  .celebrate {
+    position: absolute; left:0; right:0; top:50%;
+    transform: translateY(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 18px;
+    opacity: 0; pointer-events: none;
+    z-index: 6;
+  }
+  .celebrate.show { opacity: 1; transition: opacity .4s ease; }
+  .cheer {
+    font-size: 68px; font-weight: 800; color:#fff; letter-spacing: 1px;
+    text-shadow: 0 4px 24px rgba(0,0,0,.5);
+  }
+  .cheer .o { color: var(--orange); }
+  .cheer.pop { animation: cheerPop .42s cubic-bezier(.18,1.7,.3,1) both; }
+  @keyframes cheerPop {
+    0%   { transform: scale(1.9); opacity:0; filter: blur(6px); }
+    45%  { transform: scale(.86); opacity:1; filter: blur(0); }
+    70%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+  .machines { font-size: 56px; display:flex; gap: 30px; align-items:center; }
+  .celebrate.show .truck {
+    display:inline-block;
+    animation: truckIn 1.3s cubic-bezier(.3,.7,.3,1) both;
+  }
+  @keyframes truckIn {
+    0% { transform: translateX(-340px) scaleX(-1); opacity:0; }
+    25% { opacity:1; }
+    70% { transform: translateX(10px) scaleX(-1); }
+    85% { transform: translateX(-6px) scaleX(-1); }
+    100% { transform: translateX(0) scaleX(-1); }
+  }
+  .celebrate.show .crane {
+    display:inline-block; transform-origin: 50% 90%;
+    animation: craneSwing 1.6s ease-in-out .3s both;
+  }
+  @keyframes craneSwing {
+    0% { transform: rotate(-18deg); opacity:0; }
+    30% { opacity:1; }
+    50% { transform: rotate(12deg); }
+    70% { transform: rotate(-7deg); }
+    85% { transform: rotate(4deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  /* skjelving av hele scenen */
+  .stage.shake { animation: shake .45s cubic-bezier(.36,.07,.19,.97) both; }
+  @keyframes shake {
+    0%   { transform: translate3d(0,0,0); }
+    15%  { transform: translate3d(-10px,4px,0); }
+    30%  { transform: translate3d(11px,-5px,0); }
+    45%  { transform: translate3d(-9px,4px,0); }
+    60%  { transform: translate3d(7px,-3px,0); }
+    75%  { transform: translate3d(-4px,2px,0); }
+    100% { transform: translate3d(0,0,0); }
+  }
+  .stage.cut .top-block,
+  .stage.cut .intro-text { opacity: 0; transition: opacity .4s ease; }
+</style>
+</head>
+<body>
+
+  <div class="app">
+    <div class="sidebar">
+      <div class="logo">
+        <svg width="30" height="30" viewBox="0 0 242 242"><rect x="0" y="0" width="242" height="28" fill="#e67e22"/><rect x="0" y="81" width="94" height="161" fill="#e67e22"/><rect x="148" y="81" width="94" height="161" fill="#e67e22"/></svg>
+        <span class="wm">TOTAL<span class="k">KONTROLL</span></span>
+      </div>
+      <div class="nav">
+        <div class="active">Min side</div>
+        <div>Prosjekt</div>
+        <div>Salg</div>
+        <div>Håndbok</div>
+        <div>Arrangementer</div>
+        <div>Organisasjonskart</div>
+      </div>
+    </div>
+    <div class="main">
+      <h1>God morgen, Jan Gunnar</h1>
+      <div class="sub">Her er oversikten din for i dag.</div>
+      <div class="cards">
+        <div class="card"><div class="t">Mine prosjekter</div><div class="bar o"></div><div class="bar"></div><div class="bar"></div></div>
+        <div class="card"><div class="t">Siste nytt</div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+        <div class="card"><div class="t">Mine oppgaver</div><div class="bar"></div><div class="bar o"></div><div class="bar"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="top-block">
+      <div class="logo-big">
+        <svg width="50" height="50" viewBox="0 0 242 242"><rect x="0" y="0" width="242" height="28" fill="#e67e22"/><rect x="0" y="81" width="94" height="161" fill="#e67e22"/><rect x="148" y="81" width="94" height="161" fill="#e67e22"/></svg>
+        <span class="wm">TOTAL<span class="k">KONTROLL</span></span>
+      </div>
+      <div class="eyebrow">Digital Fundament 2026</div>
+    </div>
+
+    <div class="ribbon-wrap">
+      <div class="ribbon full">
+        <span class="label">DF26 · Offisiell åpning</span>
+        <span class="label">DF26 · Offisiell åpning</span>
+      </div>
+      <div class="ribbon half l"></div>
+      <div class="ribbon half r"></div>
+    </div>
+
+    <div class="cutzone" id="cutzone">
+      <div class="ring"></div>
+      <div class="klipp" id="klipp">Klipp her</div>
+    </div>
+
+    <div class="intro-text" id="introText">
+      <div class="headline">
+        <div class="line1">Gildt å se deg <span class="o"><span id="firstName">Jan Gunnar</span>!</span></div>
+        <div class="line2">Grunnmuren e <span class="o">støypt</span>. Nå bygge me resten <span class="o">samen!</span></div>
+      </div>
+    </div>
+
+    <div class="celebrate" id="celebrate">
+      <div class="cheer" id="cheer">Då <span class="o">kjøre</span> me!</div>
+      <div class="machines">
+        <span class="truck">🚚</span>
+        <span class="crane">🏗️</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="scissors" id="scissors">✂️</div>
+  <button class="replay" onclick="location.reload()">Spill av igjen</button>
+
+<script>
+  const stage = document.getElementById('stage');
+  const cutzone = document.getElementById('cutzone');
+  const scissors = document.getElementById('scissors');
+  const celebrate = document.getElementById('celebrate');
+  const cheer = document.getElementById('cheer');
+  const klipp = document.getElementById('klipp');
+  let cut = false;
+
+  // "Klipp her" rullerer subtilt gjennom tre språk til snoren klippes.
+  // På touch finnes ingen saks, så ordlyden blir "trykk" i stedet for "klipp".
+  const isTouch = window.matchMedia('(hover: none)').matches;
+  const klippWords = isTouch
+    ? ['Trykk her', 'Tap here', 'Naciśnij tutaj']
+    : ['Klipp her', 'Cut here', 'Przetnij tutaj'];
+  let klippIdx = 0;
+  if (isTouch) klipp.textContent = klippWords[0];
+  const klippTimer = setInterval(() => {
+    if (cut) return;
+    klipp.style.opacity = '0';
+    setTimeout(() => {
+      klippIdx = (klippIdx + 1) % klippWords.length;
+      klipp.textContent = klippWords[klippIdx];
+      klipp.style.opacity = '1';
+    }, 500);
+  }, 2200);
+
+  // PoC-snarvei: fornavn er hardkodet her. I produksjon hentes det fra
+  // innlogget bruker via MSAL/Entra ID (givenName) og settes på #firstName.
+  const firstName = 'Jan Gunnar';
+  document.getElementById('firstName').textContent = firstName;
+
+  const phrases = [
+    'Då <span class="o">kjøre</span> me!',
+    'Let\u2019s <span class="o">go</span>!',
+    '<span class="o">Zaczynamy</span>!'
+  ];
+
+  function popCheer(html) {
+    cheer.classList.remove('pop');
+    void cheer.offsetWidth;        // reflow for å restarte animasjonen
+    cheer.innerHTML = html;
+    cheer.classList.add('pop');
+    // kort smell av hele scenen ved hvert språk
+    stage.classList.remove('shake');
+    void stage.offsetWidth;
+    stage.classList.add('shake');
+    setTimeout(()=> stage.classList.remove('shake'), 450);
+  }
+
+  // saks følger musen kun over scenen
+  window.addEventListener('mousemove', e => {
+    scissors.style.left = e.clientX + 'px';
+    scissors.style.top = e.clientY + 'px';
+    scissors.style.display = (cut ? 'none' : 'block');
+  });
+
+  function doCut() {
+    if (cut) return;
+    cut = true;
+    clearInterval(klippTimer);
+    scissors.classList.add('snip');
+    setTimeout(()=> scissors.style.display='none', 200);
+
+    // 1) snoren klippes, intro tones ut
+    stage.classList.add('cut');
+
+    // 2) ett sekund senere: feiring, første språk (dialekt)
+    setTimeout(() => {
+      celebrate.classList.add('show');
+      popCheer(phrases[0]);
+    }, 1000);
+
+    // 3) bytt språk raskt: engelsk, så polsk
+    const hold = 850;             // hvor lenge hvert språk står
+    setTimeout(()=> popCheer(phrases[1]), 1000 + hold);
+    setTimeout(()=> popCheer(phrases[2]), 1000 + hold * 2);
+
+    // 4) la siste språk stå litt, deretter tone scenen galant ut
+    const end = 1000 + hold * 3;
+    setTimeout(()=> stage.classList.add('done'), end);
+    setTimeout(()=> stage.style.display='none', end + 1100);
+  }
+  cutzone.addEventListener('click', doCut);
+  // hele snoren skal også kunne klippes for romslighet
+  document.querySelector('.ribbon.full').style.pointerEvents = 'auto';
+  document.querySelector('.ribbon.full').addEventListener('click', doCut);
+</script>
+</body>
+</html>
